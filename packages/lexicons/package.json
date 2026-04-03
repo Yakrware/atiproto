@@ -1,0 +1,16 @@
+{
+  "name": "@atiproto/lexicons",
+  "version": "0.0.1",
+  "description": "ATProto lexicon types and utilities",
+  "main": "src/index.ts",
+  "scripts": {
+    "build:lexicons": "lex build --lexicons ../../lexicons --out ./src/lexicons --clear --indexFile",
+    "build": "npm run build:lexicons && tsc",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@atproto/lex": "^0.0.23",
+    "typescript": "^6.0.2"
+  }
+}

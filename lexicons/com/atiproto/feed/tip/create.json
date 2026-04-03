@@ -1,0 +1,87 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.feed.tip.create",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Create a tip on a DID or specific record. Creates or adds to a cart and returns a checkout URL.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["subject", "amount", "currency"],
+          "properties": {
+            "subject": {
+              "type": "string",
+              "format": "did",
+              "description": "DID of the user being tipped"
+            },
+            "recordUri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "AT-URI of specific record being tipped"
+            },
+            "amount": {
+              "type": "integer",
+              "description": "Tip amount in cents"
+            },
+            "currency": {
+              "type": "string",
+              "description": "ISO 4217 currency code"
+            },
+            "cartUri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "AT-URI of an existing cart to add this tip to. If omitted, a new cart is created."
+            },
+            "redirectUrl": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL to redirect to after checkout completes"
+            },
+            "message": {
+              "type": "string",
+              "description": "Optional message (max 500 chars)",
+              "maxGraphemes": 500,
+              "maxLength": 5000
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["tipUri", "tip", "cartUri", "cart", "checkoutUrl"],
+          "properties": {
+            "tipUri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "URI of the tip record in PDS"
+            },
+            "tip": {
+              "type": "ref",
+              "ref": "com.atiproto.tip",
+              "description": "The created tip record (status: pending)"
+            },
+            "cartUri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "URI of the cart record in PDS"
+            },
+            "cart": {
+              "type": "ref",
+              "ref": "com.atiproto.cart",
+              "description": "The cart record (new or updated)"
+            },
+            "checkoutUrl": {
+              "type": "string",
+              "format": "uri",
+              "description": "Checkout URL hosted by atiproto"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.account.profile.get",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get the authenticated user's profile settings. Returns defaults if no profile exists.",
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["profile", "hasProfile", "readyForPayment"],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "Profile record URI (absent if no profile configured)"
+            },
+            "cid": {
+              "type": "string",
+              "format": "cid",
+              "description": "Profile record CID (absent if no profile configured)"
+            },
+            "profile": {
+              "type": "ref",
+              "ref": "com.atiproto.profile",
+              "description": "The profile record data (defaults if not configured)"
+            },
+            "hasProfile": {
+              "type": "boolean",
+              "description": "Whether the user has saved a profile record"
+            },
+            "readyForPayment": {
+              "type": "boolean",
+              "description": "Whether the user's payment account is set up and enabled"
+            }
+          }
+        }
+      }
+    }
+  }
+}

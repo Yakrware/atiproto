@@ -1,0 +1,74 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.cart",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A record representing a shopping cart for tips/subscriptions",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "items",
+          "currency",
+          "total",
+          "status",
+          "createdAt",
+          "expiresAt"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "#cartItem"
+            }
+          },
+          "currency": {
+            "type": "string",
+            "description": "ISO 4217 currency code"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total amount in cents"
+          },
+          "status": {
+            "type": "string",
+            "description": "Cart status: open, completed, expired, abandoned"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Creation timestamp"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Expiration timestamp"
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Completion timestamp"
+          }
+        }
+      }
+    },
+    "cartItem": {
+      "type": "object",
+      "required": ["type", "recordUri"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Item type: tip or subscription",
+          "enum": ["com.atiproto.tip", "com.atiproto.subscription"]
+        },
+        "recordUri": {
+          "type": "string",
+          "format": "at-uri",
+          "description": "AT-URI for tip on record"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "defs": {
+    "main": {
+      "description": "A record representing a subscription from one user to another",
+      "key": "any",
+      "record": {
+        "properties": {
+          "subject": {
+            "description": "DID of the user being subscribed to",
+            "format": "did",
+            "type": "string"
+          },
+          "amount": {
+            "description": "Subscription amount in cents",
+            "type": "integer"
+          },
+          "currency": {
+            "description": "ISO 4217 currency code",
+            "type": "string"
+          },
+          "interval": {
+            "description": "Billing interval: monthly or yearly",
+            "type": "string"
+          },
+          "status": {
+            "description": "Subscription status: pending, active, past_due, cancelled, expired",
+            "type": "string"
+          },
+          "billingStartDate": {
+            "description": "First billing period, can be used to determine recurrence",
+            "format": "datetime",
+            "type": "string"
+          },
+          "cancelledAt": {
+            "description": "Cancellation timestamp",
+            "format": "datetime",
+            "type": "string"
+          },
+          "accessUntil": {
+            "description": "Date until which the subscriber retains access after cancellation",
+            "format": "datetime",
+            "type": "string"
+          },
+          "createdAt": {
+            "description": "Creation timestamp",
+            "format": "datetime",
+            "type": "string"
+          }
+        },
+        "required": [
+          "subject",
+          "amount",
+          "currency",
+          "interval",
+          "status",
+          "billingStartDate",
+          "createdAt"
+        ],
+        "type": "object"
+      },
+      "type": "record"
+    }
+  },
+  "id": "com.atiproto.subscription",
+  "lexicon": 1
+}

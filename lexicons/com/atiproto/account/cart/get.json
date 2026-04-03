@@ -1,0 +1,66 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.account.cart.get",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a specific cart by URI, including resolved tip and subscription records",
+      "parameters": {
+        "type": "params",
+        "required": ["uri"],
+        "properties": {
+          "uri": {
+            "type": "string",
+            "format": "at-uri",
+            "description": "AT-URI of the cart record"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["uri", "cart", "tips", "subscriptions"],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "Cart record URI"
+            },
+            "cid": {
+              "type": "string",
+              "format": "cid",
+              "description": "Cart record CID"
+            },
+            "cart": {
+              "type": "ref",
+              "ref": "com.atiproto.cart",
+              "description": "The cart record data"
+            },
+            "checkoutUrl": {
+              "type": "string",
+              "format": "uri",
+              "description": "Checkout URL, only present when cart status is open"
+            },
+            "tips": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "com.atiproto.tip"
+              },
+              "description": "Resolved tip records referenced by this cart"
+            },
+            "subscriptions": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "com.atiproto.subscription"
+              },
+              "description": "Resolved subscription records referenced by this cart"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "@atiproto/agent",
+  "version": "0.0.1",
+  "description": "ATProto agent",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@atiproto/lexicons": "*",
+    "@atproto/xrpc": "^0.7.7"
+  },
+  "devDependencies": {
+    "@atproto/api": "^0.19.6",
+    "@atproto/lex": "^0.0.23",
+    "typescript": "^6.0.2",
+    "vitest": "^4.1.2"
+  }
+}

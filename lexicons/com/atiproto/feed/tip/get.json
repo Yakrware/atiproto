@@ -1,0 +1,45 @@
+{
+  "defs": {
+    "main": {
+      "description": "Get a specific tip by URI",
+      "parameters": {
+        "properties": {
+          "uri": {
+            "description": "AT-URI of the tip record",
+            "format": "at-uri",
+            "type": "string"
+          }
+        },
+        "required": ["uri"],
+        "type": "params"
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "properties": {
+            "uri": {
+              "description": "Tip record URI",
+              "format": "at-uri",
+              "type": "string"
+            },
+            "cid": {
+              "description": "Tip record CID",
+              "format": "cid",
+              "type": "string"
+            },
+            "value": {
+              "description": "The tip record data",
+              "type": "ref",
+              "ref": "com.atiproto.tip"
+            }
+          },
+          "required": ["uri", "cid", "value"],
+          "type": "object"
+        }
+      },
+      "type": "query"
+    }
+  },
+  "id": "com.atiproto.feed.tip.get",
+  "lexicon": 1
+}

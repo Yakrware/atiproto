@@ -1,0 +1,45 @@
+{
+  "defs": {
+    "main": {
+      "description": "Get a specific subscription by URI",
+      "parameters": {
+        "properties": {
+          "uri": {
+            "description": "AT-URI of the subscription record",
+            "format": "at-uri",
+            "type": "string"
+          }
+        },
+        "required": ["uri"],
+        "type": "params"
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "properties": {
+            "uri": {
+              "description": "Subscription record URI",
+              "format": "at-uri",
+              "type": "string"
+            },
+            "cid": {
+              "description": "Subscription record CID",
+              "format": "cid",
+              "type": "string"
+            },
+            "record": {
+              "description": "The subscription record data",
+              "type": "ref",
+              "ref": "com.atiproto.subscription"
+            }
+          },
+          "required": ["uri", "cid", "record"],
+          "type": "object"
+        }
+      },
+      "type": "query"
+    }
+  },
+  "id": "com.atiproto.feed.subscription.get",
+  "lexicon": 1
+}

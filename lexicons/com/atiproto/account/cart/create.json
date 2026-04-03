@@ -1,0 +1,52 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.account.cart.create",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Create a new empty cart",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["currency"],
+          "properties": {
+            "currency": {
+              "type": "string",
+              "description": "ISO 4217 currency code"
+            },
+            "redirectUrl": {
+              "type": "string",
+              "format": "uri",
+              "description": "URI to redirect to after checkout is complete/cancelled"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["cart", "cartUri", "checkoutUrl"],
+          "properties": {
+            "cart": {
+              "type": "ref",
+              "ref": "com.atiproto.cart",
+              "description": "The created cart record"
+            },
+            "cartUri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "URI of the cart record"
+            },
+            "checkoutUrl": {
+              "type": "string",
+              "format": "uri",
+              "description": "Checkout URL hosted by atiproto"
+            }
+          }
+        }
+      }
+    }
+  }
+}

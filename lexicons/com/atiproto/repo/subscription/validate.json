@@ -1,0 +1,55 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.repo.subscription.validate",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Validate that a sender has an active, Stripe-verified subscription to a recipient. Optionally check that the subscription amount meets a minimum.",
+      "parameters": {
+        "type": "params",
+        "required": ["sender", "subject"],
+        "properties": {
+          "sender": {
+            "type": "string",
+            "format": "did",
+            "description": "DID of the subscriber"
+          },
+          "subject": {
+            "type": "string",
+            "format": "did",
+            "description": "DID of the creator being subscribed to"
+          },
+          "minAmount": {
+            "type": "integer",
+            "description": "Minimum subscription amount in cents to consider valid"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["valid"],
+          "properties": {
+            "valid": {
+              "type": "boolean",
+              "description": "Whether the sender has an active, verified subscription"
+            },
+            "amount": {
+              "type": "integer",
+              "description": "Subscription amount in cents"
+            },
+            "currency": {
+              "type": "string",
+              "description": "Currency of the subscription"
+            },
+            "reason": {
+              "type": "string",
+              "description": "If invalid, reason for rejection"
+            }
+          }
+        }
+      }
+    }
+  }
+}

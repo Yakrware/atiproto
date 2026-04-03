@@ -1,0 +1,76 @@
+{
+  "defs": {
+    "main": {
+      "description": "Create a subscription to a user. Returns a one-off cart with checkout URL.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "properties": {
+            "subject": {
+              "description": "DID of the user to subscribe to",
+              "format": "did",
+              "type": "string"
+            },
+            "amount": {
+              "description": "Custom amount in cents (if pay-as-you-want enabled)",
+              "type": "integer"
+            },
+            "currency": {
+              "description": "ISO 4217 currency code",
+              "type": "string"
+            },
+            "interval": {
+              "description": "Billing interval: monthly or yearly",
+              "type": "string"
+            }
+          },
+          "required": ["subject", "currency", "interval"],
+          "type": "object"
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "properties": {
+            "subscriptionUri": {
+              "description": "URI of the subscription record in PDS",
+              "format": "at-uri",
+              "type": "string"
+            },
+            "subscription": {
+              "description": "The created subscription record (status: pending)",
+              "type": "ref",
+              "ref": "com.atiproto.subscription"
+            },
+            "cartUri": {
+              "description": "URI of the cart record in PDS",
+              "format": "at-uri",
+              "type": "string"
+            },
+            "cart": {
+              "description": "The created cart record (status: open)",
+              "type": "ref",
+              "ref": "com.atiproto.cart"
+            },
+            "checkoutUrl": {
+              "description": "Checkout URL hosted by atiproto",
+              "format": "uri",
+              "type": "string"
+            }
+          },
+          "required": [
+            "subscriptionUri",
+            "subscription",
+            "cartUri",
+            "cart",
+            "checkoutUrl"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "procedure"
+    }
+  },
+  "id": "com.atiproto.feed.subscription.create",
+  "lexicon": 1
+}

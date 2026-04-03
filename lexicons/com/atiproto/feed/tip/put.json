@@ -1,0 +1,47 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.feed.tip.put",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Update a pending tip. Only pending tips can be updated.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["uri", "record"],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "AT-URI of the tip record to update"
+            },
+            "record": {
+              "type": "ref",
+              "ref": "com.atiproto.tip"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["uri", "cid"],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "Updated tip record URI"
+            },
+            "cid": {
+              "type": "string",
+              "format": "cid",
+              "description": "New CID of the updated record"
+            }
+          }
+        }
+      }
+    }
+  }
+}

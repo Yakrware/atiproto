@@ -1,0 +1,60 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.repo.tip.validate",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Validate that a sender has completed tip payment(s). Looks up by recordUri (sums all tips for that record) or by subject (recipient DID). These are mutually exclusive; if recordUri is provided, subject is ignored.",
+      "parameters": {
+        "type": "params",
+        "required": ["sender"],
+        "properties": {
+          "sender": {
+            "type": "string",
+            "format": "did",
+            "description": "DID of the tip sender"
+          },
+          "subject": {
+            "type": "string",
+            "format": "did",
+            "description": "DID of the tip recipient. Ignored if recordUri is provided."
+          },
+          "recordUri": {
+            "type": "string",
+            "format": "at-uri",
+            "description": "AT-URI of the record being tipped. Takes precedence over subject."
+          },
+          "minAmount": {
+            "type": "integer",
+            "description": "Minimum total tip amount in cents to consider valid"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["valid"],
+          "properties": {
+            "valid": {
+              "type": "boolean",
+              "description": "Whether the sender has completed and verified tip(s)"
+            },
+            "amount": {
+              "type": "integer",
+              "description": "Sum of all verified completed tip amounts in cents"
+            },
+            "currency": {
+              "type": "string",
+              "description": "Currency of the tips"
+            },
+            "reason": {
+              "type": "string",
+              "description": "If invalid, reason for rejection"
+            }
+          }
+        }
+      }
+    }
+  }
+}

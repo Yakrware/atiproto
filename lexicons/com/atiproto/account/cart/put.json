@@ -1,0 +1,47 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.account.cart.put",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Update a cart. Only open carts can be updated.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["uri", "record"],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "AT-URI of the cart to update"
+            },
+            "record": {
+              "type": "ref",
+              "ref": "com.atiproto.cart"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["uri", "cid"],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "Updated cart record URI"
+            },
+            "cid": {
+              "type": "string",
+              "format": "cid",
+              "description": "New CID of the updated record"
+            }
+          }
+        }
+      }
+    }
+  }
+}

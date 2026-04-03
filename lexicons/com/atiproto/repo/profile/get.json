@@ -1,0 +1,40 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.repo.profile.get",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Look up public profile information for any user",
+      "parameters": {
+        "type": "params",
+        "required": ["did"],
+        "properties": {
+          "did": {
+            "type": "string",
+            "format": "did",
+            "description": "DID of the user to look up"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["did", "profile"],
+          "properties": {
+            "did": {
+              "type": "string",
+              "format": "did",
+              "description": "User's DID"
+            },
+            "profile": {
+              "type": "ref",
+              "ref": "com.atiproto.profile",
+              "description": "Public profile data"
+            }
+          }
+        }
+      }
+    }
+  }
+}

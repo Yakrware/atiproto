@@ -1,0 +1,48 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.feed.subscription.cancel",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Cancel an active subscription",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["subscriptionUri"],
+          "properties": {
+            "subscriptionUri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "AT-URI of the subscription to cancel"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["subscriptionUri", "subscription", "accessUntil"],
+          "properties": {
+            "subscriptionUri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "URI of the updated subscription record"
+            },
+            "subscription": {
+              "type": "ref",
+              "ref": "com.atiproto.subscription",
+              "description": "Updated subscription record"
+            },
+            "accessUntil": {
+              "type": "string",
+              "format": "datetime",
+              "description": "Timestamp when access expires"
+            }
+          }
+        }
+      }
+    }
+  }
+}

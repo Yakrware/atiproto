@@ -1,0 +1,56 @@
+{
+  "defs": {
+    "main": {
+      "description": "A record representing a tip given by one user to another",
+      "key": "any",
+      "record": {
+        "properties": {
+          "subject": {
+            "description": "DID of the user receiving the tip",
+            "format": "did",
+            "type": "string"
+          },
+          "recordUri": {
+            "description": "AT-URI of specific record being tipped",
+            "format": "at-uri",
+            "type": "string"
+          },
+          "amount": {
+            "description": "Tip amount in cents",
+            "type": "integer"
+          },
+          "currency": {
+            "description": "ISO 4217 currency code",
+            "type": "string"
+          },
+          "status": {
+            "description": "Tip status: pending, authorized (payment held), completed, failed, refunded",
+            "type": "string",
+            "enum": ["pending", "authorized", "completed", "failed", "refunded"]
+          },
+          "message": {
+            "description": "Optional message (max 500 chars)",
+            "maxGraphemes": 500,
+            "maxLength": 5000,
+            "type": "string"
+          },
+          "createdAt": {
+            "description": "Creation timestamp",
+            "format": "datetime",
+            "type": "string"
+          },
+          "completedAt": {
+            "description": "Completion timestamp",
+            "format": "datetime",
+            "type": "string"
+          }
+        },
+        "required": ["subject", "amount", "currency", "status", "createdAt"],
+        "type": "object"
+      },
+      "type": "record"
+    }
+  },
+  "id": "com.atiproto.tip",
+  "lexicon": 1
+}
