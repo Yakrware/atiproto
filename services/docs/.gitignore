@@ -19,3 +19,4 @@ worker-configuration.d.ts
 
 # Test build output
 test-dist/
+test-results/
