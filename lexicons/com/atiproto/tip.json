@@ -16,7 +16,8 @@
             "type": "string"
           },
           "amount": {
-            "description": "Tip amount in cents",
+            "description": "Tip amount in cents (0 when recipient allows zero tips)",
+            "minimum": 0,
             "type": "integer"
           },
           "currency": {

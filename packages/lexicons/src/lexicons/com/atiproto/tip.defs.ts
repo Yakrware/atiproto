@@ -23,7 +23,7 @@ type Main = {
   recordUri?: l.AtUriString
 
   /**
-   * Tip amount in cents
+   * Tip amount in cents (0 when recipient allows zero tips)
    */
   amount: number
 
@@ -62,7 +62,7 @@ const main = l.record<'any', Main>(
   l.object({
     subject: l.string({ format: 'did' }),
     recordUri: l.optional(l.string({ format: 'at-uri' })),
-    amount: l.integer(),
+    amount: l.integer({ minimum: 0 }),
     currency: l.string(),
     status: l.enum([
       'pending',

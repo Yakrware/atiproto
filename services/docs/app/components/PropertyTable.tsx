@@ -10,6 +10,8 @@ interface Property {
   ref?: string;
   description?: string;
   enum?: string[];
+  minimum?: number;
+  maximum?: number;
   arrayItems?: { type: string; ref?: string; refs?: string[] };
 }
 
@@ -97,20 +99,36 @@ export function PropertyTable({ properties }: PropertyTableProps) {
         </thead>
         <tbody>
           {properties.map((prop) => (
-            <tr key={prop.name} className="border-b border-border/50 dark:border-border-dark/50">
+            <tr
+              key={prop.name}
+              className="border-b border-border/50 dark:border-border-dark/50"
+            >
               <td className="py-2 pr-4 font-mono text-xs">{prop.name}</td>
               <td className="py-2 pr-4 font-mono text-xs text-primary dark:text-primary-dark">
                 <TypeDisplay prop={prop} />
               </td>
               <td className="py-2 pr-4">
                 {prop.required ? (
-                  <span className="text-badge-record text-xs font-medium">required</span>
+                  <span className="text-badge-record text-xs font-medium">
+                    required
+                  </span>
                 ) : (
-                  <span className="text-text-muted dark:text-text-muted-dark text-xs">optional</span>
+                  <span className="text-text-muted dark:text-text-muted-dark text-xs">
+                    optional
+                  </span>
                 )}
               </td>
               <td className="py-2 text-text-muted dark:text-text-muted-dark text-xs">
                 {prop.description}
+                {(prop.minimum !== undefined || prop.maximum !== undefined) && (
+                  <span className="ml-1 text-primary dark:text-primary-dark">
+                    {prop.minimum !== undefined && prop.maximum !== undefined
+                      ? `(range: ${prop.minimum}–${prop.maximum})`
+                      : prop.minimum !== undefined
+                        ? `(min: ${prop.minimum})`
+                        : `(max: ${prop.maximum})`}
+                  </span>
+                )}
               </td>
             </tr>
           ))}
@@ -122,9 +140,11 @@ export function PropertyTable({ properties }: PropertyTableProps) {
 
 export function extractProperties(
   schema: Record<string, unknown>,
-  requiredFields: string[] = []
+  requiredFields: string[] = [],
 ): Property[] {
-  const properties = schema.properties as Record<string, Record<string, unknown>> | undefined;
+  const properties = schema.properties as
+    | Record<string, Record<string, unknown>>
+    | undefined;
   if (!properties) return [];
 
   return Object.entries(properties).map(([name, prop]) => {
@@ -148,6 +168,8 @@ export function extractProperties(
       ref: (prop.ref as string) ?? undefined,
       description: prop.description as string | undefined,
       enum: prop.enum as string[] | undefined,
+      minimum: prop.minimum as number | undefined,
+      maximum: prop.maximum as number | undefined,
       arrayItems,
     };
   });
