@@ -1,7 +1,14 @@
-import { XrpcClient, type CallOptions, type QueryParams } from "@atproto/xrpc";
+import {
+  XrpcClient,
+  type CallOptions,
+  type QueryParams,
+  XRPCResponse,
+} from "@atproto/xrpc";
 import type { com } from "@atiproto/lexicons";
 import { ComAtiprotoFeedSubscriptionNS } from "./feed/subscription.js";
 import { ComAtiprotoFeedTipNS } from "./feed/tip.js";
+
+type TypedResponse<T> = Promise<XRPCResponse & { data: T }>;
 
 export class ComAtiprotoFeedNS {
   _client: XrpcClient;
@@ -14,13 +21,16 @@ export class ComAtiprotoFeedNS {
     this.tip = new ComAtiprotoFeedTipNS(client);
   }
 
-  list(params?: com.atiproto.feed.list.$Params, opts?: CallOptions) {
+  list(
+    params?: com.atiproto.feed.list.$Params,
+    opts?: CallOptions,
+  ): TypedResponse<com.atiproto.feed.list.$OutputBody> {
     return this._client.call(
       "com.atiproto.feed.list",
       params as QueryParams,
       undefined,
       opts,
-    );
+    ) as any;
   }
 }
 
