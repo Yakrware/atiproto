@@ -18,10 +18,6 @@
             "type": "boolean",
             "description": "Whether user accepts subscriptions (default: true)"
           },
-          "allowPayAsYouWant": {
-            "type": "boolean",
-            "description": "Allow custom amounts (default: true)"
-          },
           "allowZeroTips": {
             "type": "boolean",
             "description": "Allow $0 tips (default: false)"
@@ -68,7 +64,8 @@
         },
         "amount": {
           "type": "integer",
-          "description": "Amount in cents"
+          "minimum": 0,
+          "description": "Amount in cents (0 for free tiers)"
         },
         "interval": {
           "type": "string",

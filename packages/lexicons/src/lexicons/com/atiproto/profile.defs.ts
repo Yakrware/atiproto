@@ -23,11 +23,6 @@ type Main = {
   acceptsSubscriptions?: boolean
 
   /**
-   * Allow custom amounts (default: true)
-   */
-  allowPayAsYouWant?: boolean
-
-  /**
    * Allow $0 tips (default: false)
    */
   allowZeroTips?: boolean
@@ -63,7 +58,6 @@ const main = l.record<'literal:self', Main>(
   l.object({
     acceptsTips: l.optional(l.boolean()),
     acceptsSubscriptions: l.optional(l.boolean()),
-    allowPayAsYouWant: l.optional(l.boolean()),
     allowZeroTips: l.optional(l.boolean()),
     minimumTip: l.optional(l.integer()),
     disableReceiptNotifications: l.optional(l.boolean()),
@@ -104,7 +98,7 @@ type SubscriptionTier = {
   name: string
 
   /**
-   * Amount in cents
+   * Amount in cents (0 for free tiers)
    */
   amount: number
 
@@ -132,7 +126,7 @@ const subscriptionTier = l.typedObject<SubscriptionTier>(
   l.object({
     id: l.string(),
     name: l.string(),
-    amount: l.integer(),
+    amount: l.integer({ minimum: 0 }),
     interval: l.string(),
     description: l.optional(l.string()),
     benefits: l.optional(l.array(l.string())),

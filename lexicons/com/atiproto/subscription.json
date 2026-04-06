@@ -11,7 +11,8 @@
             "type": "string"
           },
           "amount": {
-            "description": "Subscription amount in cents",
+            "description": "Subscription amount in cents (0 for free subscriptions)",
+            "minimum": 0,
             "type": "integer"
           },
           "currency": {

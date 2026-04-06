@@ -18,7 +18,7 @@ type Main = {
   subject: l.DidString
 
   /**
-   * Subscription amount in cents
+   * Subscription amount in cents (0 for free subscriptions)
    */
   amount: number
 
@@ -66,7 +66,7 @@ const main = l.record<'any', Main>(
   $nsid,
   l.object({
     subject: l.string({ format: 'did' }),
-    amount: l.integer(),
+    amount: l.integer({ minimum: 0 }),
     currency: l.string(),
     interval: l.string(),
     status: l.string(),
