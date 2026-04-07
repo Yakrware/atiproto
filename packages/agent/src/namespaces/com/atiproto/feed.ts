@@ -8,7 +8,7 @@ import type { com } from "@atiproto/lexicons";
 import { ComAtiprotoFeedSubscriptionNS } from "./feed/subscription.js";
 import { ComAtiprotoFeedTipNS } from "./feed/tip.js";
 
-type TypedResponse<T> = Promise<XRPCResponse & { data: T }>;
+type TypedResponse<T> = Promise<Omit<XRPCResponse, "data"> & { data: T }>;
 
 export class ComAtiprotoFeedNS {
   _client: XrpcClient;

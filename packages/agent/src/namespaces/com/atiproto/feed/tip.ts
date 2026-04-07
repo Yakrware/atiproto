@@ -6,7 +6,7 @@ import {
 } from "@atproto/xrpc";
 import type { com } from "@atiproto/lexicons";
 
-type TypedResponse<T> = Promise<XRPCResponse & { data: T }>;
+type TypedResponse<T> = Promise<Omit<XRPCResponse, "data"> & { data: T }>;
 
 export class ComAtiprotoFeedTipNS {
   _client: XrpcClient;
