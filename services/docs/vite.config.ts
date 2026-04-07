@@ -5,6 +5,14 @@ import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
+  resolve: {
+    conditions: ["source"],
+  },
+  ssr: {
+    resolve: {
+      conditions: ["source"],
+    },
+  },
   plugins: [
     cloudflare({ viteEnvironment: { name: "ssr" } }),
     tailwindcss(),
