@@ -2,9 +2,21 @@
   "name": "@atiproto/agent",
   "version": "0.0.1",
   "description": "ATProto agent",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
+    "prepack": "npm run build",
     "test": "vitest run"
   },
   "license": "MIT",

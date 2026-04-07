@@ -2,15 +2,30 @@
   "name": "@atiproto/lexicons",
   "version": "0.0.1",
   "description": "ATProto lexicon types and utilities",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build:lexicons": "lex build --lexicons ../../lexicons --out ./src/lexicons --clear --indexFile",
+    "build:lexicons": "lex build --lexicons ./src/schemas --out ./src/lexicons --clear --indexFile",
     "build": "npm run build:lexicons && tsc",
+    "prepack": "npm run build",
     "test": "echo \"No tests yet\" && exit 0"
   },
   "license": "MIT",
+  "dependencies": {
+    "@atproto/lex": "^0.0.23"
+  },
   "devDependencies": {
-    "@atproto/lex": "^0.0.23",
+    "@atproto/lexicon": "^0.6.2",
     "typescript": "^6.0.2"
   }
 }
