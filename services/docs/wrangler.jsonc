@@ -3,6 +3,9 @@
   "name": "atiproto-docs",
   "compatibility_date": "2025-04-04",
   "main": "./workers/app.ts",
+  "routes": [
+    { "pattern": "*atiproto.com/docs/*", "zone_name": "atiproto.com" },
+  ],
   "observability": {
     "enabled": true,
   },
