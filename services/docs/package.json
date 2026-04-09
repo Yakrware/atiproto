@@ -15,7 +15,7 @@
     "test:e2e": "npm run build:test && npm run test"
   },
   "dependencies": {
-    "@atiproto/lexicons": "*",
+    "@atiproto/lexicons": ">=0.1.0",
     "isbot": "^5.1.31",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
