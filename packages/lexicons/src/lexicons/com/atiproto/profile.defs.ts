@@ -23,20 +23,9 @@ type Main = {
   acceptsSubscriptions?: boolean
 
   /**
-   * Allow $0 tips (default: false)
-   */
-  allowZeroTips?: boolean
-
-  /**
-   * Minimum tip amount in cents (default: 100)
-   */
-  minimumTip?: number
-
-  /**
    * Opt out of payment receipt DMs (default: false)
    */
   disableReceiptNotifications?: boolean
-  subscriptionTiers?: SubscriptionTier[]
 
   /**
    * Creation timestamp
@@ -58,12 +47,7 @@ const main = l.record<'literal:self', Main>(
   l.object({
     acceptsTips: l.optional(l.boolean()),
     acceptsSubscriptions: l.optional(l.boolean()),
-    allowZeroTips: l.optional(l.boolean()),
-    minimumTip: l.optional(l.integer()),
     disableReceiptNotifications: l.optional(l.boolean()),
-    subscriptionTiers: l.optional(
-      l.array(l.ref<SubscriptionTier>((() => subscriptionTier) as any)),
-    ),
     createdAt: l.string({ format: 'datetime' }),
     updatedAt: l.optional(l.string({ format: 'datetime' })),
   }),
@@ -83,54 +67,3 @@ export const $assert = /*#__PURE__*/ main.assert.bind(main),
   $safeParse = /*#__PURE__*/ main.safeParse.bind(main),
   $validate = /*#__PURE__*/ main.validate.bind(main),
   $safeValidate = /*#__PURE__*/ main.safeValidate.bind(main)
-
-type SubscriptionTier = {
-  $type?: 'com.atiproto.profile#subscriptionTier'
-
-  /**
-   * Unique tier identifier
-   */
-  id: string
-
-  /**
-   * Display name
-   */
-  name: string
-
-  /**
-   * Amount in cents (0 for free tiers)
-   */
-  amount: number
-
-  /**
-   * Billing interval: monthly or yearly
-   */
-  interval: string
-
-  /**
-   * Tier description
-   */
-  description?: string
-
-  /**
-   * List of benefit strings
-   */
-  benefits?: string[]
-}
-
-export type { SubscriptionTier }
-
-const subscriptionTier = l.typedObject<SubscriptionTier>(
-  $nsid,
-  'subscriptionTier',
-  l.object({
-    id: l.string(),
-    name: l.string(),
-    amount: l.integer({ minimum: 0 }),
-    interval: l.string(),
-    description: l.optional(l.string()),
-    benefits: l.optional(l.array(l.string())),
-  }),
-)
-
-export { subscriptionTier }

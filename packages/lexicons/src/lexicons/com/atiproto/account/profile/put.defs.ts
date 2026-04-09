@@ -16,16 +16,7 @@ const main = l.procedure(
   l.jsonPayload({
     acceptsTips: l.optional(l.boolean()),
     acceptsSubscriptions: l.optional(l.boolean()),
-    allowPayAsYouWant: l.optional(l.boolean()),
-    allowZeroTips: l.optional(l.boolean()),
-    minimumTip: l.optional(l.integer()),
-    subscriptionTiers: l.optional(
-      l.array(
-        l.ref<AtiprotoProfile.SubscriptionTier>(
-          (() => AtiprotoProfile.subscriptionTier) as any,
-        ),
-      ),
-    ),
+    disableReceiptNotifications: l.optional(l.boolean()),
   }),
   l.jsonPayload({
     uri: l.string({ format: 'at-uri' }),

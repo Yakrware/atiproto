@@ -8,13 +8,13 @@ const $nsid = 'com.atiproto.repo.subscription.validate'
 
 export { $nsid }
 
-/** Validate that a sender has an active, Stripe-verified subscription to a recipient. Optionally check that the subscription amount meets a minimum. */
+/** Validate that a sender has an active, Stripe-verified subscription to a recipient. Optionally check the subscription amount. */
 const main = l.query(
   $nsid,
   l.params({
     sender: l.string({ format: 'did' }),
     subject: l.string({ format: 'did' }),
-    minAmount: l.optional(l.integer()),
+    amount: l.optional(l.integer()),
   }),
   l.jsonPayload({
     valid: l.boolean(),

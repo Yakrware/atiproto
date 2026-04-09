@@ -4,7 +4,7 @@
   "defs": {
     "main": {
       "type": "query",
-      "description": "Validate that a sender has an active, Stripe-verified subscription to a recipient. Optionally check that the subscription amount meets a minimum.",
+      "description": "Validate that a sender has an active, Stripe-verified subscription to a recipient. Optionally check the subscription amount.",
       "parameters": {
         "type": "params",
         "required": ["sender", "subject"],
@@ -19,9 +19,9 @@
             "format": "did",
             "description": "DID of the creator being subscribed to"
           },
-          "minAmount": {
+          "amount": {
             "type": "integer",
-            "description": "Minimum subscription amount in cents to consider valid"
+            "description": "Expected subscription amount in cents. If omitted, only checks that a subscription exists."
           }
         }
       },
