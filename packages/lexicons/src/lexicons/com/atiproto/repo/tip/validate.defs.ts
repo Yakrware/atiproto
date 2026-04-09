@@ -8,13 +8,14 @@ const $nsid = 'com.atiproto.repo.tip.validate'
 
 export { $nsid }
 
-/** Validate that a sender has completed tip payment(s). Looks up by recordUri (sums all tips for that record) or by subject (recipient DID). These are mutually exclusive; if recordUri is provided, subject is ignored. */
+/** Validate that a sender has completed tip payment(s). Looks up by tipUri (a specific tip record), recordUri (sums all tips for that record), or subject (recipient DID). These are mutually exclusive and resolved in that order. */
 const main = l.query(
   $nsid,
   l.params({
     sender: l.string({ format: 'did' }),
-    subject: l.optional(l.string({ format: 'did' })),
+    tipUri: l.optional(l.string({ format: 'at-uri' })),
     recordUri: l.optional(l.string({ format: 'at-uri' })),
+    subject: l.optional(l.string({ format: 'did' })),
     amount: l.optional(l.integer()),
   }),
   l.jsonPayload({

@@ -4,7 +4,7 @@
   "defs": {
     "main": {
       "type": "query",
-      "description": "Validate that a sender has completed tip payment(s). Looks up by recordUri (sums all tips for that record) or by subject (recipient DID). These are mutually exclusive; if recordUri is provided, subject is ignored.",
+      "description": "Validate that a sender has completed tip payment(s). Looks up by tipUri (a specific tip record), recordUri (sums all tips for that record), or subject (recipient DID). These are mutually exclusive and resolved in that order.",
       "parameters": {
         "type": "params",
         "required": ["sender"],
@@ -14,15 +14,20 @@
             "format": "did",
             "description": "DID of the tip sender"
           },
-          "subject": {
+          "tipUri": {
             "type": "string",
-            "format": "did",
-            "description": "DID of the tip recipient. Ignored if recordUri is provided."
+            "format": "at-uri",
+            "description": "AT-URI of a specific tip record. Takes precedence over recordUri and subject."
           },
           "recordUri": {
             "type": "string",
             "format": "at-uri",
             "description": "AT-URI of the record being tipped. Takes precedence over subject."
+          },
+          "subject": {
+            "type": "string",
+            "format": "did",
+            "description": "DID of the tip recipient. Ignored if tipUri or recordUri is provided."
           },
           "amount": {
             "type": "integer",
