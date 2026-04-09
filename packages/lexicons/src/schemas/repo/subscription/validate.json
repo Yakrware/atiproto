@@ -4,20 +4,25 @@
   "defs": {
     "main": {
       "type": "query",
-      "description": "Validate that a sender has an active, Stripe-verified subscription to a recipient. Optionally check the subscription amount.",
+      "description": "Validate that a sender has an active, Stripe-verified subscription. Looks up by subscriptionUri (a specific subscription record) or subject (recipient DID). These are mutually exclusive; subscriptionUri takes precedence.",
       "parameters": {
         "type": "params",
-        "required": ["sender", "subject"],
+        "required": ["sender"],
         "properties": {
           "sender": {
             "type": "string",
             "format": "did",
             "description": "DID of the subscriber"
           },
+          "subscriptionUri": {
+            "type": "string",
+            "format": "at-uri",
+            "description": "AT-URI of a specific subscription record. Takes precedence over subject."
+          },
           "subject": {
             "type": "string",
             "format": "did",
-            "description": "DID of the creator being subscribed to"
+            "description": "DID of the creator being subscribed to. Ignored if subscriptionUri is provided."
           },
           "amount": {
             "type": "integer",
