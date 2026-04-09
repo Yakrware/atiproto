@@ -15,7 +15,7 @@ const main = l.query(
     sender: l.string({ format: 'did' }),
     subject: l.optional(l.string({ format: 'did' })),
     recordUri: l.optional(l.string({ format: 'at-uri' })),
-    minAmount: l.optional(l.integer()),
+    amount: l.optional(l.integer()),
   }),
   l.jsonPayload({
     valid: l.boolean(),

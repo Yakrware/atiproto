@@ -18,24 +18,9 @@
             "type": "boolean",
             "description": "Whether user accepts subscriptions (default: true)"
           },
-          "allowZeroTips": {
-            "type": "boolean",
-            "description": "Allow $0 tips (default: false)"
-          },
-          "minimumTip": {
-            "type": "integer",
-            "description": "Minimum tip amount in cents (default: 100)"
-          },
           "disableReceiptNotifications": {
             "type": "boolean",
             "description": "Opt out of payment receipt DMs (default: false)"
-          },
-          "subscriptionTiers": {
-            "type": "array",
-            "items": {
-              "type": "ref",
-              "ref": "#subscriptionTier"
-            }
           },
           "createdAt": {
             "type": "string",
@@ -47,40 +32,6 @@
             "format": "datetime",
             "description": "Last update timestamp"
           }
-        }
-      }
-    },
-    "subscriptionTier": {
-      "type": "object",
-      "required": ["id", "name", "amount", "interval"],
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique tier identifier"
-        },
-        "name": {
-          "type": "string",
-          "description": "Display name"
-        },
-        "amount": {
-          "type": "integer",
-          "minimum": 0,
-          "description": "Amount in cents (0 for free tiers)"
-        },
-        "interval": {
-          "type": "string",
-          "description": "Billing interval: monthly or yearly"
-        },
-        "description": {
-          "type": "string",
-          "description": "Tier description"
-        },
-        "benefits": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "List of benefit strings"
         }
       }
     }

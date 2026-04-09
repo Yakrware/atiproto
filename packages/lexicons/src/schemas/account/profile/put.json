@@ -18,25 +18,9 @@
               "type": "boolean",
               "description": "Enable accepting subscriptions"
             },
-            "allowPayAsYouWant": {
+            "disableReceiptNotifications": {
               "type": "boolean",
-              "description": "Enable custom amounts"
-            },
-            "allowZeroTips": {
-              "type": "boolean",
-              "description": "Enable $0 tips"
-            },
-            "minimumTip": {
-              "type": "integer",
-              "description": "Minimum tip amount in cents"
-            },
-            "subscriptionTiers": {
-              "type": "array",
-              "description": "Subscription tier configurations",
-              "items": {
-                "type": "ref",
-                "ref": "com.atiproto.profile#subscriptionTier"
-              }
+              "description": "Opt out of payment receipt DMs"
             }
           }
         }

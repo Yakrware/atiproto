@@ -24,9 +24,9 @@
             "format": "at-uri",
             "description": "AT-URI of the record being tipped. Takes precedence over subject."
           },
-          "minAmount": {
+          "amount": {
             "type": "integer",
-            "description": "Minimum total tip amount in cents to consider valid"
+            "description": "Expected tip amount in cents. If omitted, only checks that a tip exists."
           }
         }
       },
