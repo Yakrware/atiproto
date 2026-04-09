@@ -8,7 +8,8 @@
   ],
   "scripts": {
     "build": "npm run build --workspaces",
-    "test": "npm run test --workspaces"
+    "test": "npm run test --workspaces",
+    "deploy": "bash scripts/deploy.sh"
   },
   "overrides": {
     "vite": "^7.1.7"
