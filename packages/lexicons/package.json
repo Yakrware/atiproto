@@ -1,14 +1,16 @@
 {
   "name": "@atiproto/lexicons",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "ATProto lexicon types and utilities",
   "main": "dist/index.js",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "source": "./src/index.ts",
       "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
     }
   },
   "files": [
@@ -16,7 +18,7 @@
   ],
   "scripts": {
     "build:lexicons": "lex build --lexicons ./src/schemas --out ./src/lexicons --clear --indexFile",
-    "build": "npm run build:lexicons && tsc",
+    "build": "npm run build:lexicons && tsup && tsc --emitDeclarationOnly --declaration --composite false --incremental false",
     "prepack": "npm run build",
     "test": "echo \"No tests yet\" && exit 0"
   },
@@ -26,6 +28,7 @@
   },
   "devDependencies": {
     "@atproto/lexicon": "^0.6.2",
+    "tsup": "^8.5.1",
     "typescript": "^6.0.2"
   }
 }
