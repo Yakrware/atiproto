@@ -21,6 +21,13 @@
     "prepack": "npm run build",
     "test": "vitest run"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Yakrware/atiproto.git",
+    "directory": "packages/edge-resolvers"
+  },
+  "homepage": "https://atiproto.com/docs/edge-oauth",
+  "bugs": "https://github.com/Yakrware/atiproto/issues",
   "license": "MIT",
   "dependencies": {
     "@atproto/identity": "^0.4.12"
