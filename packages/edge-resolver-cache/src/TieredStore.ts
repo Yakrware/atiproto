@@ -1,4 +1,9 @@
-import type { SimpleStore, Key, Value, GetOptions } from "@atproto-labs/simple-store";
+import type {
+  SimpleStore,
+  Key,
+  Value,
+  GetOptions,
+} from "@atproto-labs/simple-store";
 
 /**
  * Two-tier read-through cache combining a fast L1 (typically in-memory)
@@ -9,9 +14,10 @@ import type { SimpleStore, Key, Value, GetOptions } from "@atproto-labs/simple-s
  * - del: delete from both
  * - clear: clear L1 only (L2 may not support bulk delete)
  */
-export class TieredSimpleStore<K extends Key, V extends Value>
-  implements SimpleStore<K, V>
-{
+export class TieredStore<K extends Key, V extends Value> implements SimpleStore<
+  K,
+  V
+> {
   constructor(
     private readonly l1: SimpleStore<K, V>,
     private readonly l2: SimpleStore<K, V>,
@@ -32,17 +38,11 @@ export class TieredSimpleStore<K extends Key, V extends Value>
   }
 
   async set(key: K, value: V): Promise<void> {
-    await Promise.all([
-      this.l1.set(key, value),
-      this.l2.set(key, value),
-    ]);
+    await Promise.all([this.l1.set(key, value), this.l2.set(key, value)]);
   }
 
   async del(key: K): Promise<void> {
-    await Promise.all([
-      this.l1.del(key),
-      this.l2.del(key),
-    ]);
+    await Promise.all([this.l1.del(key), this.l2.del(key)]);
   }
 
   clear(): void {

@@ -46,6 +46,17 @@ export default function EdgeOAuth() {
               Cloudflare KV-backed state and session stores for OAuth
             </p>
           </div>
+          <div className="p-4 rounded-lg border border-border dark:border-border-dark">
+            <a
+              href="https://www.npmjs.com/package/@atiproto/edge-resolver-cache"
+              className="text-primary dark:text-primary-dark hover:underline font-mono text-sm font-semibold"
+            >
+              @atiproto/edge-resolver-cache
+            </a>
+            <p className="text-sm text-text-muted dark:text-text-muted-dark mt-1">
+              Tiered cache (Cache API + in-memory) for DID and handle resolvers
+            </p>
+          </div>
         </div>
       </section>
 
@@ -244,6 +255,121 @@ const client = new EdgeOAuthClient({
           The tiered cache uses in-memory LRU as L1 and the free Cloudflare
           Cache API as L2. No KV bindings or additional cost required.
         </p>
+
+        <h3 className="text-lg font-medium mt-6 mb-3">Cache tiers</h3>
+        <div className="overflow-x-auto mb-4">
+          <table className="w-full text-sm border border-border dark:border-border-dark">
+            <thead>
+              <tr className="bg-surface-alt dark:bg-surface-alt-dark">
+                <th className="px-3 py-2 text-left border-b border-border dark:border-border-dark">
+                  Tier
+                </th>
+                <th className="px-3 py-2 text-left border-b border-border dark:border-border-dark">
+                  Backend
+                </th>
+                <th className="px-3 py-2 text-left border-b border-border dark:border-border-dark">
+                  Latency
+                </th>
+                <th className="px-3 py-2 text-left border-b border-border dark:border-border-dark">
+                  Lifetime
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="px-3 py-2 border-b border-border dark:border-border-dark">
+                  L1
+                </td>
+                <td className="px-3 py-2 border-b border-border dark:border-border-dark">
+                  In-memory LRU
+                </td>
+                <td className="px-3 py-2 border-b border-border dark:border-border-dark">
+                  ~0ms
+                </td>
+                <td className="px-3 py-2 border-b border-border dark:border-border-dark">
+                  Worker isolate lifetime
+                </td>
+              </tr>
+              <tr>
+                <td className="px-3 py-2">L2</td>
+                <td className="px-3 py-2">Cloudflare Cache API</td>
+                <td className="px-3 py-2">&lt;1ms</td>
+                <td className="px-3 py-2">
+                  Regional, survives isolate restarts
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 className="text-lg font-medium mt-6 mb-3">Default TTLs</h3>
+        <div className="overflow-x-auto mb-4">
+          <table className="w-full text-sm border border-border dark:border-border-dark">
+            <thead>
+              <tr className="bg-surface-alt dark:bg-surface-alt-dark">
+                <th className="px-3 py-2 text-left border-b border-border dark:border-border-dark">
+                  Cache
+                </th>
+                <th className="px-3 py-2 text-left border-b border-border dark:border-border-dark">
+                  L1 (memory)
+                </th>
+                <th className="px-3 py-2 text-left border-b border-border dark:border-border-dark">
+                  L2 (Cache API)
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="px-3 py-2 border-b border-border dark:border-border-dark">
+                  DID documents
+                </td>
+                <td className="px-3 py-2 border-b border-border dark:border-border-dark">
+                  1 hour, ~50MB max
+                </td>
+                <td className="px-3 py-2 border-b border-border dark:border-border-dark">
+                  24 hours
+                </td>
+              </tr>
+              <tr>
+                <td className="px-3 py-2">Handle resolution</td>
+                <td className="px-3 py-2">10 minutes, 1000 entries</td>
+                <td className="px-3 py-2">1 hour</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 className="text-lg font-medium mt-6 mb-3">
+          Custom cache configuration
+        </h3>
+        <p className="mb-3">
+          You can use{" "}
+          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+            CacheApiStore
+          </code>{" "}
+          and{" "}
+          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+            TieredStore
+          </code>{" "}
+          directly for custom configurations:
+        </p>
+        <CodeBlock
+          code={`import { CacheApiStore, TieredStore } from "@atiproto/edge-resolver-cache";
+import { SimpleStoreMemory } from "@atproto-labs/simple-store-memory";
+
+// Cache API only (no memory tier)
+const cacheOnly = new CacheApiStore({
+  prefix: "my-prefix:",
+  ttlSeconds: 3600,
+  cacheName: "my-cache",
+});
+
+// Custom tiered configuration
+const tiered = new TieredStore(
+  new SimpleStoreMemory({ max: 500, ttl: 300_000 }),
+  new CacheApiStore({ prefix: "custom:", ttlSeconds: 7200 }),
+);`}
+        />
       </section>
 
       <section>

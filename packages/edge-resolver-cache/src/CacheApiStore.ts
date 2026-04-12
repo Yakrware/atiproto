@@ -1,6 +1,10 @@
-import type { SimpleStore, Value, GetOptions } from "@atproto-labs/simple-store";
+import type {
+  SimpleStore,
+  Value,
+  GetOptions,
+} from "@atproto-labs/simple-store";
 
-export interface CacheApiSimpleStoreOptions {
+export interface CacheApiStoreOptions {
   cacheName?: string;
   prefix?: string;
   ttlSeconds: number;
@@ -13,14 +17,12 @@ export interface CacheApiSimpleStoreOptions {
  * TTL is controlled via Cache-Control max-age headers.
  * Cache is regional (per-colo) and free with no per-operation cost.
  */
-export class CacheApiSimpleStore<V extends Value>
-  implements SimpleStore<string, V>
-{
+export class CacheApiStore<V extends Value> implements SimpleStore<string, V> {
   private readonly cachePromise: Promise<Cache>;
   private readonly prefix: string;
   private readonly ttlSeconds: number;
 
-  constructor(options: CacheApiSimpleStoreOptions) {
+  constructor(options: CacheApiStoreOptions) {
     this.cachePromise = caches.open(options.cacheName ?? "atproto-resolver");
     this.prefix = options.prefix ?? "";
     this.ttlSeconds = options.ttlSeconds;

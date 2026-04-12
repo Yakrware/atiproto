@@ -1,26 +1,32 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { TieredSimpleStore } from "../src/TieredSimpleStore.js";
+import { TieredStore } from "../src/TieredStore.js";
 
 function createMockStore() {
   const data = new Map<string, any>();
   return {
     get: vi.fn(async (key: string) => data.get(key)),
-    set: vi.fn(async (key: string, value: any) => { data.set(key, value); }),
-    del: vi.fn(async (key: string) => { data.delete(key); }),
-    clear: vi.fn(() => { data.clear(); }),
+    set: vi.fn(async (key: string, value: any) => {
+      data.set(key, value);
+    }),
+    del: vi.fn(async (key: string) => {
+      data.delete(key);
+    }),
+    clear: vi.fn(() => {
+      data.clear();
+    }),
     _data: data,
   };
 }
 
-describe("TieredSimpleStore", () => {
+describe("TieredStore", () => {
   let l1: ReturnType<typeof createMockStore>;
   let l2: ReturnType<typeof createMockStore>;
-  let tiered: TieredSimpleStore<string, any>;
+  let tiered: TieredStore<string, any>;
 
   beforeEach(() => {
     l1 = createMockStore();
     l2 = createMockStore();
-    tiered = new TieredSimpleStore(l1, l2);
+    tiered = new TieredStore(l1, l2);
   });
 
   it("returns undefined when both tiers miss", async () => {

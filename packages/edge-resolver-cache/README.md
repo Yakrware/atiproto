@@ -4,7 +4,7 @@ Tiered edge cache (Cloudflare Cache API + in-memory) for ATProto DID and handle 
 
 [![npm](https://img.shields.io/npm/v/@atiproto/edge-resolver-cache)](https://www.npmjs.com/package/@atiproto/edge-resolver-cache)
 
-- [Documentation](https://atiproto.com/docs/edge-resolver-cache)
+- [Documentation](https://atiproto.com/docs/edge-oauth)
 - [GitHub](https://github.com/Yakrware/atiproto)
 
 ## Installation
@@ -49,20 +49,20 @@ Each factory returns a `SimpleStore` with two tiers:
 ### Using individual components
 
 ```typescript
-import { CacheApiSimpleStore, TieredSimpleStore } from "@atiproto/edge-resolver-cache";
+import { CacheApiStore, TieredStore } from "@atiproto/edge-resolver-cache";
 import { SimpleStoreMemory } from "@atproto-labs/simple-store-memory";
 
 // Cache API store only (no memory tier)
-const cacheOnly = new CacheApiSimpleStore({
+const cacheOnly = new CacheApiStore({
   prefix: "my-prefix:",
   ttlSeconds: 3600,
   cacheName: "my-cache",
 });
 
 // Custom tiered configuration
-const tiered = new TieredSimpleStore(
+const tiered = new TieredStore(
   new SimpleStoreMemory({ max: 500, ttl: 300_000 }),
-  new CacheApiSimpleStore({ prefix: "custom:", ttlSeconds: 7200 }),
+  new CacheApiStore({ prefix: "custom:", ttlSeconds: 7200 }),
 );
 ```
 
