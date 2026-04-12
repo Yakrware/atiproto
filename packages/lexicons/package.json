@@ -22,6 +22,13 @@
     "prepack": "npm run build",
     "test": "echo \"No tests yet\" && exit 0"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Yakrware/atiproto.git",
+    "directory": "packages/lexicons"
+  },
+  "homepage": "https://atiproto.com/docs/lexicon",
+  "bugs": "https://github.com/Yakrware/atiproto/issues",
   "license": "MIT",
   "dependencies": {
     "@atproto/lex": "^0.0.23"

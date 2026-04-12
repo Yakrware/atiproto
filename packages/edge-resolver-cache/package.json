@@ -13,12 +13,21 @@
       "require": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup && tsc --emitDeclarationOnly --declaration",
     "prepack": "npm run build",
     "test": "vitest run"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Yakrware/atiproto.git",
+    "directory": "packages/edge-resolver-cache"
+  },
+  "homepage": "https://atiproto.com/docs/edge-oauth",
+  "bugs": "https://github.com/Yakrware/atiproto/issues",
   "license": "MIT",
   "dependencies": {
     "@atproto-labs/simple-store": "^0.3.0",
