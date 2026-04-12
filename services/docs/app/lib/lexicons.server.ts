@@ -32,6 +32,7 @@ export function buildNavTree(): NavItem[] {
     { label: "Get Started", href: "/docs/get-started" },
     { label: "Checkout Flow", href: "/docs/checkout" },
     { label: "Stripe Connect", href: "/docs/stripe-connect" },
+    { label: "Edge OAuth Client", href: "/docs/edge-oauth" },
   ];
 
   const records: NavItem[] = [];
@@ -98,7 +99,10 @@ export function buildSearchIndex(): SearchEntry[] {
 }
 
 export function computeVersion(): string {
-  const ids = schemas.map((s) => s.id).sort().join(",");
+  const ids = schemas
+    .map((s) => s.id)
+    .sort()
+    .join(",");
   let hash = 0;
   for (let i = 0; i < ids.length; i++) {
     hash = ((hash << 5) - hash + ids.charCodeAt(i)) | 0;

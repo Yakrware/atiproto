@@ -5,32 +5,56 @@ export default function GetStarted() {
     <div>
       <h1 className="text-2xl font-bold mb-2">Get Started</h1>
       <p className="text-text-muted dark:text-text-muted-dark mb-8">
-        Set up the atiproto agent to integrate tipping and subscriptions into your ATProto application.
+        Set up the atiproto agent to integrate tipping and subscriptions into
+        your ATProto application.
       </p>
 
       <section className="mb-10">
         <h2 className="text-xl font-semibold mb-4">Installation</h2>
         <p className="mb-3">Install the agent and lexicons packages:</p>
-        <CodeBlock language="bash" code="npm install @atiproto/agent @atiproto/lexicons" />
+        <CodeBlock
+          language="bash"
+          code="npm install @atiproto/agent @atiproto/lexicons"
+        />
       </section>
 
       <section className="mb-10">
-        <h2 className="text-xl font-semibold mb-4">Create an Authenticated Agent</h2>
+        <h2 className="text-xl font-semibold mb-4">
+          Create an Authenticated Agent
+        </h2>
         <p className="mb-3">
-          The <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">Agent</code> from{" "}
-          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">@atiproto/agent</code>{" "}
-          wraps any <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">XrpcClient</code>{" "}
-          and proxies requests to the atiproto tipping service. It automatically injects the{" "}
-          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">atproto-proxy</code>{" "}
+          The{" "}
+          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+            Agent
+          </code>{" "}
+          from{" "}
+          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+            @atiproto/agent
+          </code>{" "}
+          wraps any{" "}
+          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+            XrpcClient
+          </code>{" "}
+          and proxies requests to the atiproto tipping service. It automatically
+          injects the{" "}
+          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+            atproto-proxy
+          </code>{" "}
           header so requests are routed through your PDS to our service.
         </p>
 
-        <h3 className="text-lg font-medium mt-6 mb-3">With @atproto/api Agent</h3>
+        <h3 className="text-lg font-medium mt-6 mb-3">
+          With @atproto/api Agent
+        </h3>
         <p className="mb-3">
-          If you're using the official <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">@atproto/api</code> package,
-          pass your authenticated agent directly:
+          If you're using the official{" "}
+          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+            @atproto/api
+          </code>{" "}
+          package, pass your authenticated agent directly:
         </p>
-        <CodeBlock code={`import { Agent as BskyAgent } from "@atproto/api";
+        <CodeBlock
+          code={`import { Agent as BskyAgent } from "@atproto/api";
 import { Agent as TipAgent } from "@atiproto/agent";
 
 // Authenticate with your PDS
@@ -46,37 +70,53 @@ await bskyAgent.login({
 const tipAgent = new TipAgent(bskyAgent);
 
 // Now you can call tipping APIs
-const profile = await tipAgent.com.atiproto.account.profile.get();`} />
+const profile = await tipAgent.com.atiproto.account.profile.get();`}
+        />
       </section>
 
       <section className="mb-10">
         <h2 className="text-xl font-semibold mb-4">With Any XrpcClient</h2>
         <p className="mb-3">
-          You can use any <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">XrpcClient</code>{" "}
-          instance. The TipAgent will wrap it and add the proxy header for routing:
+          You can use any{" "}
+          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+            XrpcClient
+          </code>{" "}
+          instance. The TipAgent will wrap it and add the proxy header for
+          routing:
         </p>
-        <CodeBlock code={`import { XrpcClient } from "@atproto/xrpc";
+        <CodeBlock
+          code={`import { XrpcClient } from "@atproto/xrpc";
 import { Agent as TipAgent } from "@atiproto/agent";
 
 // Create any XrpcClient with your PDS
 const client = new XrpcClient("https://your-pds.example.com", mySchemas);
 
 // Wrap it with the TipAgent
-const tipAgent = new TipAgent(client);`} />
+const tipAgent = new TipAgent(client);`}
+        />
       </section>
 
       <section className="mb-10">
         <h2 className="text-xl font-semibold mb-4">How It Works</h2>
         <p className="mb-3">
-          When you create a <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">TipAgent</code>,
-          it sets up a proxy to <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">did:web:atiproto.com#tips_service</code>.
-          Your PDS receives the request, sees the proxy header, and forwards it to our service for processing.
+          When you create a{" "}
+          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+            TipAgent
+          </code>
+          , it sets up a proxy to{" "}
+          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+            did:web:atiproto.com#tips_service
+          </code>
+          . Your PDS receives the request, sees the proxy header, and forwards
+          it to our service for processing.
         </p>
         <p className="mb-3">
-          The agent also provides full TypeScript types for all API methods, generated from the ATProto lexicon definitions.
-          Every call is type-checked at compile time.
+          The agent also provides full TypeScript types for all API methods,
+          generated from the ATProto lexicon definitions. Every call is
+          type-checked at compile time.
         </p>
-        <CodeBlock code={`// All methods are fully typed
+        <CodeBlock
+          code={`// All methods are fully typed
 const { data } = await tipAgent.com.atiproto.feed.tip.create({
   subject: "did:plc:recipient123",
   amount: 500,       // 500 cents = $5.00
@@ -84,23 +124,52 @@ const { data } = await tipAgent.com.atiproto.feed.tip.create({
 });
 
 // data.tipUri, data.cartUri, data.checkoutUrl are all typed
-console.log(data.checkoutUrl);`} />
+console.log(data.checkoutUrl);`}
+        />
       </section>
 
       <section>
         <h2 className="text-xl font-semibold mb-4">Next Steps</h2>
         <ul className="list-disc pl-6 space-y-2 text-text-muted dark:text-text-muted-dark">
           <li>
-            Learn about the <a href="/docs/checkout" className="text-primary dark:text-primary-dark hover:underline">checkout flow</a> for
-            creating carts, tips, and subscriptions
+            Learn about the{" "}
+            <a
+              href="/docs/checkout"
+              className="text-primary dark:text-primary-dark hover:underline"
+            >
+              checkout flow
+            </a>{" "}
+            for creating carts, tips, and subscriptions
           </li>
           <li>
-            Set up <a href="/docs/stripe-connect" className="text-primary dark:text-primary-dark hover:underline">Stripe Connect</a> so
-            users can receive payments
+            Set up{" "}
+            <a
+              href="/docs/stripe-connect"
+              className="text-primary dark:text-primary-dark hover:underline"
+            >
+              Stripe Connect
+            </a>{" "}
+            so users can receive payments
           </li>
           <li>
-            Browse the <a href="/docs/lexicon" className="text-primary dark:text-primary-dark hover:underline">lexicon reference</a> for
-            the complete API
+            Browse the{" "}
+            <a
+              href="/docs/lexicon"
+              className="text-primary dark:text-primary-dark hover:underline"
+            >
+              lexicon reference
+            </a>{" "}
+            for the complete API
+          </li>
+          <li>
+            Deploy on the edge with the{" "}
+            <a
+              href="/docs/edge-oauth"
+              className="text-primary dark:text-primary-dark hover:underline"
+            >
+              Edge OAuth Client
+            </a>{" "}
+            for Cloudflare Workers
           </li>
         </ul>
       </section>

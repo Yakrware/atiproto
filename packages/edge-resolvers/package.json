@@ -1,7 +1,7 @@
 {
-  "name": "@atiproto/agent",
-  "version": "0.2.0",
-  "description": "ATProto agent",
+  "name": "@atiproto/edge-resolvers",
+  "version": "0.0.1",
+  "description": "Edge-compatible DID resolvers for Cloudflare Workers",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -23,15 +23,10 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@atiproto/lexicons": "*",
-    "@atproto/api": "^0.19.6",
-    "@atproto/xrpc": "^0.7.7"
+    "@atproto/identity": "^0.4.12"
   },
   "devDependencies": {
-    "@atproto/lex": "^0.0.23",
-    "@vitest/coverage-v8": "^4.1.4",
     "tsup": "^8.5.1",
-    "typescript": "^6.0.2",
-    "vitest": "^4.1.2"
+    "typescript": "^6.0.2"
   }
 }

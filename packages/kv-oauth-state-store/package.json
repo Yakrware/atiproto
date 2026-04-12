@@ -1,7 +1,7 @@
 {
-  "name": "@atiproto/agent",
-  "version": "0.2.0",
-  "description": "ATProto agent",
+  "name": "@atiproto/kv-oauth-state-store",
+  "version": "0.0.1",
+  "description": "Cloudflare KV-backed state and session stores for @atproto/oauth-client",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -23,15 +23,17 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@atiproto/lexicons": "*",
-    "@atproto/api": "^0.19.6",
-    "@atproto/xrpc": "^0.7.7"
+    "@atproto/jwk-jose": "^0.1.11"
   },
   "devDependencies": {
-    "@atproto/lex": "^0.0.23",
-    "@vitest/coverage-v8": "^4.1.4",
+    "@atproto/jwk": "^0.2.0",
+    "@atproto/oauth-client": "^0.6.0",
+    "@cloudflare/workers-types": "^4.20260411.1",
     "tsup": "^8.5.1",
     "typescript": "^6.0.2",
-    "vitest": "^4.1.2"
+    "vitest": "^4.1.4"
+  },
+  "peerDependencies": {
+    "@atproto/oauth-client": ">=0.5.0"
   }
 }

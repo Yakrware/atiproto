@@ -6,6 +6,7 @@ export default [
     route("get-started", "routes/get-started.tsx"),
     route("checkout", "routes/checkout.tsx"),
     route("stripe-connect", "routes/stripe-connect.tsx"),
+    route("edge-oauth", "routes/edge-oauth.tsx"),
     route("lexicon", "routes/lexicon/_index.tsx"),
     route("lexicon/:nsid", "routes/lexicon/$nsid.tsx"),
     route("api/search", "routes/api/search.tsx"),
