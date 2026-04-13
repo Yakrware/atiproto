@@ -9,17 +9,29 @@ function TypeBadge({ type }: { type: string }) {
     record: "bg-badge-record/15 text-badge-record",
   };
   return (
-    <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${colors[type] ?? ""}`}>
+    <span
+      className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${colors[type] ?? ""}`}
+    >
       {type === "procedure" ? "proc" : type}
     </span>
   );
 }
 
-export function NavTreeNode({ item, depth = 0 }: { item: NavItem; depth?: number }) {
+export function NavTreeNode({
+  item,
+  depth = 0,
+  onNavigate,
+}: {
+  item: NavItem;
+  depth?: number;
+  onNavigate?: () => void;
+}) {
   const location = useLocation();
   const isActive = item.href === location.pathname;
   const hasActiveChild = item.children?.some(
-    (c) => c.href === location.pathname || c.children?.some((gc) => gc.href === location.pathname)
+    (c) =>
+      c.href === location.pathname ||
+      c.children?.some((gc) => gc.href === location.pathname),
   );
   const [open, setOpen] = useState(hasActiveChild ?? true);
 
@@ -29,21 +41,35 @@ export function NavTreeNode({ item, depth = 0 }: { item: NavItem; depth?: number
         <button
           onClick={() => setOpen(!open)}
           className={`flex items-center gap-1 w-full text-left py-1.5 px-2 text-sm rounded hover:bg-surface-alt dark:hover:bg-surface-alt-dark transition-colors ${
-            depth === 0 ? "font-semibold text-text dark:text-text-dark" : "text-text-muted dark:text-text-muted-dark"
+            depth === 0
+              ? "font-semibold text-text dark:text-text-dark"
+              : "text-text-muted dark:text-text-muted-dark"
           }`}
         >
           <svg
             className={`w-3.5 h-3.5 shrink-0 transition-transform ${open ? "rotate-90" : ""}`}
-            fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5l7 7-7 7"
+            />
           </svg>
           <span>{item.label}</span>
         </button>
         {open && (
           <div className="ml-3 border-l border-border dark:border-border-dark pl-2">
             {item.children.map((child) => (
-              <NavTreeNode key={child.label} item={child} depth={depth + 1} />
+              <NavTreeNode
+                key={child.label}
+                item={child}
+                depth={depth + 1}
+                onNavigate={onNavigate}
+              />
             ))}
           </div>
         )}
@@ -54,6 +80,7 @@ export function NavTreeNode({ item, depth = 0 }: { item: NavItem; depth?: number
   return (
     <Link
       to={item.href!}
+      onClick={onNavigate}
       className={`flex items-center gap-2 py-1.5 px-2 text-sm rounded transition-colors ${
         isActive
           ? "bg-primary/10 text-primary dark:text-primary-dark font-medium"

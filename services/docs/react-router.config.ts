@@ -5,4 +5,8 @@ export default {
   future: {
     v8_viteEnvironmentApi: true,
   },
+  routeDiscovery: {
+    mode: "lazy",
+    manifestPath: "/docs/__manifest",
+  },
 } satisfies Config;
