@@ -8,7 +8,7 @@ import { schemas } from "@atiproto/lexicons";
 import { ComNS } from "./namespaces/com.js";
 
 const SERVICE_DID = "did:web:atiproto.com";
-const SERVICE_TYPE = "tips_service";
+const SERVICE_TYPE = "payments";
 
 function createFetchHandler(client: XrpcClient): FetchHandler {
   if (client instanceof ApiAgent) {
