@@ -1,16 +1,21 @@
 import { CodeBlock } from "~/components/CodeBlock";
+import { AnchorHeading } from "~/components/AnchorHeading";
 
 export default function GetStarted() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-2">Get Started</h1>
       <p className="text-text-muted dark:text-text-muted-dark mb-8">
-        Set up the atiproto agent to integrate tipping and subscriptions into
-        your ATProto application.
+        Set up the a
+        <span className="text-primary dark:text-primary-dark">TIP</span>roto
+        agent to integrate tipping and subscriptions into your ATProto
+        application.
       </p>
 
       <section className="mb-10">
-        <h2 className="text-xl font-semibold mb-4">Installation</h2>
+        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
+          Installation
+        </AnchorHeading>
         <p className="mb-3">Install the agent and lexicons packages:</p>
         <CodeBlock
           language="bash"
@@ -19,9 +24,9 @@ export default function GetStarted() {
       </section>
 
       <section className="mb-10">
-        <h2 className="text-xl font-semibold mb-4">
+        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
           Create an Authenticated Agent
-        </h2>
+        </AnchorHeading>
         <p className="mb-3">
           The{" "}
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
@@ -43,28 +48,29 @@ export default function GetStarted() {
           header so requests are routed through your PDS to our service.
         </p>
 
-        <h3 className="text-lg font-medium mt-6 mb-3">
+        <AnchorHeading as="h3" className="text-lg font-medium mt-6 mb-3">
           With @atproto/api Agent
-        </h3>
+        </AnchorHeading>
         <p className="mb-3">
           If you're using the official{" "}
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
             @atproto/api
           </code>{" "}
-          package, pass your authenticated agent directly:
+          package, restore an OAuth session and pass the agent directly:
         </p>
         <CodeBlock
           code={`import { Agent as BskyAgent } from "@atproto/api";
 import { Agent as TipAgent } from "@atiproto/agent";
+// See: https://github.com/bluesky-social/atproto/tree/main/packages/oauth/oauth-client#readme
+import { OAuthClient } from "@atproto/oauth-client";
 
-// Authenticate with your PDS
-const bskyAgent = new BskyAgent({
-  service: "https://bsky.social",
+const oauthClient = new OAuthClient({
+  // ...
 });
-await bskyAgent.login({
-  identifier: "your-handle.bsky.social",
-  password: "your-app-password",
-});
+
+// Restore an authenticated session
+const oauthSession = await oauthClient.restore("did:plc:123");
+const bskyAgent = new BskyAgent(oauthSession);
 
 // Create a TipAgent — automatically uses withProxy()
 const tipAgent = new TipAgent(bskyAgent);
@@ -75,7 +81,9 @@ const profile = await tipAgent.com.atiproto.account.profile.get();`}
       </section>
 
       <section className="mb-10">
-        <h2 className="text-xl font-semibold mb-4">With Any XrpcClient</h2>
+        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
+          With Any XrpcClient
+        </AnchorHeading>
         <p className="mb-3">
           You can use any{" "}
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
@@ -97,7 +105,9 @@ const tipAgent = new TipAgent(client);`}
       </section>
 
       <section className="mb-10">
-        <h2 className="text-xl font-semibold mb-4">How It Works</h2>
+        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
+          How It Works
+        </AnchorHeading>
         <p className="mb-3">
           When you create a{" "}
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
@@ -129,7 +139,9 @@ console.log(data.checkoutUrl);`}
       </section>
 
       <section>
-        <h2 className="text-xl font-semibold mb-4">Next Steps</h2>
+        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
+          Next Steps
+        </AnchorHeading>
         <ul className="list-disc pl-6 space-y-2 text-text-muted dark:text-text-muted-dark">
           <li>
             Learn about the{" "}

@@ -1,4 +1,5 @@
 import { CodeBlock } from "~/components/CodeBlock";
+import { AnchorHeading } from "~/components/AnchorHeading";
 
 export default function EdgeOAuth() {
   return (
@@ -10,7 +11,9 @@ export default function EdgeOAuth() {
       </p>
 
       <section className="mb-10">
-        <h2 className="text-xl font-semibold mb-4">Packages</h2>
+        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
+          Packages
+        </AnchorHeading>
         <div className="space-y-3">
           <div className="p-4 rounded-lg border border-border dark:border-border-dark">
             <a
@@ -61,7 +64,9 @@ export default function EdgeOAuth() {
       </section>
 
       <section className="mb-10">
-        <h2 className="text-xl font-semibold mb-4">Installation</h2>
+        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
+          Installation
+        </AnchorHeading>
         <CodeBlock
           language="bash"
           code={`npm install @atiproto/edge-oauth-client @atiproto/kv-oauth-state-store @atproto/oauth-client`}
@@ -69,7 +74,9 @@ export default function EdgeOAuth() {
       </section>
 
       <section className="mb-10">
-        <h2 className="text-xl font-semibold mb-4">Wrangler Configuration</h2>
+        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
+          Wrangler Configuration
+        </AnchorHeading>
         <p className="mb-3">
           Add KV namespaces for OAuth state and session storage in your{" "}
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
@@ -89,7 +96,9 @@ export default function EdgeOAuth() {
       </section>
 
       <section className="mb-10">
-        <h2 className="text-xl font-semibold mb-4">Create the OAuth Client</h2>
+        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
+          Create the OAuth Client
+        </AnchorHeading>
         <p className="mb-3">
           Set up the client in your Worker. The{" "}
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
@@ -133,9 +142,13 @@ function createOAuthClient(env: Env) {
       </section>
 
       <section className="mb-10">
-        <h2 className="text-xl font-semibold mb-4">Authorization Flow</h2>
+        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
+          Authorization Flow
+        </AnchorHeading>
 
-        <h3 className="text-lg font-medium mt-6 mb-3">Start the login</h3>
+        <AnchorHeading as="h3" className="text-lg font-medium mt-6 mb-3">
+          Start the login
+        </AnchorHeading>
         <p className="mb-3">
           Redirect the user to authorize with their ATProto identity provider:
         </p>
@@ -153,7 +166,9 @@ async function handleLogin(request: Request, env: Env) {
 }`}
         />
 
-        <h3 className="text-lg font-medium mt-6 mb-3">Handle the callback</h3>
+        <AnchorHeading as="h3" className="text-lg font-medium mt-6 mb-3">
+          Handle the callback
+        </AnchorHeading>
         <p className="mb-3">Exchange the authorization code for a session:</p>
         <CodeBlock
           code={`// In your OAuth callback route handler
@@ -174,7 +189,9 @@ async function handleCallback(request: Request, env: Env) {
       </section>
 
       <section className="mb-10">
-        <h2 className="text-xl font-semibold mb-4">Restoring Sessions</h2>
+        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
+          Restoring Sessions
+        </AnchorHeading>
         <p className="mb-3">
           Restore a previously authenticated session to make API calls:
         </p>
@@ -197,7 +214,9 @@ async function handleCallback(request: Request, env: Env) {
       </section>
 
       <section className="mb-10">
-        <h2 className="text-xl font-semibold mb-4">Custom Resolvers</h2>
+        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
+          Custom Resolvers
+        </AnchorHeading>
         <p className="mb-3">
           The default resolvers use{" "}
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
@@ -226,7 +245,9 @@ const client = new EdgeOAuthClient({
       </section>
 
       <section className="mb-10">
-        <h2 className="text-xl font-semibold mb-4">Resolver Caching</h2>
+        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
+          Resolver Caching
+        </AnchorHeading>
         <p className="mb-3">
           By default, the OAuth client uses in-memory caches for DID and handle
           resolution that reset when the Worker isolate recycles. For better
@@ -256,7 +277,9 @@ const client = new EdgeOAuthClient({
           Cache API as L2. No KV bindings or additional cost required.
         </p>
 
-        <h3 className="text-lg font-medium mt-6 mb-3">Cache tiers</h3>
+        <AnchorHeading as="h3" className="text-lg font-medium mt-6 mb-3">
+          Cache tiers
+        </AnchorHeading>
         <div className="overflow-x-auto mb-4">
           <table className="w-full text-sm border border-border dark:border-border-dark">
             <thead>
@@ -302,7 +325,9 @@ const client = new EdgeOAuthClient({
           </table>
         </div>
 
-        <h3 className="text-lg font-medium mt-6 mb-3">Default TTLs</h3>
+        <AnchorHeading as="h3" className="text-lg font-medium mt-6 mb-3">
+          Default TTLs
+        </AnchorHeading>
         <div className="overflow-x-auto mb-4">
           <table className="w-full text-sm border border-border dark:border-border-dark">
             <thead>
@@ -339,9 +364,9 @@ const client = new EdgeOAuthClient({
           </table>
         </div>
 
-        <h3 className="text-lg font-medium mt-6 mb-3">
+        <AnchorHeading as="h3" className="text-lg font-medium mt-6 mb-3">
           Custom cache configuration
-        </h3>
+        </AnchorHeading>
         <p className="mb-3">
           You can use{" "}
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
@@ -373,7 +398,9 @@ const tiered = new TieredStore(
       </section>
 
       <section>
-        <h2 className="text-xl font-semibold mb-4">KV Store Options</h2>
+        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
+          KV Store Options
+        </AnchorHeading>
         <p className="mb-3">
           Both{" "}
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
