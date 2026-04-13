@@ -25,7 +25,11 @@ export function Sidebar({ navTree, open, onClose }: SidebarProps) {
       >
         <nav className="p-4 space-y-1" data-testid="sidebar-nav">
           {navTree.map((section) => (
-            <NavTreeNode key={section.label} item={section} />
+            <NavTreeNode
+              key={section.label}
+              item={section}
+              onNavigate={onClose}
+            />
           ))}
         </nav>
       </aside>
