@@ -32,7 +32,90 @@ export function buildNavTree(): NavItem[] {
     { label: "Get Started", href: "/docs/get-started" },
     { label: "Checkout Flow", href: "/docs/checkout" },
     { label: "Stripe Connect", href: "/docs/stripe-connect" },
-    { label: "Edge OAuth Client", href: "/docs/edge-oauth" },
+  ];
+
+  const edgePackages: NavItem[] = [
+    {
+      label: "edge-oauth-client",
+      children: [
+        { label: "Get Started", href: "/docs/edge-oauth-client" },
+        {
+          label: "EdgeOAuthClient",
+          href: "/docs/edge-oauth-client/EdgeOAuthClient",
+        },
+        {
+          label: "EdgeRuntimeImplementation",
+          href: "/docs/edge-oauth-client/EdgeRuntimeImplementation",
+        },
+        {
+          label: "patchGlobalRequestObject",
+          href: "/docs/edge-oauth-client/patchGlobalRequestObject",
+        },
+      ],
+    },
+    {
+      label: "edge-resolvers",
+      children: [
+        { label: "Get Started", href: "/docs/edge-resolvers" },
+        {
+          label: "EdgeDidResolver",
+          href: "/docs/edge-resolvers/EdgeDidResolver",
+        },
+        {
+          label: "EdgeDidPlcResolver",
+          href: "/docs/edge-resolvers/EdgeDidPlcResolver",
+        },
+        {
+          label: "EdgeDidWebResolver",
+          href: "/docs/edge-resolvers/EdgeDidWebResolver",
+        },
+        {
+          label: "EdgeXrpcHandleResolver",
+          href: "/docs/edge-resolvers/EdgeXrpcHandleResolver",
+        },
+        { label: "timed", href: "/docs/edge-resolvers/timed" },
+        {
+          label: "resolveHandles",
+          href: "/docs/edge-resolvers/resolveHandles",
+        },
+      ],
+    },
+    {
+      label: "kv-oauth-state-store",
+      children: [
+        { label: "Get Started", href: "/docs/kv-oauth-state-store" },
+        {
+          label: "KvStateStore",
+          href: "/docs/kv-oauth-state-store/KvStateStore",
+        },
+        {
+          label: "KvSessionStore",
+          href: "/docs/kv-oauth-state-store/KvSessionStore",
+        },
+      ],
+    },
+    {
+      label: "edge-resolver-cache",
+      children: [
+        { label: "Get Started", href: "/docs/edge-resolver-cache" },
+        {
+          label: "CacheApiStore",
+          href: "/docs/edge-resolver-cache/CacheApiStore",
+        },
+        {
+          label: "TieredStore",
+          href: "/docs/edge-resolver-cache/TieredStore",
+        },
+        {
+          label: "createDidCache",
+          href: "/docs/edge-resolver-cache/createDidCache",
+        },
+        {
+          label: "createHandleCache",
+          href: "/docs/edge-resolver-cache/createHandleCache",
+        },
+      ],
+    },
   ];
 
   const records: NavItem[] = [];
@@ -79,6 +162,7 @@ export function buildNavTree(): NavItem[] {
 
   return [
     { label: "Guides", children: guides },
+    { label: "Edge OAuth Packages", children: edgePackages },
     {
       label: "Record Types",
       children: records.sort((a, b) => a.label.localeCompare(b.label)),
