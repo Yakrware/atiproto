@@ -2,10 +2,17 @@ import { Agent as ApiAgent } from "@atproto/api";
 import {
   XrpcClient,
   type FetchHandler,
+  type FetchHandlerObject,
   type FetchHandlerOptions,
 } from "@atproto/xrpc";
 import { schemas } from "@atiproto/lexicons";
 import { ComNS } from "./namespaces/com.js";
+
+// Mirrors @atproto/api's SessionManager interface; declared locally to avoid
+// importing from @atproto/api's internal dist directory.
+interface SessionManager extends FetchHandlerObject {
+  readonly did?: string;
+}
 
 const SERVICE_DID = "did:web:atiproto.com";
 const SERVICE_TYPE = "payments";
@@ -28,7 +35,9 @@ function createFetchHandler(client: XrpcClient): FetchHandler {
 export class Agent extends XrpcClient {
   com: ComNS;
 
-  constructor(options: XrpcClient | FetchHandler | FetchHandlerOptions) {
+  constructor(
+    options: SessionManager | XrpcClient | FetchHandler | FetchHandlerOptions,
+  ) {
     const client =
       options instanceof XrpcClient ? options : new ApiAgent(options);
 
