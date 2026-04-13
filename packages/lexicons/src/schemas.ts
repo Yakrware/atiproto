@@ -24,6 +24,8 @@ import RepoSubscriptionSearch from "./schemas/repo/subscription/search.json";
 import RepoSubscriptionValidate from "./schemas/repo/subscription/validate.json";
 import RepoTipSearch from "./schemas/repo/tip/search.json";
 import RepoTipValidate from "./schemas/repo/tip/validate.json";
+import AuthEnhanced from "./schemas/authEnhanced.json";
+import AuthGeneral from "./schemas/authGeneral.json";
 import Subscription from "./schemas/subscription.json";
 import Tip from "./schemas/tip.json";
 
@@ -52,6 +54,8 @@ export const schemas: LexiconDoc[] = [
   RepoSubscriptionValidate,
   RepoTipSearch,
   RepoTipValidate,
+  AuthEnhanced,
+  AuthGeneral,
   Subscription,
   Tip,
 ] as LexiconDoc[];
