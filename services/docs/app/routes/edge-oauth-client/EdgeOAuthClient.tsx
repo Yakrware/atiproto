@@ -211,34 +211,6 @@ const client = new EdgeOAuthClient({
         />
       </section>
 
-      <section className="mb-10">
-        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
-          patchGlobalRequestObject
-        </AnchorHeading>
-        <p className="mb-3 text-text-muted dark:text-text-muted-dark">
-          The{" "}
-          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
-            patchGlobalRequestObject()
-          </code>{" "}
-          function patches the global{" "}
-          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
-            Request
-          </code>{" "}
-          constructor to strip the unsupported{" "}
-          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
-            cache
-          </code>{" "}
-          property, which causes errors in Cloudflare Workers when set by the
-          underlying OAuth client. Call it once before creating any clients.
-        </p>
-        <CodeBlock
-          code={`import { patchGlobalRequestObject } from "@atiproto/edge-oauth-client";
-
-// At the top of your worker entrypoint, before any other imports use fetch
-patchGlobalRequestObject();`}
-        />
-      </section>
-
       <section>
         <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
           Inherited Methods

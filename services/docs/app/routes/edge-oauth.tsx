@@ -1,428 +1,121 @@
-import { CodeBlock } from "~/components/CodeBlock";
 import { AnchorHeading } from "~/components/AnchorHeading";
+import { ExternalLink } from "~/components/ExternalLink";
 
 export default function EdgeOAuth() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-2">Edge OAuth Client</h1>
       <p className="text-text-muted dark:text-text-muted-dark mb-8">
-        Authenticate ATProto users with OAuth on Cloudflare Workers using the
-        edge-compatible OAuth client, resolvers, and KV-backed state stores.
+        ATProto OAuth on Cloudflare Workers — and why a dedicated package is
+        needed.
       </p>
 
       <section className="mb-10">
         <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
-          Packages
+          What it is
         </AnchorHeading>
-        <div className="space-y-3">
-          <div className="p-4 rounded-lg border border-border dark:border-border-dark">
-            <a
-              href="https://www.npmjs.com/package/@atiproto/edge-oauth-client"
-              className="text-primary dark:text-primary-dark hover:underline font-mono text-sm font-semibold"
-            >
-              @atiproto/edge-oauth-client
-            </a>
-            <p className="text-sm text-text-muted dark:text-text-muted-dark mt-1">
-              Edge-compatible ATProto OAuth client for Cloudflare Workers
-            </p>
-          </div>
-          <div className="p-4 rounded-lg border border-border dark:border-border-dark">
-            <a
-              href="https://www.npmjs.com/package/@atiproto/edge-resolvers"
-              className="text-primary dark:text-primary-dark hover:underline font-mono text-sm font-semibold"
-            >
-              @atiproto/edge-resolvers
-            </a>
-            <p className="text-sm text-text-muted dark:text-text-muted-dark mt-1">
-              Edge-compatible DID and handle resolvers using fetch (no Node.js
-              APIs)
-            </p>
-          </div>
-          <div className="p-4 rounded-lg border border-border dark:border-border-dark">
-            <a
-              href="https://www.npmjs.com/package/@atiproto/kv-oauth-state-store"
-              className="text-primary dark:text-primary-dark hover:underline font-mono text-sm font-semibold"
-            >
-              @atiproto/kv-oauth-state-store
-            </a>
-            <p className="text-sm text-text-muted dark:text-text-muted-dark mt-1">
-              Cloudflare KV-backed state and session stores for OAuth
-            </p>
-          </div>
-          <div className="p-4 rounded-lg border border-border dark:border-border-dark">
-            <a
-              href="https://www.npmjs.com/package/@atiproto/edge-resolver-cache"
-              className="text-primary dark:text-primary-dark hover:underline font-mono text-sm font-semibold"
-            >
-              @atiproto/edge-resolver-cache
-            </a>
-            <p className="text-sm text-text-muted dark:text-text-muted-dark mt-1">
-              Tiered cache (Cache API + in-memory) for DID and handle resolvers
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="mb-10">
-        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
-          Installation
-        </AnchorHeading>
-        <CodeBlock
-          language="bash"
-          code={`npm install @atiproto/edge-oauth-client @atiproto/kv-oauth-state-store @atproto/oauth-client`}
-        />
-      </section>
-
-      <section className="mb-10">
-        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
-          Wrangler Configuration
-        </AnchorHeading>
-        <p className="mb-3">
-          Add KV namespaces for OAuth state and session storage in your{" "}
-          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
-            wrangler.jsonc
-          </code>
-          :
+        <p className="mb-3 text-text-muted dark:text-text-muted-dark">
+          The{" "}
+          <a
+            href="/docs/edge-oauth-client"
+            className="text-primary dark:text-primary-dark hover:underline font-mono"
+          >
+            @atiproto/edge-oauth-client
+          </a>{" "}
+          package extends{" "}
+          <ExternalLink href="https://github.com/bluesky-social/atproto/tree/main/packages/oauth/oauth-client#readme">
+            @atproto/oauth-client
+          </ExternalLink>{" "}
+          to run in Cloudflare Workers. It handles the full ATProto OAuth 2.0
+          flow: generating authorization URLs, exchanging codes for sessions,
+          refreshing tokens, and making DPoP-authenticated API requests on
+          behalf of a user.
         </p>
-        <CodeBlock
-          language="jsonc"
-          code={`{
-  "kv_namespaces": [
-    { "binding": "OAUTH_STATE_KV", "id": "<your-kv-id>" },
-    { "binding": "OAUTH_SESSION_KV", "id": "<your-kv-id>" }
-  ]
-}`}
-        />
       </section>
 
       <section className="mb-10">
         <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
-          Create the OAuth Client
+          Why a separate package
         </AnchorHeading>
-        <p className="mb-3">
-          Set up the client in your Worker. The{" "}
+        <p className="mb-3 text-text-muted dark:text-text-muted-dark">
+          The upstream{" "}
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
-            EdgeOAuthClient
+            @atproto/oauth-client
           </code>{" "}
-          provides edge-compatible defaults for DID resolution, handle
-          resolution, and cryptographic operations.
+          is written for Node.js and relies on Node-specific APIs that are not
+          available in the Cloudflare Workers runtime:
         </p>
-        <CodeBlock
-          code={`import { EdgeOAuthClient } from "@atiproto/edge-oauth-client";
-import { patchGlobalRequestObject } from "@atiproto/edge-oauth-client";
-import { KvStateStore, KvSessionStore } from "@atiproto/kv-oauth-state-store";
-
-// Call once at the top of your worker entrypoint
-patchGlobalRequestObject();
-
-interface Env {
-  OAUTH_STATE_KV: KVNamespace;
-  OAUTH_SESSION_KV: KVNamespace;
-}
-
-function createOAuthClient(env: Env) {
-  return new EdgeOAuthClient({
-    clientMetadata: {
-      client_id: "https://your-app.example.com/oauth/client-metadata.json",
-      client_name: "My App",
-      client_uri: "https://your-app.example.com",
-      redirect_uris: ["https://your-app.example.com/oauth/callback"],
-      grant_types: ["authorization_code", "refresh_token"],
-      response_types: ["code"],
-      scope: "atproto transition:generic",
-      token_endpoint_auth_method: "none",
-      application_type: "web",
-      dpop_bound_access_tokens: true,
-    },
-    stateStore: new KvStateStore(env.OAUTH_STATE_KV),
-    sessionStore: new KvSessionStore(env.OAUTH_SESSION_KV),
-  });
-}`}
-        />
-      </section>
-
-      <section className="mb-10">
-        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
-          Authorization Flow
-        </AnchorHeading>
-
-        <AnchorHeading as="h3" className="text-lg font-medium mt-6 mb-3">
-          Start the login
-        </AnchorHeading>
-        <p className="mb-3">
-          Redirect the user to authorize with their ATProto identity provider:
+        <ul className="list-disc pl-6 space-y-1 text-sm text-text-muted dark:text-text-muted-dark mb-3">
+          <li>
+            <strong>Crypto</strong> — uses Node{" "}
+            <code className="bg-surface-alt dark:bg-surface-alt-dark px-1 rounded font-mono">
+              crypto
+            </code>{" "}
+            module; Workers only expose WebCrypto (
+            <code className="bg-surface-alt dark:bg-surface-alt-dark px-1 rounded font-mono">
+              globalThis.crypto
+            </code>
+            ).
+          </li>
+          <li>
+            <strong>Request cache property</strong> — the client sets{" "}
+            <code className="bg-surface-alt dark:bg-surface-alt-dark px-1 rounded font-mono">
+              cache: "no-store"
+            </code>{" "}
+            on fetch requests; Workers throw a{" "}
+            <code className="bg-surface-alt dark:bg-surface-alt-dark px-1 rounded font-mono">
+              TypeError
+            </code>{" "}
+            if this property is present.
+          </li>
+          <li>
+            <strong>DID / handle resolution</strong> — the default resolvers use
+            Node networking; Workers require standard{" "}
+            <code className="bg-surface-alt dark:bg-surface-alt-dark px-1 rounded font-mono">
+              fetch
+            </code>
+            .
+          </li>
+          <li>
+            <strong>Session / state storage</strong> — file and in-process
+            stores don't persist across isolate instances; KV-backed stores are
+            required.
+          </li>
+        </ul>
+        <p className="text-sm text-text-muted dark:text-text-muted-dark">
+          This package wires up the WebCrypto{" "}
+          <a
+            href="/docs/edge-oauth-client/EdgeRuntimeImplementation"
+            className="text-primary dark:text-primary-dark hover:underline font-mono"
+          >
+            EdgeRuntimeImplementation
+          </a>
+          , the{" "}
+          <a
+            href="/docs/edge-oauth-client/patchGlobalRequestObject"
+            className="text-primary dark:text-primary-dark hover:underline font-mono"
+          >
+            patchGlobalRequestObject
+          </a>{" "}
+          fix, and edge-compatible resolver defaults so you don't have to.
         </p>
-        <CodeBlock
-          code={`// In your login route handler
-async function handleLogin(request: Request, env: Env) {
-  const client = createOAuthClient(env);
-  const handle = new URL(request.url).searchParams.get("handle");
-
-  const url = await client.authorize(handle, {
-    scope: "atproto transition:generic",
-  });
-
-  return Response.redirect(url.toString());
-}`}
-        />
-
-        <AnchorHeading as="h3" className="text-lg font-medium mt-6 mb-3">
-          Handle the callback
-        </AnchorHeading>
-        <p className="mb-3">Exchange the authorization code for a session:</p>
-        <CodeBlock
-          code={`// In your OAuth callback route handler
-async function handleCallback(request: Request, env: Env) {
-  const client = createOAuthClient(env);
-  const params = new URL(request.url).searchParams;
-
-  const { session } = await client.callback(params);
-
-  // session.did contains the authenticated user's DID
-  // session.sub contains the user's DID
-  // Store the session ID in a cookie or your own session store
-  return new Response(JSON.stringify({ did: session.did }), {
-    headers: { "Content-Type": "application/json" },
-  });
-}`}
-        />
-      </section>
-
-      <section className="mb-10">
-        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
-          Restoring Sessions
-        </AnchorHeading>
-        <p className="mb-3">
-          Restore a previously authenticated session to make API calls:
-        </p>
-        <CodeBlock
-          code={`async function handleApiRequest(request: Request, env: Env) {
-  const client = createOAuthClient(env);
-
-  // Restore session from the stored DID
-  const oauthSession = await client.restore("did:plc:user123");
-
-  // Use the session's fetch to make authenticated requests
-  const response = await oauthSession.fetchHandler(
-    "https://bsky.social/xrpc/app.bsky.actor.getProfile",
-    { method: "GET" }
-  );
-
-  return response;
-}`}
-        />
-      </section>
-
-      <section className="mb-10">
-        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
-          Custom Resolvers
-        </AnchorHeading>
-        <p className="mb-3">
-          The default resolvers use{" "}
-          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
-            plc.directory
-          </code>{" "}
-          for DID resolution and{" "}
-          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
-            public.api.bsky.app
-          </code>{" "}
-          for handle resolution. You can customize these:
-        </p>
-        <CodeBlock
-          code={`import { EdgeDidResolver, EdgeXrpcHandleResolver } from "@atiproto/edge-resolvers";
-
-const client = new EdgeOAuthClient({
-  // ...other options
-  didResolver: new EdgeDidResolver({
-    plcUrl: "https://plc.directory",
-    timeout: 5000,
-  }).asOAuthResolver(),
-  handleResolver: new EdgeXrpcHandleResolver(
-    "https://public.api.bsky.app"
-  ),
-});`}
-        />
-      </section>
-
-      <section className="mb-10">
-        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
-          Resolver Caching
-        </AnchorHeading>
-        <p className="mb-3">
-          By default, the OAuth client uses in-memory caches for DID and handle
-          resolution that reset when the Worker isolate recycles. For better
-          cache durability, use{" "}
-          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
-            @atiproto/edge-resolver-cache
-          </code>{" "}
-          which adds a Cloudflare Cache API tier that survives isolate restarts:
-        </p>
-        <CodeBlock
-          language="bash"
-          code="npm install @atiproto/edge-resolver-cache"
-        />
-        <div className="mt-3">
-          <CodeBlock
-            code={`import { createDidCache, createHandleCache } from "@atiproto/edge-resolver-cache";
-
-const client = new EdgeOAuthClient({
-  // ...other options
-  didCache: createDidCache(),
-  handleCache: createHandleCache(),
-});`}
-          />
-        </div>
-        <p className="mt-3 text-sm text-text-muted dark:text-text-muted-dark">
-          The tiered cache uses in-memory LRU as L1 and the free Cloudflare
-          Cache API as L2. No KV bindings or additional cost required.
-        </p>
-
-        <AnchorHeading as="h3" className="text-lg font-medium mt-6 mb-3">
-          Cache tiers
-        </AnchorHeading>
-        <div className="overflow-x-auto mb-4">
-          <table className="w-full text-sm border border-border dark:border-border-dark">
-            <thead>
-              <tr className="bg-surface-alt dark:bg-surface-alt-dark">
-                <th className="px-3 py-2 text-left border-b border-border dark:border-border-dark">
-                  Tier
-                </th>
-                <th className="px-3 py-2 text-left border-b border-border dark:border-border-dark">
-                  Backend
-                </th>
-                <th className="px-3 py-2 text-left border-b border-border dark:border-border-dark">
-                  Latency
-                </th>
-                <th className="px-3 py-2 text-left border-b border-border dark:border-border-dark">
-                  Lifetime
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="px-3 py-2 border-b border-border dark:border-border-dark">
-                  L1
-                </td>
-                <td className="px-3 py-2 border-b border-border dark:border-border-dark">
-                  In-memory LRU
-                </td>
-                <td className="px-3 py-2 border-b border-border dark:border-border-dark">
-                  ~0ms
-                </td>
-                <td className="px-3 py-2 border-b border-border dark:border-border-dark">
-                  Worker isolate lifetime
-                </td>
-              </tr>
-              <tr>
-                <td className="px-3 py-2">L2</td>
-                <td className="px-3 py-2">Cloudflare Cache API</td>
-                <td className="px-3 py-2">&lt;1ms</td>
-                <td className="px-3 py-2">
-                  Regional, survives isolate restarts
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <AnchorHeading as="h3" className="text-lg font-medium mt-6 mb-3">
-          Default TTLs
-        </AnchorHeading>
-        <div className="overflow-x-auto mb-4">
-          <table className="w-full text-sm border border-border dark:border-border-dark">
-            <thead>
-              <tr className="bg-surface-alt dark:bg-surface-alt-dark">
-                <th className="px-3 py-2 text-left border-b border-border dark:border-border-dark">
-                  Cache
-                </th>
-                <th className="px-3 py-2 text-left border-b border-border dark:border-border-dark">
-                  L1 (memory)
-                </th>
-                <th className="px-3 py-2 text-left border-b border-border dark:border-border-dark">
-                  L2 (Cache API)
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="px-3 py-2 border-b border-border dark:border-border-dark">
-                  DID documents
-                </td>
-                <td className="px-3 py-2 border-b border-border dark:border-border-dark">
-                  1 hour, ~50MB max
-                </td>
-                <td className="px-3 py-2 border-b border-border dark:border-border-dark">
-                  24 hours
-                </td>
-              </tr>
-              <tr>
-                <td className="px-3 py-2">Handle resolution</td>
-                <td className="px-3 py-2">10 minutes, 1000 entries</td>
-                <td className="px-3 py-2">1 hour</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <AnchorHeading as="h3" className="text-lg font-medium mt-6 mb-3">
-          Custom cache configuration
-        </AnchorHeading>
-        <p className="mb-3">
-          You can use{" "}
-          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
-            CacheApiStore
-          </code>{" "}
-          and{" "}
-          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
-            TieredStore
-          </code>{" "}
-          directly for custom configurations:
-        </p>
-        <CodeBlock
-          code={`import { CacheApiStore, TieredStore } from "@atiproto/edge-resolver-cache";
-import { SimpleStoreMemory } from "@atproto-labs/simple-store-memory";
-
-// Cache API only (no memory tier)
-const cacheOnly = new CacheApiStore({
-  prefix: "my-prefix:",
-  ttlSeconds: 3600,
-  cacheName: "my-cache",
-});
-
-// Custom tiered configuration
-const tiered = new TieredStore(
-  new SimpleStoreMemory({ max: 500, ttl: 300_000 }),
-  new CacheApiStore({ prefix: "custom:", ttlSeconds: 7200 }),
-);`}
-        />
       </section>
 
       <section>
         <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
-          KV Store Options
+          Getting started
         </AnchorHeading>
-        <p className="mb-3">
-          Both{" "}
-          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
-            KvStateStore
-          </code>{" "}
-          and{" "}
-          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
-            KvSessionStore
-          </code>{" "}
-          accept optional configuration:
+        <p className="text-text-muted dark:text-text-muted-dark">
+          See the{" "}
+          <a
+            href="/docs/edge-oauth-client"
+            className="text-primary dark:text-primary-dark hover:underline"
+          >
+            edge-oauth-client package docs
+          </a>{" "}
+          for installation, Wrangler configuration, and a full example of the
+          authorization flow.
         </p>
-        <CodeBlock
-          code={`new KvStateStore(env.OAUTH_STATE_KV, {
-  prefix: "oauth_state:",    // default
-  ttlSeconds: 600,           // default: 10 minutes
-});
-
-new KvSessionStore(env.OAUTH_SESSION_KV, {
-  prefix: "oauth_session:",  // default
-  ttlSeconds: 604800,        // default: 7 days
-});`}
-        />
       </section>
     </div>
   );
