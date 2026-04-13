@@ -17,6 +17,7 @@
   "dependencies": {
     "@atiproto/lexicons": ">=0.1.0",
     "isbot": "^5.1.31",
+    "prism-react-renderer": "^2.4.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router": "^7.10.0"

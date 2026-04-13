@@ -7,6 +7,76 @@ export default [
     route("checkout", "routes/checkout.tsx"),
     route("stripe-connect", "routes/stripe-connect.tsx"),
     route("edge-oauth", "routes/edge-oauth.tsx"),
+
+    // edge-oauth-client
+    route("edge-oauth-client", "routes/edge-oauth-client/_index.tsx"),
+    route(
+      "edge-oauth-client/EdgeOAuthClient",
+      "routes/edge-oauth-client/EdgeOAuthClient.tsx",
+    ),
+    route(
+      "edge-oauth-client/EdgeRuntimeImplementation",
+      "routes/edge-oauth-client/EdgeRuntimeImplementation.tsx",
+    ),
+    route(
+      "edge-oauth-client/patchGlobalRequestObject",
+      "routes/edge-oauth-client/patchGlobalRequestObject.tsx",
+    ),
+
+    // edge-resolvers
+    route("edge-resolvers", "routes/edge-resolvers/_index.tsx"),
+    route(
+      "edge-resolvers/EdgeDidResolver",
+      "routes/edge-resolvers/EdgeDidResolver.tsx",
+    ),
+    route(
+      "edge-resolvers/EdgeDidPlcResolver",
+      "routes/edge-resolvers/EdgeDidPlcResolver.tsx",
+    ),
+    route(
+      "edge-resolvers/EdgeDidWebResolver",
+      "routes/edge-resolvers/EdgeDidWebResolver.tsx",
+    ),
+    route(
+      "edge-resolvers/EdgeXrpcHandleResolver",
+      "routes/edge-resolvers/EdgeXrpcHandleResolver.tsx",
+    ),
+    route("edge-resolvers/timed", "routes/edge-resolvers/timed.tsx"),
+    route(
+      "edge-resolvers/resolveHandles",
+      "routes/edge-resolvers/resolveHandles.tsx",
+    ),
+
+    // kv-oauth-state-store
+    route("kv-oauth-state-store", "routes/kv-oauth-state-store/_index.tsx"),
+    route(
+      "kv-oauth-state-store/KvStateStore",
+      "routes/kv-oauth-state-store/KvStateStore.tsx",
+    ),
+    route(
+      "kv-oauth-state-store/KvSessionStore",
+      "routes/kv-oauth-state-store/KvSessionStore.tsx",
+    ),
+
+    // edge-resolver-cache
+    route("edge-resolver-cache", "routes/edge-resolver-cache/_index.tsx"),
+    route(
+      "edge-resolver-cache/CacheApiStore",
+      "routes/edge-resolver-cache/CacheApiStore.tsx",
+    ),
+    route(
+      "edge-resolver-cache/TieredStore",
+      "routes/edge-resolver-cache/TieredStore.tsx",
+    ),
+    route(
+      "edge-resolver-cache/createDidCache",
+      "routes/edge-resolver-cache/createDidCache.tsx",
+    ),
+    route(
+      "edge-resolver-cache/createHandleCache",
+      "routes/edge-resolver-cache/createHandleCache.tsx",
+    ),
+
     route("lexicon", "routes/lexicon/_index.tsx"),
     route("lexicon/:nsid", "routes/lexicon/$nsid.tsx"),
     route("api/search", "routes/api/search.tsx"),

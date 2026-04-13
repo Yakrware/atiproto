@@ -1,36 +1,77 @@
 import { useCallback, useState } from "react";
+import { Highlight, themes } from "prism-react-renderer";
+import type { Language } from "prism-react-renderer";
 
 interface CodeBlockProps {
   code: string;
   language?: string;
 }
 
+const LANGUAGE_MAP: Record<string, Language> = {
+  jsonc: "json",
+  typescript: "typescript",
+  bash: "bash",
+  json: "json",
+  tsx: "tsx",
+  jsx: "jsx",
+  javascript: "javascript",
+  js: "javascript",
+  ts: "typescript",
+};
+
 export function CodeBlock({ code, language = "typescript" }: CodeBlockProps) {
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(code).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
+  const handleCopy = useCallback(async () => {
+    const text = code.trim();
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const el = document.createElement("textarea");
+      el.value = text;
+      el.style.cssText = "position:fixed;opacity:0;pointer-events:none";
+      document.body.appendChild(el);
+      el.focus();
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }, [code]);
 
+  const lang = LANGUAGE_MAP[language] ?? "typescript";
+
   return (
-    <div className="relative group rounded-lg overflow-hidden border border-border dark:border-border-dark">
+    <div className="relative group rounded-lg overflow-hidden border border-[#181a1f]">
       {language && (
-        <div className="px-3 py-1 bg-surface-alt dark:bg-surface-alt-dark text-xs text-text-muted dark:text-text-muted-dark border-b border-border dark:border-border-dark">
+        <div className="px-3 py-1.5 bg-[#21252b] text-xs text-[#636d83] border-b border-[#181a1f] font-mono">
           {language}
         </div>
       )}
       <button
         onClick={handleCopy}
-        className="absolute top-1 right-2 p-1.5 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity bg-surface-alt dark:bg-surface-alt-dark hover:bg-border dark:hover:bg-border-dark"
+        className="absolute top-1 right-2 p-1.5 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity bg-[#21252b] hover:bg-[#2c313a] text-[#abb2bf]"
+        aria-label="Copy code"
       >
         {copied ? "Copied!" : "Copy"}
       </button>
-      <pre className="p-4 overflow-x-auto text-sm bg-surface-alt/50 dark:bg-surface-alt-dark/50">
-        <code>{code}</code>
-      </pre>
+      <Highlight theme={themes.oneDark} code={code.trim()} language={lang}>
+        {({ style, tokens, getLineProps, getTokenProps }) => (
+          <pre
+            className="p-4 overflow-x-auto text-sm leading-relaxed"
+            style={style}
+          >
+            {tokens.map((line, i) => (
+              <div key={i} {...getLineProps({ line })}>
+                {line.map((token, key) => (
+                  <span key={key} {...getTokenProps({ token })} />
+                ))}
+              </div>
+            ))}
+          </pre>
+        )}
+      </Highlight>
     </div>
   );
 }
