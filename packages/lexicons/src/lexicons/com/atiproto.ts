@@ -3,6 +3,8 @@
  */
 
 export * as account from './atiproto/account.js'
+export * as authEnhanced from './atiproto/authEnhanced.js'
+export * as authGeneral from './atiproto/authGeneral.js'
 export * as cart from './atiproto/cart.js'
 export * as feed from './atiproto/feed.js'
 export * as profile from './atiproto/profile.js'
