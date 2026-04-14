@@ -15,6 +15,7 @@
           },
           "cursor": {
             "type": "string",
+            "maxLength": 512,
             "description": "Pagination cursor"
           },
           "limit": {
@@ -42,6 +43,7 @@
             },
             "cursor": {
               "type": "string",
+              "maxLength": 512,
               "description": "Pagination cursor for next page"
             }
           }

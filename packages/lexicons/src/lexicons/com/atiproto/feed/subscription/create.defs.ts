@@ -17,8 +17,8 @@ const main = l.procedure(
   l.jsonPayload({
     subject: l.string({ format: 'did' }),
     amount: l.optional(l.integer()),
-    currency: l.string(),
-    interval: l.string(),
+    currency: l.string({ maxLength: 3 }),
+    interval: l.enum(['monthly', 'yearly']),
   }),
   l.jsonPayload({
     subscriptionUri: l.string({ format: 'at-uri' }),

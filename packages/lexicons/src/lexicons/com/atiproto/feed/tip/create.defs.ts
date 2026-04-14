@@ -18,7 +18,7 @@ const main = l.procedure(
     subject: l.string({ format: 'did' }),
     recordUri: l.optional(l.string({ format: 'at-uri' })),
     amount: l.integer(),
-    currency: l.string(),
+    currency: l.string({ maxLength: 3 }),
     cartUri: l.optional(l.string({ format: 'at-uri' })),
     redirectUrl: l.optional(l.string({ format: 'uri' })),
     message: l.optional(l.string({ maxGraphemes: 500, maxLength: 5000 })),

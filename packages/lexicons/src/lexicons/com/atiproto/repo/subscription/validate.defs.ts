@@ -20,8 +20,8 @@ const main = l.query(
   l.jsonPayload({
     valid: l.boolean(),
     amount: l.optional(l.integer()),
-    currency: l.optional(l.string()),
-    reason: l.optional(l.string()),
+    currency: l.optional(l.string({ maxLength: 3 })),
+    reason: l.optional(l.string({ maxLength: 1024 })),
   }),
 )
 export { main }

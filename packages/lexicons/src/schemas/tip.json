@@ -22,10 +22,12 @@
           },
           "currency": {
             "description": "ISO 4217 currency code",
+            "maxLength": 3,
             "type": "string"
           },
           "status": {
-            "description": "Tip status: pending, authorized (payment held), completed, failed, refunded",
+            "description": "Tip status",
+            "maxLength": 64,
             "type": "string",
             "enum": ["pending", "authorized", "completed", "failed", "refunded"]
           },

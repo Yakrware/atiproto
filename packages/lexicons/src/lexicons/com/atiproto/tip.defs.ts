@@ -33,7 +33,7 @@ type Main = {
   currency: string
 
   /**
-   * Tip status: pending, authorized (payment held), completed, failed, refunded
+   * Tip status
    */
   status: 'pending' | 'authorized' | 'completed' | 'failed' | 'refunded'
 
@@ -63,7 +63,7 @@ const main = l.record<'any', Main>(
     subject: l.string({ format: 'did' }),
     recordUri: l.optional(l.string({ format: 'at-uri' })),
     amount: l.integer({ minimum: 0 }),
-    currency: l.string(),
+    currency: l.string({ maxLength: 3 }),
     status: l.enum([
       'pending',
       'authorized',

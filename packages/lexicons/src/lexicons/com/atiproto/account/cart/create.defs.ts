@@ -14,7 +14,7 @@ const main = l.procedure(
   $nsid,
   l.params(),
   l.jsonPayload({
-    currency: l.string(),
+    currency: l.string({ maxLength: 3 }),
     redirectUrl: l.optional(l.string({ format: 'uri' })),
   }),
   l.jsonPayload({

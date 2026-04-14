@@ -15,7 +15,7 @@ const main = l.query(
   l.params(),
   l.jsonPayload({
     records: l.array(l.ref<AtiprotoTip.Main>((() => AtiprotoTip.main) as any)),
-    cursor: l.optional(l.string()),
+    cursor: l.optional(l.string({ maxLength: 512 })),
   }),
 )
 export { main }

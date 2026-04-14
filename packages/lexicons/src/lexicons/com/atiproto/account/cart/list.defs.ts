@@ -15,7 +15,7 @@ const main = l.query(
   l.params(),
   l.jsonPayload({
     carts: l.array(l.ref<CartResponse>((() => cartResponse) as any)),
-    cursor: l.optional(l.string()),
+    cursor: l.optional(l.string({ maxLength: 512 })),
   }),
 )
 export { main }

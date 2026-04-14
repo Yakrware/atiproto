@@ -12,10 +12,13 @@
           "properties": {
             "status": {
               "type": "string",
-              "description": "Filter: open, completed, expired, abandoned"
+              "maxLength": 64,
+              "enum": ["open", "completed", "expired", "abandoned"],
+              "description": "Filter by cart status"
             },
             "cursor": {
               "type": "string",
+              "maxLength": 512,
               "description": "Pagination cursor"
             },
             "limit": {
@@ -42,6 +45,7 @@
             },
             "cursor": {
               "type": "string",
+              "maxLength": 512,
               "description": "Pagination cursor for next page"
             }
           },

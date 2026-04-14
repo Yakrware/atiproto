@@ -17,10 +17,13 @@
             },
             "currency": {
               "description": "ISO 4217 currency code",
+              "maxLength": 3,
               "type": "string"
             },
             "interval": {
-              "description": "Billing interval: monthly or yearly",
+              "description": "Billing interval",
+              "maxLength": 64,
+              "enum": ["monthly", "yearly"],
               "type": "string"
             }
           },

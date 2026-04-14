@@ -28,14 +28,14 @@ type Main = {
   currency: string
 
   /**
-   * Billing interval: monthly or yearly
+   * Billing interval
    */
-  interval: string
+  interval: 'monthly' | 'yearly'
 
   /**
-   * Subscription status: pending, active, past_due, cancelled, expired
+   * Subscription status
    */
-  status: string
+  status: 'pending' | 'active' | 'past_due' | 'cancelled' | 'expired'
 
   /**
    * First billing period, can be used to determine recurrence
@@ -67,9 +67,9 @@ const main = l.record<'any', Main>(
   l.object({
     subject: l.string({ format: 'did' }),
     amount: l.integer({ minimum: 0 }),
-    currency: l.string(),
-    interval: l.string(),
-    status: l.string(),
+    currency: l.string({ maxLength: 3 }),
+    interval: l.enum(['monthly', 'yearly']),
+    status: l.enum(['pending', 'active', 'past_due', 'cancelled', 'expired']),
     billingStartDate: l.string({ format: 'datetime' }),
     cancelledAt: l.optional(l.string({ format: 'datetime' })),
     accessUntil: l.optional(l.string({ format: 'datetime' })),

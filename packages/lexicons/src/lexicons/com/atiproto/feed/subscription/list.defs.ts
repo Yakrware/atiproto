@@ -17,7 +17,7 @@ const main = l.query(
     subscriptions: l.array(
       l.ref<SubscriptionResponse>((() => subscriptionResponse) as any),
     ),
-    cursor: l.optional(l.string()),
+    cursor: l.optional(l.string({ maxLength: 512 })),
   }),
 )
 export { main }
