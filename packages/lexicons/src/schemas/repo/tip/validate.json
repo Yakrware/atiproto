@@ -51,10 +51,12 @@
             },
             "currency": {
               "type": "string",
+              "maxLength": 3,
               "description": "Currency of the tips"
             },
             "reason": {
               "type": "string",
+              "maxLength": 1024,
               "description": "If invalid, reason for rejection"
             }
           }

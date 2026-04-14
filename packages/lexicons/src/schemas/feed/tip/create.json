@@ -27,6 +27,7 @@
             },
             "currency": {
               "type": "string",
+              "maxLength": 3,
               "description": "ISO 4217 currency code"
             },
             "cartUri": {
@@ -52,7 +53,7 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": ["tipUri", "tip", "cartUri", "cart", "checkoutUrl"],
+          "required": ["tipUri", "tip"],
           "properties": {
             "tipUri": {
               "type": "string",

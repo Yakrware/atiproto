@@ -17,10 +17,23 @@
             },
             "currency": {
               "description": "ISO 4217 currency code",
+              "maxLength": 3,
               "type": "string"
             },
             "interval": {
-              "description": "Billing interval: monthly or yearly",
+              "description": "Billing interval",
+              "maxLength": 64,
+              "enum": ["monthly", "yearly"],
+              "type": "string"
+            },
+            "cartUri": {
+              "description": "AT-URI of an existing cart to add this subscription to. If omitted, a new cart is created.",
+              "format": "at-uri",
+              "type": "string"
+            },
+            "redirectUrl": {
+              "description": "URL to redirect to after checkout completes",
+              "format": "uri",
               "type": "string"
             }
           },
@@ -58,13 +71,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "subscriptionUri",
-            "subscription",
-            "cartUri",
-            "cart",
-            "checkoutUrl"
-          ],
+          "required": ["subscriptionUri", "subscription"],
           "type": "object"
         }
       },

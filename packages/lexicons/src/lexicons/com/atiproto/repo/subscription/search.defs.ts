@@ -14,7 +14,7 @@ const main = l.query(
   $nsid,
   l.params({
     subject: l.string({ format: 'did' }),
-    cursor: l.optional(l.string()),
+    cursor: l.optional(l.string({ maxLength: 512 })),
     limit: l.optional(
       l.withDefault(l.integer({ minimum: 1, maximum: 100 }), 50),
     ),
@@ -23,7 +23,7 @@ const main = l.query(
     subscriptions: l.array(
       l.ref<SubscriptionResponse>((() => subscriptionResponse) as any),
     ),
-    cursor: l.optional(l.string()),
+    cursor: l.optional(l.string({ maxLength: 512 })),
   }),
 )
 export { main }

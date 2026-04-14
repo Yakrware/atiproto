@@ -26,6 +26,7 @@
           },
           "currency": {
             "type": "string",
+            "maxLength": 3,
             "description": "ISO 4217 currency code"
           },
           "total": {
@@ -34,7 +35,9 @@
           },
           "status": {
             "type": "string",
-            "description": "Cart status: open, completed, expired, abandoned"
+            "maxLength": 64,
+            "enum": ["open", "completed", "expired", "abandoned"],
+            "description": "Cart status"
           },
           "createdAt": {
             "type": "string",
@@ -60,6 +63,7 @@
       "properties": {
         "type": {
           "type": "string",
+          "maxLength": 128,
           "description": "Item type: tip or subscription",
           "enum": ["com.atiproto.tip", "com.atiproto.subscription"]
         },

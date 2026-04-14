@@ -17,14 +17,19 @@
           },
           "currency": {
             "description": "ISO 4217 currency code",
+            "maxLength": 3,
             "type": "string"
           },
           "interval": {
-            "description": "Billing interval: monthly or yearly",
+            "description": "Billing interval",
+            "maxLength": 64,
+            "enum": ["monthly", "yearly"],
             "type": "string"
           },
           "status": {
-            "description": "Subscription status: pending, active, past_due, cancelled, expired",
+            "description": "Subscription status",
+            "maxLength": 64,
+            "enum": ["pending", "active", "past_due", "cancelled", "expired"],
             "type": "string"
           },
           "billingStartDate": {

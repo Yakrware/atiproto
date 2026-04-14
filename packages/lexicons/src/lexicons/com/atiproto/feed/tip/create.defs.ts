@@ -18,7 +18,7 @@ const main = l.procedure(
     subject: l.string({ format: 'did' }),
     recordUri: l.optional(l.string({ format: 'at-uri' })),
     amount: l.integer(),
-    currency: l.string(),
+    currency: l.string({ maxLength: 3 }),
     cartUri: l.optional(l.string({ format: 'at-uri' })),
     redirectUrl: l.optional(l.string({ format: 'uri' })),
     message: l.optional(l.string({ maxGraphemes: 500, maxLength: 5000 })),
@@ -26,9 +26,11 @@ const main = l.procedure(
   l.jsonPayload({
     tipUri: l.string({ format: 'at-uri' }),
     tip: l.ref<AtiprotoTip.Main>((() => AtiprotoTip.main) as any),
-    cartUri: l.string({ format: 'at-uri' }),
-    cart: l.ref<AtiprotoCart.Main>((() => AtiprotoCart.main) as any),
-    checkoutUrl: l.string({ format: 'uri' }),
+    cartUri: l.optional(l.string({ format: 'at-uri' })),
+    cart: l.optional(
+      l.ref<AtiprotoCart.Main>((() => AtiprotoCart.main) as any),
+    ),
+    checkoutUrl: l.optional(l.string({ format: 'uri' })),
   }),
 )
 export { main }

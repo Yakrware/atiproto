@@ -19,7 +19,7 @@ const main = l.permissionSet(
       ],
     }),
     l.permission('rpc', {
-      aud: 'did:web:atiproto.com#payments',
+      inheritAud: true,
       lxm: [
         'com.atiproto.account.cart.clone',
         'com.atiproto.account.cart.create',
@@ -47,7 +47,7 @@ const main = l.permissionSet(
   {
     title: 'General Access',
     detail:
-      'Write access to cart, subscription, and tip records, plus RPC access to all non-profile endpoints.',
+      'Write access to cart, subscription, and tip records, plus RPC access to payment, feed, and public profile lookup endpoints.',
   },
 )
 

@@ -13,6 +13,7 @@
           "properties": {
             "currency": {
               "type": "string",
+              "maxLength": 3,
               "description": "ISO 4217 currency code"
             },
             "redirectUrl": {

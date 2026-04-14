@@ -20,7 +20,7 @@ const main = l.permissionSet(
       ],
     }),
     l.permission('rpc', {
-      aud: 'did:web:atiproto.com#payments',
+      inheritAud: true,
       lxm: [
         'com.atiproto.account.cart.clone',
         'com.atiproto.account.cart.create',

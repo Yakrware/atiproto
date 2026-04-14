@@ -7,6 +7,7 @@ export default [
     route("checkout", "routes/checkout.tsx"),
     route("stripe-connect", "routes/stripe-connect.tsx"),
     route("edge-oauth", "routes/edge-oauth.tsx"),
+    route("permission-sets", "routes/permission-sets.tsx"),
 
     // edge-oauth-client
     route("edge-oauth-client", "routes/edge-oauth-client/_index.tsx"),

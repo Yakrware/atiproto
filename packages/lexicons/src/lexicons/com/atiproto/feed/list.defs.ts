@@ -26,7 +26,7 @@ const main = l.query(
         false,
       ),
     ),
-    cursor: l.optional(l.string()),
+    cursor: l.optional(l.string({ maxLength: 512 })),
   }),
 )
 export { main }

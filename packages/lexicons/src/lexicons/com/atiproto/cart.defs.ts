@@ -24,9 +24,9 @@ type Main = {
   total: number
 
   /**
-   * Cart status: open, completed, expired, abandoned
+   * Cart status
    */
-  status: string
+  status: 'open' | 'completed' | 'expired' | 'abandoned'
 
   /**
    * Creation timestamp
@@ -52,9 +52,9 @@ const main = l.record<'any', Main>(
   $nsid,
   l.object({
     items: l.array(l.ref<CartItem>((() => cartItem) as any)),
-    currency: l.string(),
+    currency: l.string({ maxLength: 3 }),
     total: l.integer(),
-    status: l.string(),
+    status: l.enum(['open', 'completed', 'expired', 'abandoned']),
     createdAt: l.string({ format: 'datetime' }),
     expiresAt: l.string({ format: 'datetime' }),
     completedAt: l.optional(l.string({ format: 'datetime' })),
