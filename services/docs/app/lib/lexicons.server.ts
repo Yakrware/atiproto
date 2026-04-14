@@ -33,6 +33,7 @@ export function buildNavTree(): NavItem[] {
     { label: "Checkout Flow", href: "/docs/checkout" },
     { label: "Stripe Connect", href: "/docs/stripe-connect" },
     { label: "Edge OAuth Client", href: "/docs/edge-oauth" },
+    { label: "Permission Sets", href: "/docs/permission-sets" },
   ];
 
   const edgePackages: NavItem[] = [

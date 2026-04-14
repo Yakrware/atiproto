@@ -5,7 +5,7 @@
     "main": {
       "type": "permission-set",
       "title": "General Access",
-      "detail": "Write access to cart, subscription, and tip records, plus RPC access to all non-profile endpoints.",
+      "detail": "Write access to cart, subscription, and tip records, plus RPC access to payment, feed, and public profile lookup endpoints.",
       "permissions": [
         {
           "type": "permission",
@@ -19,7 +19,7 @@
         {
           "type": "permission",
           "resource": "rpc",
-          "aud": "did:web:atiproto.com#payments",
+          "inheritAud": true,
           "lxm": [
             "com.atiproto.account.cart.clone",
             "com.atiproto.account.cart.create",
