@@ -19,15 +19,19 @@ const main = l.procedure(
     amount: l.optional(l.integer()),
     currency: l.string({ maxLength: 3 }),
     interval: l.enum(['monthly', 'yearly']),
+    cartUri: l.optional(l.string({ format: 'at-uri' })),
+    redirectUrl: l.optional(l.string({ format: 'uri' })),
   }),
   l.jsonPayload({
     subscriptionUri: l.string({ format: 'at-uri' }),
     subscription: l.ref<AtiprotoSubscription.Main>(
       (() => AtiprotoSubscription.main) as any,
     ),
-    cartUri: l.string({ format: 'at-uri' }),
-    cart: l.ref<AtiprotoCart.Main>((() => AtiprotoCart.main) as any),
-    checkoutUrl: l.string({ format: 'uri' }),
+    cartUri: l.optional(l.string({ format: 'at-uri' })),
+    cart: l.optional(
+      l.ref<AtiprotoCart.Main>((() => AtiprotoCart.main) as any),
+    ),
+    checkoutUrl: l.optional(l.string({ format: 'uri' })),
   }),
 )
 export { main }
