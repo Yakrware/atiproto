@@ -46,7 +46,7 @@ type SubscriptionResponse = {
    * AT-URI of the subscription record
    */
   uri: l.AtUriString
-  record: AtiprotoSubscription.Main
+  record: AtiprotoSubscription.View
 }
 
 export type { SubscriptionResponse }
@@ -56,8 +56,8 @@ const subscriptionResponse = l.typedObject<SubscriptionResponse>(
   'subscriptionResponse',
   l.object({
     uri: l.string({ format: 'at-uri' }),
-    record: l.ref<AtiprotoSubscription.Main>(
-      (() => AtiprotoSubscription.main) as any,
+    record: l.ref<AtiprotoSubscription.View>(
+      (() => AtiprotoSubscription.view) as any,
     ),
   }),
 )

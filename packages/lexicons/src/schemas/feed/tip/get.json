@@ -30,7 +30,7 @@
             "value": {
               "description": "The tip record data",
               "type": "ref",
-              "ref": "com.atiproto.tip"
+              "ref": "com.atiproto.tip#view"
             }
           },
           "required": ["uri", "cid", "value"],

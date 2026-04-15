@@ -34,6 +34,35 @@
           }
         }
       }
+    },
+    "view": {
+      "type": "object",
+      "description": "View of a user's profile settings for use in API responses",
+      "required": ["createdAt"],
+      "properties": {
+        "acceptsTips": {
+          "type": "boolean",
+          "description": "Whether user accepts tips (default: true)"
+        },
+        "acceptsSubscriptions": {
+          "type": "boolean",
+          "description": "Whether user accepts subscriptions (default: true)"
+        },
+        "disableReceiptNotifications": {
+          "type": "boolean",
+          "description": "Opt out of payment receipt DMs (default: false)"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime",
+          "description": "Creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "datetime",
+          "description": "Last update timestamp"
+        }
+      }
     }
   }
 }

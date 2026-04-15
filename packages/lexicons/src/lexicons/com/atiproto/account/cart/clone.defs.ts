@@ -20,13 +20,13 @@ const main = l.procedure(
     redirectUrl: l.optional(l.string({ format: 'uri' })),
   }),
   l.jsonPayload({
-    cart: l.ref<AtiprotoCart.Main>((() => AtiprotoCart.main) as any),
+    cart: l.ref<AtiprotoCart.View>((() => AtiprotoCart.view) as any),
     cartUri: l.string({ format: 'at-uri' }),
     checkoutUrl: l.string({ format: 'uri' }),
-    tips: l.array(l.ref<AtiprotoTip.Main>((() => AtiprotoTip.main) as any)),
+    tips: l.array(l.ref<AtiprotoTip.View>((() => AtiprotoTip.view) as any)),
     subscriptions: l.array(
-      l.ref<AtiprotoSubscription.Main>(
-        (() => AtiprotoSubscription.main) as any,
+      l.ref<AtiprotoSubscription.View>(
+        (() => AtiprotoSubscription.view) as any,
       ),
     ),
   }),

@@ -71,7 +71,7 @@ describe("Agent", () => {
         .calls[0][1] as RequestInit;
       const headers = new Headers(init.headers);
       expect(headers.get("atproto-proxy")).toBe(
-        "did:web:atiproto.com#tips_service",
+        "did:web:atiproto.com#payments",
       );
     });
 
@@ -99,17 +99,14 @@ describe("Agent", () => {
       new Agent(atpAgent);
 
       expect(withProxySpy).toHaveBeenCalledWith(
-        "tips_service",
+        "payments",
         "did:web:atiproto.com",
       );
     });
 
     it("delegates to the proxied agent fetchHandler", async () => {
       const atpAgent = createMockApiAgent();
-      const proxied = atpAgent.withProxy(
-        "tips_service",
-        "did:web:atiproto.com",
-      );
+      const proxied = atpAgent.withProxy("payments", "did:web:atiproto.com");
       const proxiedFetchSpy = vi.spyOn(proxied, "fetchHandler");
 
       vi.spyOn(atpAgent, "withProxy").mockReturnValue(proxied);
@@ -137,7 +134,7 @@ describe("Agent", () => {
         .calls[0][1] as RequestInit;
       const headers = new Headers(init.headers);
       expect(headers.get("atproto-proxy")).toBe(
-        "did:web:atiproto.com#tips_service",
+        "did:web:atiproto.com#payments",
       );
     });
   });

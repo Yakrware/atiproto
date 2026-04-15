@@ -65,6 +65,68 @@
         "type": "object"
       },
       "type": "record"
+    },
+    "view": {
+      "type": "object",
+      "description": "View of a subscription record for use in API responses",
+      "required": [
+        "subject",
+        "amount",
+        "currency",
+        "interval",
+        "status",
+        "billingStartDate",
+        "createdAt"
+      ],
+      "properties": {
+        "subject": {
+          "description": "DID of the user being subscribed to",
+          "format": "did",
+          "type": "string"
+        },
+        "amount": {
+          "description": "Subscription amount in cents (0 for free subscriptions)",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "currency": {
+          "description": "ISO 4217 currency code",
+          "maxLength": 3,
+          "type": "string"
+        },
+        "interval": {
+          "description": "Billing interval",
+          "maxLength": 64,
+          "enum": ["monthly", "yearly"],
+          "type": "string"
+        },
+        "status": {
+          "description": "Subscription status",
+          "maxLength": 64,
+          "enum": ["pending", "active", "past_due", "cancelled", "expired"],
+          "type": "string"
+        },
+        "billingStartDate": {
+          "description": "First billing period, can be used to determine recurrence",
+          "format": "datetime",
+          "type": "string"
+        },
+        "cancelledAt": {
+          "description": "Cancellation timestamp",
+          "format": "datetime",
+          "type": "string"
+        },
+        "accessUntil": {
+          "description": "Date until which the subscriber retains access after cancellation",
+          "format": "datetime",
+          "type": "string"
+        },
+        "createdAt": {
+          "description": "Creation timestamp",
+          "format": "datetime",
+          "type": "string"
+        }
+      }
     }
   },
   "id": "com.atiproto.subscription",

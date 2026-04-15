@@ -16,8 +16,8 @@ const main = l.procedure(
   l.jsonPayload({ subscriptionUri: l.string({ format: 'at-uri' }) }),
   l.jsonPayload({
     subscriptionUri: l.string({ format: 'at-uri' }),
-    subscription: l.ref<AtiprotoSubscription.Main>(
-      (() => AtiprotoSubscription.main) as any,
+    subscription: l.ref<AtiprotoSubscription.View>(
+      (() => AtiprotoSubscription.view) as any,
     ),
     accessUntil: l.string({ format: 'datetime' }),
   }),

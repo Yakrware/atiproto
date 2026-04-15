@@ -76,6 +76,61 @@ export const $assert = /*#__PURE__*/ main.assert.bind(main),
   $validate = /*#__PURE__*/ main.validate.bind(main),
   $safeValidate = /*#__PURE__*/ main.safeValidate.bind(main)
 
+/** View of a cart record for use in API responses */
+type View = {
+  $type?: 'com.atiproto.cart#view'
+  items: CartItem[]
+
+  /**
+   * ISO 4217 currency code
+   */
+  currency: string
+
+  /**
+   * Total amount in cents
+   */
+  total: number
+
+  /**
+   * Cart status
+   */
+  status: 'open' | 'completed' | 'expired' | 'abandoned'
+
+  /**
+   * Creation timestamp
+   */
+  createdAt: l.DatetimeString
+
+  /**
+   * Expiration timestamp
+   */
+  expiresAt: l.DatetimeString
+
+  /**
+   * Completion timestamp
+   */
+  completedAt?: l.DatetimeString
+}
+
+export type { View }
+
+/** View of a cart record for use in API responses */
+const view = l.typedObject<View>(
+  $nsid,
+  'view',
+  l.object({
+    items: l.array(l.ref<CartItem>((() => cartItem) as any)),
+    currency: l.string({ maxLength: 3 }),
+    total: l.integer(),
+    status: l.enum(['open', 'completed', 'expired', 'abandoned']),
+    createdAt: l.string({ format: 'datetime' }),
+    expiresAt: l.string({ format: 'datetime' }),
+    completedAt: l.optional(l.string({ format: 'datetime' })),
+  }),
+)
+
+export { view }
+
 type CartItem = {
   $type?: 'com.atiproto.cart#cartItem'
 

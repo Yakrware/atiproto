@@ -21,7 +21,7 @@ const main = l.procedure(
   l.jsonPayload({
     uri: l.string({ format: 'at-uri' }),
     cid: l.string({ format: 'cid' }),
-    profile: l.ref<AtiprotoProfile.Main>((() => AtiprotoProfile.main) as any),
+    profile: l.ref<AtiprotoProfile.View>((() => AtiprotoProfile.view) as any),
     hasProfile: l.boolean(),
     readyForPayment: l.boolean(),
   }),

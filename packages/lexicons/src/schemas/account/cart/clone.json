@@ -38,7 +38,7 @@
           "properties": {
             "cart": {
               "type": "ref",
-              "ref": "com.atiproto.cart",
+              "ref": "com.atiproto.cart#view",
               "description": "The new cart record"
             },
             "cartUri": {
@@ -55,7 +55,7 @@
               "type": "array",
               "items": {
                 "type": "ref",
-                "ref": "com.atiproto.tip"
+                "ref": "com.atiproto.tip#view"
               },
               "description": "Newly created tip records"
             },
@@ -63,7 +63,7 @@
               "type": "array",
               "items": {
                 "type": "ref",
-                "ref": "com.atiproto.subscription"
+                "ref": "com.atiproto.subscription#view"
               },
               "description": "Newly created subscription records"
             }

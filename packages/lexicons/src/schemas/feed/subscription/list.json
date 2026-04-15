@@ -58,7 +58,7 @@
         },
         "record": {
           "type": "ref",
-          "ref": "com.atiproto.subscription"
+          "ref": "com.atiproto.subscription#view"
         }
       }
     }

@@ -44,7 +44,7 @@ type TipResponse = {
    * AT-URI of the tip record
    */
   uri: l.AtUriString
-  record: AtiprotoTip.Main
+  record: AtiprotoTip.View
 }
 
 export type { TipResponse }
@@ -54,7 +54,7 @@ const tipResponse = l.typedObject<TipResponse>(
   'tipResponse',
   l.object({
     uri: l.string({ format: 'at-uri' }),
-    record: l.ref<AtiprotoTip.Main>((() => AtiprotoTip.main) as any),
+    record: l.ref<AtiprotoTip.View>((() => AtiprotoTip.view) as any),
   }),
 )
 

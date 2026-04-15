@@ -16,8 +16,8 @@ const main = l.query(
   l.jsonPayload({
     uri: l.string({ format: 'at-uri' }),
     cid: l.string({ format: 'cid' }),
-    record: l.ref<AtiprotoSubscription.Main>(
-      (() => AtiprotoSubscription.main) as any,
+    record: l.ref<AtiprotoSubscription.View>(
+      (() => AtiprotoSubscription.view) as any,
     ),
   }),
 )

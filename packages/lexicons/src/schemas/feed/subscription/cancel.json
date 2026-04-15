@@ -32,7 +32,7 @@
             },
             "subscription": {
               "type": "ref",
-              "ref": "com.atiproto.subscription",
+              "ref": "com.atiproto.subscription#view",
               "description": "Updated subscription record"
             },
             "accessUntil": {

@@ -32,7 +32,7 @@
           "properties": {
             "cart": {
               "type": "ref",
-              "ref": "com.atiproto.cart",
+              "ref": "com.atiproto.cart#view",
               "description": "The created cart record"
             },
             "cartUri": {

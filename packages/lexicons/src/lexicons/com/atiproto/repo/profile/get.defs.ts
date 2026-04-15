@@ -15,7 +15,7 @@ const main = l.query(
   l.params({ did: l.string({ format: 'did' }) }),
   l.jsonPayload({
     did: l.string({ format: 'did' }),
-    profile: l.ref<AtiprotoProfile.Main>((() => AtiprotoProfile.main) as any),
+    profile: l.ref<AtiprotoProfile.View>((() => AtiprotoProfile.view) as any),
   }),
 )
 export { main }
