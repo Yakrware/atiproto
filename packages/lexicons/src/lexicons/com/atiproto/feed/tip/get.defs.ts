@@ -16,7 +16,7 @@ const main = l.query(
   l.jsonPayload({
     uri: l.string({ format: 'at-uri' }),
     cid: l.string({ format: 'cid' }),
-    value: l.ref<AtiprotoTip.Main>((() => AtiprotoTip.main) as any),
+    value: l.ref<AtiprotoTip.View>((() => AtiprotoTip.view) as any),
   }),
 )
 export { main }

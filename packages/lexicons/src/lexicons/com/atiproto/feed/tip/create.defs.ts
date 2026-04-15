@@ -25,10 +25,10 @@ const main = l.procedure(
   }),
   l.jsonPayload({
     tipUri: l.string({ format: 'at-uri' }),
-    tip: l.ref<AtiprotoTip.Main>((() => AtiprotoTip.main) as any),
+    tip: l.ref<AtiprotoTip.View>((() => AtiprotoTip.view) as any),
     cartUri: l.optional(l.string({ format: 'at-uri' })),
     cart: l.optional(
-      l.ref<AtiprotoCart.Main>((() => AtiprotoCart.main) as any),
+      l.ref<AtiprotoCart.View>((() => AtiprotoCart.view) as any),
     ),
     checkoutUrl: l.optional(l.string({ format: 'uri' })),
   }),

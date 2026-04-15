@@ -34,7 +34,7 @@
             },
             "cart": {
               "type": "ref",
-              "ref": "com.atiproto.cart",
+              "ref": "com.atiproto.cart#view",
               "description": "The cart record data"
             },
             "checkoutUrl": {
@@ -46,7 +46,7 @@
               "type": "array",
               "items": {
                 "type": "ref",
-                "ref": "com.atiproto.tip"
+                "ref": "com.atiproto.tip#view"
               },
               "description": "Resolved tip records referenced by this cart"
             },
@@ -54,7 +54,7 @@
               "type": "array",
               "items": {
                 "type": "ref",
-                "ref": "com.atiproto.subscription"
+                "ref": "com.atiproto.subscription#view"
               },
               "description": "Resolved subscription records referenced by this cart"
             }

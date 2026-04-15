@@ -24,12 +24,12 @@ const main = l.procedure(
   }),
   l.jsonPayload({
     subscriptionUri: l.string({ format: 'at-uri' }),
-    subscription: l.ref<AtiprotoSubscription.Main>(
-      (() => AtiprotoSubscription.main) as any,
+    subscription: l.ref<AtiprotoSubscription.View>(
+      (() => AtiprotoSubscription.view) as any,
     ),
     cartUri: l.optional(l.string({ format: 'at-uri' })),
     cart: l.optional(
-      l.ref<AtiprotoCart.Main>((() => AtiprotoCart.main) as any),
+      l.ref<AtiprotoCart.View>((() => AtiprotoCart.view) as any),
     ),
     checkoutUrl: l.optional(l.string({ format: 'uri' })),
   }),

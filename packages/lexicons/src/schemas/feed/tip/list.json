@@ -35,7 +35,7 @@
               "type": "array",
               "items": {
                 "type": "ref",
-                "ref": "com.atiproto.tip"
+                "ref": "com.atiproto.tip#view"
               }
             },
             "cursor": {

@@ -14,7 +14,7 @@ const main = l.query(
   $nsid,
   l.params(),
   l.jsonPayload({
-    records: l.array(l.ref<AtiprotoTip.Main>((() => AtiprotoTip.main) as any)),
+    records: l.array(l.ref<AtiprotoTip.View>((() => AtiprotoTip.view) as any)),
     cursor: l.optional(l.string({ maxLength: 512 })),
   }),
 )

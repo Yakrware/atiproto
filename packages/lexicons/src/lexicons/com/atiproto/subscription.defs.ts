@@ -91,3 +91,74 @@ export const $assert = /*#__PURE__*/ main.assert.bind(main),
   $safeParse = /*#__PURE__*/ main.safeParse.bind(main),
   $validate = /*#__PURE__*/ main.validate.bind(main),
   $safeValidate = /*#__PURE__*/ main.safeValidate.bind(main)
+
+/** View of a subscription record for use in API responses */
+type View = {
+  $type?: 'com.atiproto.subscription#view'
+
+  /**
+   * DID of the user being subscribed to
+   */
+  subject: l.DidString
+
+  /**
+   * Subscription amount in cents (0 for free subscriptions)
+   */
+  amount: number
+
+  /**
+   * ISO 4217 currency code
+   */
+  currency: string
+
+  /**
+   * Billing interval
+   */
+  interval: 'monthly' | 'yearly'
+
+  /**
+   * Subscription status
+   */
+  status: 'pending' | 'active' | 'past_due' | 'cancelled' | 'expired'
+
+  /**
+   * First billing period, can be used to determine recurrence
+   */
+  billingStartDate: l.DatetimeString
+
+  /**
+   * Cancellation timestamp
+   */
+  cancelledAt?: l.DatetimeString
+
+  /**
+   * Date until which the subscriber retains access after cancellation
+   */
+  accessUntil?: l.DatetimeString
+
+  /**
+   * Creation timestamp
+   */
+  createdAt: l.DatetimeString
+}
+
+export type { View }
+
+/** View of a subscription record for use in API responses */
+const view = l.typedObject<View>(
+  $nsid,
+  'view',
+  l.object({
+    subject: l.string({ format: 'did' }),
+    amount: l.integer({ minimum: 0 }),
+    currency: l.string({ maxLength: 3 }),
+    interval: l.enum(['monthly', 'yearly']),
+    status: l.enum(['pending', 'active', 'past_due', 'cancelled', 'expired']),
+    billingStartDate: l.string({ format: 'datetime' }),
+    cancelledAt: l.optional(l.string({ format: 'datetime' })),
+    accessUntil: l.optional(l.string({ format: 'datetime' })),
+    createdAt: l.string({ format: 'datetime' }),
+  }),
+)
+
+export { view }

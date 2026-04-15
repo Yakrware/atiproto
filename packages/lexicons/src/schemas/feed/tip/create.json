@@ -62,7 +62,7 @@
             },
             "tip": {
               "type": "ref",
-              "ref": "com.atiproto.tip",
+              "ref": "com.atiproto.tip#view",
               "description": "The created tip record (status: pending)"
             },
             "cartUri": {
@@ -72,7 +72,7 @@
             },
             "cart": {
               "type": "ref",
-              "ref": "com.atiproto.cart",
+              "ref": "com.atiproto.cart#view",
               "description": "The cart record (new or updated)"
             },
             "checkoutUrl": {

@@ -18,7 +18,7 @@ const main = l.procedure(
     redirectUrl: l.optional(l.string({ format: 'uri' })),
   }),
   l.jsonPayload({
-    cart: l.ref<AtiprotoCart.Main>((() => AtiprotoCart.main) as any),
+    cart: l.ref<AtiprotoCart.View>((() => AtiprotoCart.view) as any),
     cartUri: l.string({ format: 'at-uri' }),
     checkoutUrl: l.string({ format: 'uri' }),
   }),

@@ -61,7 +61,7 @@
         },
         "record": {
           "type": "ref",
-          "ref": "com.atiproto.tip"
+          "ref": "com.atiproto.tip#view"
         }
       }
     }

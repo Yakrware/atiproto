@@ -57,6 +57,57 @@
         }
       }
     },
+    "view": {
+      "type": "object",
+      "description": "View of a cart record for use in API responses",
+      "required": [
+        "items",
+        "currency",
+        "total",
+        "status",
+        "createdAt",
+        "expiresAt"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#cartItem"
+          }
+        },
+        "currency": {
+          "type": "string",
+          "maxLength": 3,
+          "description": "ISO 4217 currency code"
+        },
+        "total": {
+          "type": "integer",
+          "description": "Total amount in cents"
+        },
+        "status": {
+          "type": "string",
+          "maxLength": 64,
+          "enum": ["open", "completed", "expired", "abandoned"],
+          "description": "Cart status"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime",
+          "description": "Creation timestamp"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "datetime",
+          "description": "Expiration timestamp"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "datetime",
+          "description": "Completion timestamp"
+        }
+      }
+    },
     "cartItem": {
       "type": "object",
       "required": ["type", "recordUri"],

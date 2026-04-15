@@ -29,7 +29,7 @@
             },
             "profile": {
               "type": "ref",
-              "ref": "com.atiproto.profile",
+              "ref": "com.atiproto.profile#view",
               "description": "Public profile data"
             }
           }

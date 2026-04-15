@@ -53,7 +53,7 @@
             "subscription": {
               "description": "The created subscription record (status: pending)",
               "type": "ref",
-              "ref": "com.atiproto.subscription"
+              "ref": "com.atiproto.subscription#view"
             },
             "cartUri": {
               "description": "URI of the cart record in PDS",
@@ -63,7 +63,7 @@
             "cart": {
               "description": "The created cart record (status: open)",
               "type": "ref",
-              "ref": "com.atiproto.cart"
+              "ref": "com.atiproto.cart#view"
             },
             "checkoutUrl": {
               "description": "Checkout URL hosted by atiproto",

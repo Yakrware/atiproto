@@ -18,12 +18,12 @@ const main = l.query(
   l.jsonPayload({
     uri: l.string({ format: 'at-uri' }),
     cid: l.optional(l.string({ format: 'cid' })),
-    cart: l.ref<AtiprotoCart.Main>((() => AtiprotoCart.main) as any),
+    cart: l.ref<AtiprotoCart.View>((() => AtiprotoCart.view) as any),
     checkoutUrl: l.optional(l.string({ format: 'uri' })),
-    tips: l.array(l.ref<AtiprotoTip.Main>((() => AtiprotoTip.main) as any)),
+    tips: l.array(l.ref<AtiprotoTip.View>((() => AtiprotoTip.view) as any)),
     subscriptions: l.array(
-      l.ref<AtiprotoSubscription.Main>(
-        (() => AtiprotoSubscription.main) as any,
+      l.ref<AtiprotoSubscription.View>(
+        (() => AtiprotoSubscription.view) as any,
       ),
     ),
   }),

@@ -16,7 +16,7 @@ const main = l.query(
   l.jsonPayload({
     uri: l.optional(l.string({ format: 'at-uri' })),
     cid: l.optional(l.string({ format: 'cid' })),
-    profile: l.ref<AtiprotoProfile.Main>((() => AtiprotoProfile.main) as any),
+    profile: l.ref<AtiprotoProfile.View>((() => AtiprotoProfile.view) as any),
     hasProfile: l.boolean(),
     readyForPayment: l.boolean(),
   }),

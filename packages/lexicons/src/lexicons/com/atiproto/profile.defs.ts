@@ -67,3 +67,50 @@ export const $assert = /*#__PURE__*/ main.assert.bind(main),
   $safeParse = /*#__PURE__*/ main.safeParse.bind(main),
   $validate = /*#__PURE__*/ main.validate.bind(main),
   $safeValidate = /*#__PURE__*/ main.safeValidate.bind(main)
+
+/** View of a user's profile settings for use in API responses */
+type View = {
+  $type?: 'com.atiproto.profile#view'
+
+  /**
+   * Whether user accepts tips (default: true)
+   */
+  acceptsTips?: boolean
+
+  /**
+   * Whether user accepts subscriptions (default: true)
+   */
+  acceptsSubscriptions?: boolean
+
+  /**
+   * Opt out of payment receipt DMs (default: false)
+   */
+  disableReceiptNotifications?: boolean
+
+  /**
+   * Creation timestamp
+   */
+  createdAt: l.DatetimeString
+
+  /**
+   * Last update timestamp
+   */
+  updatedAt?: l.DatetimeString
+}
+
+export type { View }
+
+/** View of a user's profile settings for use in API responses */
+const view = l.typedObject<View>(
+  $nsid,
+  'view',
+  l.object({
+    acceptsTips: l.optional(l.boolean()),
+    acceptsSubscriptions: l.optional(l.boolean()),
+    disableReceiptNotifications: l.optional(l.boolean()),
+    createdAt: l.string({ format: 'datetime' }),
+    updatedAt: l.optional(l.string({ format: 'datetime' })),
+  }),
+)
+
+export { view }

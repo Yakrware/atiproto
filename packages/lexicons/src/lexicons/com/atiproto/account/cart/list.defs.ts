@@ -43,7 +43,7 @@ type CartResponse = {
    * CID of the cart record
    */
   cid: l.CidString
-  record: AtiprotoCart.Main
+  record: AtiprotoCart.View
 }
 
 export type { CartResponse }
@@ -54,7 +54,7 @@ const cartResponse = l.typedObject<CartResponse>(
   l.object({
     uri: l.string({ format: 'at-uri' }),
     cid: l.string({ format: 'cid' }),
-    record: l.ref<AtiprotoCart.Main>((() => AtiprotoCart.main) as any),
+    record: l.ref<AtiprotoCart.View>((() => AtiprotoCart.view) as any),
   }),
 )
 

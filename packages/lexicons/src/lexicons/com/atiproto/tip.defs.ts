@@ -91,3 +91,74 @@ export const $assert = /*#__PURE__*/ main.assert.bind(main),
   $safeParse = /*#__PURE__*/ main.safeParse.bind(main),
   $validate = /*#__PURE__*/ main.validate.bind(main),
   $safeValidate = /*#__PURE__*/ main.safeValidate.bind(main)
+
+/** View of a tip record for use in API responses */
+type View = {
+  $type?: 'com.atiproto.tip#view'
+
+  /**
+   * DID of the user receiving the tip
+   */
+  subject: l.DidString
+
+  /**
+   * AT-URI of specific record being tipped
+   */
+  recordUri?: l.AtUriString
+
+  /**
+   * Tip amount in cents (0 when recipient allows zero tips)
+   */
+  amount: number
+
+  /**
+   * ISO 4217 currency code
+   */
+  currency: string
+
+  /**
+   * Tip status
+   */
+  status: 'pending' | 'authorized' | 'completed' | 'failed' | 'refunded'
+
+  /**
+   * Optional message (max 500 chars)
+   */
+  message?: string
+
+  /**
+   * Creation timestamp
+   */
+  createdAt: l.DatetimeString
+
+  /**
+   * Completion timestamp
+   */
+  completedAt?: l.DatetimeString
+}
+
+export type { View }
+
+/** View of a tip record for use in API responses */
+const view = l.typedObject<View>(
+  $nsid,
+  'view',
+  l.object({
+    subject: l.string({ format: 'did' }),
+    recordUri: l.optional(l.string({ format: 'at-uri' })),
+    amount: l.integer({ minimum: 0 }),
+    currency: l.string({ maxLength: 3 }),
+    status: l.enum([
+      'pending',
+      'authorized',
+      'completed',
+      'failed',
+      'refunded',
+    ]),
+    message: l.optional(l.string({ maxGraphemes: 500, maxLength: 5000 })),
+    createdAt: l.string({ format: 'datetime' }),
+    completedAt: l.optional(l.string({ format: 'datetime' })),
+  }),
+)
+
+export { view }

@@ -23,7 +23,7 @@
             },
             "profile": {
               "type": "ref",
-              "ref": "com.atiproto.profile",
+              "ref": "com.atiproto.profile#view",
               "description": "The profile record data (defaults if not configured)"
             },
             "hasProfile": {

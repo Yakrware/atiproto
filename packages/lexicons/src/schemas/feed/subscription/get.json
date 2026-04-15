@@ -30,7 +30,7 @@
             "record": {
               "description": "The subscription record data",
               "type": "ref",
-              "ref": "com.atiproto.subscription"
+              "ref": "com.atiproto.subscription#view"
             }
           },
           "required": ["uri", "cid", "record"],
