@@ -43,8 +43,10 @@ export class Agent extends XrpcClient {
 
     super(createFetchHandler(client), schemas);
 
-    this.com = new ComNS(this);
+    this.com = new ComNS(this, client);
 
+    // Root proxy: our own properties take priority, everything else falls
+    // through to the underlying client.
     return new Proxy(this, {
       get(target, prop, receiver) {
         if (prop in target) return Reflect.get(target, prop, receiver);
