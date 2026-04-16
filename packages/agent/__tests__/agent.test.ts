@@ -159,6 +159,36 @@ describe("Agent", () => {
     });
   });
 
+  describe("nested com proxy delegation", () => {
+    it("delegates com.atproto to the underlying client", () => {
+      const atpAgent = createMockApiAgent();
+      const agent = new Agent(atpAgent);
+
+      // com.atproto should fall through to the ApiAgent's com.atproto
+      expect(agent.com.atproto).toBeDefined();
+      expect(agent.com.atproto.repo).toBeDefined();
+      expect(agent.com.atproto.server).toBeDefined();
+    });
+
+    it("preserves our atiproto namespace on com", () => {
+      const atpAgent = createMockApiAgent();
+      const agent = new Agent(atpAgent);
+
+      expect(agent.com.atiproto).toBeDefined();
+      expect(agent.com.atiproto.feed).toBeDefined();
+      expect(agent.com.atiproto.account).toBeDefined();
+    });
+
+    it("prefers our com properties over the client's", () => {
+      const atpAgent = createMockApiAgent();
+      const agent = new Agent(atpAgent);
+
+      // atiproto._client should be our agent, not the ApiAgent
+      expect(agent.com.atiproto._client).not.toBe(atpAgent);
+      expect(agent.com.atiproto._client).toBeInstanceOf(XrpcClient);
+    });
+  });
+
   describe("namespace method calls", () => {
     let agent: Agent;
 

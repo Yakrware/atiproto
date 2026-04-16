@@ -32,9 +32,13 @@ function createFetchHandler(client: XrpcClient): FetchHandler {
   };
 }
 
-export class Agent extends XrpcClient {
-  com: ComNS;
+type ComOf<T> = T extends { com: infer C extends object } ? C : {};
 
+export class Agent<TClient extends XrpcClient = ApiAgent> extends XrpcClient {
+  com: ComNS & ComOf<TClient>;
+
+  constructor(options: TClient);
+  constructor(options: SessionManager | FetchHandler | FetchHandlerOptions);
   constructor(
     options: SessionManager | XrpcClient | FetchHandler | FetchHandlerOptions,
   ) {
@@ -43,8 +47,10 @@ export class Agent extends XrpcClient {
 
     super(createFetchHandler(client), schemas);
 
-    this.com = new ComNS(this);
+    this.com = new ComNS(this, client) as ComNS & ComOf<TClient>;
 
+    // Root proxy: our own properties take priority, everything else falls
+    // through to the underlying client.
     return new Proxy(this, {
       get(target, prop, receiver) {
         if (prop in target) return Reflect.get(target, prop, receiver);
