@@ -35,6 +35,10 @@
               "description": "URL to redirect to after checkout completes",
               "format": "uri",
               "type": "string"
+            },
+            "isPrivate": {
+              "description": "If true, the recipient (subject) is stored only in atiproto's private database and is omitted from the PDS subscription record.",
+              "type": "boolean"
             }
           },
           "required": ["subject", "currency", "interval"],

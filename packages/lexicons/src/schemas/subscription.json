@@ -70,7 +70,6 @@
       "type": "object",
       "description": "View of a subscription record for use in API responses",
       "required": [
-        "subject",
         "amount",
         "currency",
         "interval",

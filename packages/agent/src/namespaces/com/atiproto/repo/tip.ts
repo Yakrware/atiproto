@@ -15,24 +15,12 @@ export class ComAtiprotoRepoTipNS {
     this._client = client;
   }
 
-  search(
-    params: com.atiproto.repo.tip.search.$Params,
+  count(
+    params: com.atiproto.repo.tip.count.$Params,
     opts?: CallOptions,
-  ): TypedResponse<com.atiproto.repo.tip.search.$OutputBody> {
+  ): TypedResponse<com.atiproto.repo.tip.count.$OutputBody> {
     return this._client.call(
-      "com.atiproto.repo.tip.search",
-      params as QueryParams,
-      undefined,
-      opts,
-    ) as any;
-  }
-
-  validate(
-    params: com.atiproto.repo.tip.validate.$Params,
-    opts?: CallOptions,
-  ): TypedResponse<com.atiproto.repo.tip.validate.$OutputBody> {
-    return this._client.call(
-      "com.atiproto.repo.tip.validate",
+      "com.atiproto.repo.tip.count",
       params as QueryParams,
       undefined,
       opts,

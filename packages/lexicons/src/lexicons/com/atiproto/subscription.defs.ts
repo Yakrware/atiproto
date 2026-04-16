@@ -99,7 +99,7 @@ type View = {
   /**
    * DID of the user being subscribed to
    */
-  subject: l.DidString
+  subject?: l.DidString
 
   /**
    * Subscription amount in cents (0 for free subscriptions)
@@ -149,7 +149,7 @@ const view = l.typedObject<View>(
   $nsid,
   'view',
   l.object({
-    subject: l.string({ format: 'did' }),
+    subject: l.optional(l.string({ format: 'did' })),
     amount: l.integer({ minimum: 0 }),
     currency: l.string({ maxLength: 3 }),
     interval: l.enum(['monthly', 'yearly']),

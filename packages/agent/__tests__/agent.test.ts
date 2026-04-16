@@ -39,6 +39,8 @@ describe("Agent", () => {
       expect(agent.com.atiproto.account).toBeDefined();
       expect(agent.com.atiproto.account.cart).toBeDefined();
       expect(agent.com.atiproto.account.profile).toBeDefined();
+      expect(agent.com.atiproto.account.subscription).toBeDefined();
+      expect(agent.com.atiproto.account.tip).toBeDefined();
 
       expect(agent.com.atiproto.feed).toBeDefined();
       expect(agent.com.atiproto.feed.subscription).toBeDefined();
@@ -249,16 +251,45 @@ describe("Agent", () => {
       );
     });
 
-    it("calls com.atiproto.repo.subscription.validate with correct NSID and params", async () => {
+    it("calls com.atiproto.account.subscription.validate with correct NSID and params", async () => {
       const params = {
         sender: "did:plc:sender" as const,
+      };
+
+      await agent.com.atiproto.account.subscription.validate(params);
+
+      expect(agent.call).toHaveBeenCalledWith(
+        "com.atiproto.account.subscription.validate",
+        params,
+        undefined,
+        undefined,
+      );
+    });
+
+    it("calls com.atiproto.feed.subscription.validate with correct NSID and params", async () => {
+      const params = {
         subject: "did:plc:subject" as const,
       };
 
-      await agent.com.atiproto.repo.subscription.validate(params);
+      await agent.com.atiproto.feed.subscription.validate(params);
 
       expect(agent.call).toHaveBeenCalledWith(
-        "com.atiproto.repo.subscription.validate",
+        "com.atiproto.feed.subscription.validate",
+        params,
+        undefined,
+        undefined,
+      );
+    });
+
+    it("calls com.atiproto.repo.subscription.count with correct NSID and params", async () => {
+      const params = {
+        subject: "did:plc:subject" as const,
+      };
+
+      await agent.com.atiproto.repo.subscription.count(params);
+
+      expect(agent.call).toHaveBeenCalledWith(
+        "com.atiproto.repo.subscription.count",
         params,
         undefined,
         undefined,
@@ -281,16 +312,45 @@ describe("Agent", () => {
       );
     });
 
-    it("calls com.atiproto.repo.tip.search with correct NSID and params", async () => {
+    it("calls com.atiproto.account.tip.list with correct NSID and params", async () => {
       const params = {
-        subject: "did:plc:recipient" as const,
         limit: 50,
       };
 
-      await agent.com.atiproto.repo.tip.search(params);
+      await agent.com.atiproto.account.tip.list(params);
 
       expect(agent.call).toHaveBeenCalledWith(
-        "com.atiproto.repo.tip.search",
+        "com.atiproto.account.tip.list",
+        params,
+        undefined,
+        undefined,
+      );
+    });
+
+    it("calls com.atiproto.feed.tip.validate with correct NSID and params", async () => {
+      const params = {
+        recordUri: "at://did:plc:creator/app.bsky.feed.post/abc" as any,
+      };
+
+      await agent.com.atiproto.feed.tip.validate(params);
+
+      expect(agent.call).toHaveBeenCalledWith(
+        "com.atiproto.feed.tip.validate",
+        params,
+        undefined,
+        undefined,
+      );
+    });
+
+    it("calls com.atiproto.repo.tip.count with correct NSID and params", async () => {
+      const params = {
+        subject: "did:plc:recipient" as const,
+      };
+
+      await agent.com.atiproto.repo.tip.count(params);
+
+      expect(agent.call).toHaveBeenCalledWith(
+        "com.atiproto.repo.tip.count",
         params,
         undefined,
         undefined,

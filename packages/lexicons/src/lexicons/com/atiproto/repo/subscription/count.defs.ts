@@ -4,24 +4,22 @@
 
 import { l } from '@atproto/lex'
 
-const $nsid = 'com.atiproto.repo.subscription.validate'
+const $nsid = 'com.atiproto.repo.subscription.count'
 
 export { $nsid }
 
-/** Validate that a sender has an active, Stripe-verified subscription. Looks up by subscriptionUri (a specific subscription record) or subject (recipient DID). These are mutually exclusive; subscriptionUri takes precedence. */
+/** Count active subscriptions. If subject is provided, counts subscriptions received by that DID. If omitted, counts subscriptions the authenticated user has active (as the subscriber). Optionally filtered by a start/end datetime window (matching billingStartDate). When the authenticated user is the subject/owner of the target, the response also includes the sum of amounts. */
 const main = l.query(
   $nsid,
   l.params({
-    sender: l.string({ format: 'did' }),
-    subscriptionUri: l.optional(l.string({ format: 'at-uri' })),
     subject: l.optional(l.string({ format: 'did' })),
-    amount: l.optional(l.integer()),
+    startDate: l.optional(l.string({ format: 'datetime' })),
+    endDate: l.optional(l.string({ format: 'datetime' })),
   }),
   l.jsonPayload({
-    valid: l.boolean(),
+    count: l.integer(),
     amount: l.optional(l.integer()),
     currency: l.optional(l.string({ maxLength: 3 })),
-    reason: l.optional(l.string({ maxLength: 1024 })),
   }),
 )
 export { main }

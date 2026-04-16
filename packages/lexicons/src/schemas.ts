@@ -7,6 +7,12 @@ import AccountCartList from "./schemas/account/cart/list.json";
 import AccountCartPut from "./schemas/account/cart/put.json";
 import AccountProfileGet from "./schemas/account/profile/get.json";
 import AccountProfilePut from "./schemas/account/profile/put.json";
+import AccountSubscriptionGet from "./schemas/account/subscription/get.json";
+import AccountSubscriptionList from "./schemas/account/subscription/list.json";
+import AccountSubscriptionValidate from "./schemas/account/subscription/validate.json";
+import AccountTipGet from "./schemas/account/tip/get.json";
+import AccountTipList from "./schemas/account/tip/list.json";
+import AccountTipValidate from "./schemas/account/tip/validate.json";
 import Cart from "./schemas/cart.json";
 import FeedList from "./schemas/feed/list.json";
 import FeedSubscriptionCancel from "./schemas/feed/subscription/cancel.json";
@@ -14,16 +20,16 @@ import FeedSubscriptionCreate from "./schemas/feed/subscription/create.json";
 import FeedSubscriptionGet from "./schemas/feed/subscription/get.json";
 import FeedSubscriptionList from "./schemas/feed/subscription/list.json";
 import FeedSubscriptionPut from "./schemas/feed/subscription/put.json";
+import FeedSubscriptionValidate from "./schemas/feed/subscription/validate.json";
 import FeedTipCreate from "./schemas/feed/tip/create.json";
 import FeedTipGet from "./schemas/feed/tip/get.json";
 import FeedTipList from "./schemas/feed/tip/list.json";
 import FeedTipPut from "./schemas/feed/tip/put.json";
+import FeedTipValidate from "./schemas/feed/tip/validate.json";
 import Profile from "./schemas/profile.json";
 import RepoProfileGet from "./schemas/repo/profile/get.json";
-import RepoSubscriptionSearch from "./schemas/repo/subscription/search.json";
-import RepoSubscriptionValidate from "./schemas/repo/subscription/validate.json";
-import RepoTipSearch from "./schemas/repo/tip/search.json";
-import RepoTipValidate from "./schemas/repo/tip/validate.json";
+import RepoSubscriptionCount from "./schemas/repo/subscription/count.json";
+import RepoTipCount from "./schemas/repo/tip/count.json";
 import AuthEnhanced from "./schemas/authEnhanced.json";
 import AuthGeneral from "./schemas/authGeneral.json";
 import Subscription from "./schemas/subscription.json";
@@ -37,6 +43,12 @@ export const schemas: LexiconDoc[] = [
   AccountCartPut,
   AccountProfileGet,
   AccountProfilePut,
+  AccountSubscriptionGet,
+  AccountSubscriptionList,
+  AccountSubscriptionValidate,
+  AccountTipGet,
+  AccountTipList,
+  AccountTipValidate,
   Cart,
   FeedList,
   FeedSubscriptionCancel,
@@ -44,16 +56,16 @@ export const schemas: LexiconDoc[] = [
   FeedSubscriptionGet,
   FeedSubscriptionList,
   FeedSubscriptionPut,
+  FeedSubscriptionValidate,
   FeedTipCreate,
   FeedTipGet,
   FeedTipList,
   FeedTipPut,
+  FeedTipValidate,
   Profile,
   RepoProfileGet,
-  RepoSubscriptionSearch,
-  RepoSubscriptionValidate,
-  RepoTipSearch,
-  RepoTipValidate,
+  RepoSubscriptionCount,
+  RepoTipCount,
   AuthEnhanced,
   AuthGeneral,
   Subscription,

@@ -21,6 +21,7 @@ const main = l.procedure(
     interval: l.enum(['monthly', 'yearly']),
     cartUri: l.optional(l.string({ format: 'at-uri' })),
     redirectUrl: l.optional(l.string({ format: 'uri' })),
+    isPrivate: l.optional(l.boolean()),
   }),
   l.jsonPayload({
     subscriptionUri: l.string({ format: 'at-uri' }),

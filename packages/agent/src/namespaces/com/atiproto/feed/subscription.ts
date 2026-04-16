@@ -74,4 +74,16 @@ export class ComAtiprotoFeedSubscriptionNS {
       opts,
     ) as any;
   }
+
+  validate(
+    params?: com.atiproto.feed.subscription.validate.$Params,
+    opts?: CallOptions,
+  ): TypedResponse<com.atiproto.feed.subscription.validate.$OutputBody> {
+    return this._client.call(
+      "com.atiproto.feed.subscription.validate",
+      params as QueryParams,
+      undefined,
+      opts,
+    ) as any;
+  }
 }
