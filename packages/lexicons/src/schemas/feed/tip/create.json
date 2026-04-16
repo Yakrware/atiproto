@@ -45,6 +45,10 @@
               "description": "Optional message (max 500 chars)",
               "maxGraphemes": 500,
               "maxLength": 5000
+            },
+            "isPrivate": {
+              "type": "boolean",
+              "description": "If true, the recipient (subject) and recordUri are stored only in atiproto's private database and are omitted from the PDS tip record."
             }
           }
         }

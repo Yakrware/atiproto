@@ -48,7 +48,7 @@
             "type": "string"
           }
         },
-        "required": ["subject", "amount", "currency", "status", "createdAt"],
+        "required": ["amount", "currency", "status", "createdAt"],
         "type": "object"
       },
       "type": "record"
@@ -56,7 +56,7 @@
     "view": {
       "type": "object",
       "description": "View of a tip record for use in API responses",
-      "required": ["subject", "amount", "currency", "status", "createdAt"],
+      "required": ["amount", "currency", "status", "createdAt"],
       "properties": {
         "subject": {
           "description": "DID of the user receiving the tip",

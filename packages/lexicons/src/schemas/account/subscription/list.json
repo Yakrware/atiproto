@@ -1,18 +1,13 @@
 {
   "lexicon": 1,
-  "id": "com.atiproto.repo.subscription.search",
+  "id": "com.atiproto.account.subscription.list",
   "defs": {
     "main": {
       "type": "query",
-      "description": "Search for subscriptions to a user (subscriptions where subject matches the given DID)",
+      "description": "List subscriptions received by the authenticated user (subscriptions where the authed user is the recipient/subject). Includes subscriptions marked private, which are only stored in atiproto's database.",
       "parameters": {
         "type": "params",
         "properties": {
-          "subject": {
-            "type": "string",
-            "format": "did",
-            "description": "DID of the user being subscribed to"
-          },
           "cursor": {
             "type": "string",
             "maxLength": 512,
@@ -25,8 +20,7 @@
             "default": 50,
             "description": "Results per page (1-100, default: 50)"
           }
-        },
-        "required": ["subject"]
+        }
       },
       "output": {
         "encoding": "application/json",
@@ -38,7 +32,7 @@
               "type": "array",
               "items": {
                 "type": "ref",
-                "ref": "#subscriptionResponse"
+                "ref": "com.atiproto.subscription#view"
               }
             },
             "cursor": {
@@ -47,21 +41,6 @@
               "description": "Pagination cursor for next page"
             }
           }
-        }
-      }
-    },
-    "subscriptionResponse": {
-      "type": "object",
-      "required": ["uri", "record"],
-      "properties": {
-        "uri": {
-          "type": "string",
-          "format": "at-uri",
-          "description": "AT-URI of the subscription record"
-        },
-        "record": {
-          "type": "ref",
-          "ref": "com.atiproto.subscription#view"
         }
       }
     }

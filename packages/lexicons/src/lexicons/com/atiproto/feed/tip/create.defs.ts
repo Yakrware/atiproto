@@ -22,6 +22,7 @@ const main = l.procedure(
     cartUri: l.optional(l.string({ format: 'at-uri' })),
     redirectUrl: l.optional(l.string({ format: 'uri' })),
     message: l.optional(l.string({ maxGraphemes: 500, maxLength: 5000 })),
+    isPrivate: l.optional(l.boolean()),
   }),
   l.jsonPayload({
     tipUri: l.string({ format: 'at-uri' }),

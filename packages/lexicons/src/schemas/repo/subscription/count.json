@@ -1,0 +1,52 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.repo.subscription.count",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Count active subscriptions. If subject is provided, counts subscriptions received by that DID. If omitted, counts subscriptions the authenticated user has active (as the subscriber). Optionally filtered by a start/end datetime window (matching billingStartDate). When the authenticated user is the subject/owner of the target, the response also includes the sum of amounts.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "subject": {
+            "type": "string",
+            "format": "did",
+            "description": "DID of the user being subscribed to. If omitted, the query counts subscriptions the authenticated user has active as the subscriber."
+          },
+          "startDate": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Only count subscriptions whose billingStartDate is at or after this timestamp"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Only count subscriptions whose billingStartDate is at or before this timestamp"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["count"],
+          "properties": {
+            "count": {
+              "type": "integer",
+              "description": "Number of active subscriptions matching the filter"
+            },
+            "amount": {
+              "type": "integer",
+              "description": "Sum of all subscription amounts in cents. Only returned when the authenticated user is the subject/owner of the target (or when counting their own active subscriptions)."
+            },
+            "currency": {
+              "type": "string",
+              "maxLength": 3,
+              "description": "Currency of the summed amount. Only returned when the authenticated user is the subject/owner of the target (or when counting their own active subscriptions)."
+            }
+          }
+        }
+      }
+    }
+  }
+}

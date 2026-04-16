@@ -1,19 +1,13 @@
 {
   "lexicon": 1,
-  "id": "com.atiproto.repo.tip.validate",
+  "id": "com.atiproto.feed.tip.validate",
   "defs": {
     "main": {
       "type": "query",
-      "description": "Validate that a sender has completed tip payment(s). Looks up by tipUri (a specific tip record), recordUri (sums all tips for that record), or subject (recipient DID). These are mutually exclusive and resolved in that order.",
+      "description": "Validate that the authenticated user (as the sender) has completed tip payment(s). Looks up by tipUri (a specific tip record), recordUri (sums all tips for that record), or subject (recipient DID). These are mutually exclusive and resolved in that order.",
       "parameters": {
         "type": "params",
-        "required": ["sender"],
         "properties": {
-          "sender": {
-            "type": "string",
-            "format": "did",
-            "description": "DID of the tip sender"
-          },
           "tipUri": {
             "type": "string",
             "format": "at-uri",
@@ -43,7 +37,7 @@
           "properties": {
             "valid": {
               "type": "boolean",
-              "description": "Whether the sender has completed and verified tip(s)"
+              "description": "Whether the authed sender has completed and verified tip(s)"
             },
             "amount": {
               "type": "integer",

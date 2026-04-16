@@ -1,17 +1,22 @@
 {
   "lexicon": 1,
-  "id": "com.atiproto.repo.tip.search",
+  "id": "com.atiproto.account.tip.list",
   "defs": {
     "main": {
       "type": "query",
-      "description": "Search for tips sent to a user (tips where subject matches the given DID)",
+      "description": "List tips received by the authenticated user (tips where the authed user is the recipient/subject). Includes tips marked private, which are only stored in atiproto's database.",
       "parameters": {
         "type": "params",
         "properties": {
-          "subject": {
+          "sender": {
             "type": "string",
             "format": "did",
-            "description": "DID of the user receiving tips"
+            "description": "Optional: only return tips sent by this DID"
+          },
+          "recordUri": {
+            "type": "string",
+            "format": "at-uri",
+            "description": "Optional: only return tips received for this specific record"
           },
           "cursor": {
             "type": "string",
@@ -25,8 +30,7 @@
             "default": 50,
             "description": "Results per page (1-100, default: 50)"
           }
-        },
-        "required": ["subject"]
+        }
       },
       "output": {
         "encoding": "application/json",
@@ -38,7 +42,7 @@
               "type": "array",
               "items": {
                 "type": "ref",
-                "ref": "#tipResponse"
+                "ref": "com.atiproto.tip#view"
               }
             },
             "cursor": {
@@ -47,21 +51,6 @@
               "description": "Pagination cursor for next page"
             }
           }
-        }
-      }
-    },
-    "tipResponse": {
-      "type": "object",
-      "required": ["uri", "record"],
-      "properties": {
-        "uri": {
-          "type": "string",
-          "format": "at-uri",
-          "description": "AT-URI of the tip record"
-        },
-        "record": {
-          "type": "ref",
-          "ref": "com.atiproto.tip#view"
         }
       }
     }

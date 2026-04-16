@@ -3,24 +3,27 @@
  */
 
 import { l } from '@atproto/lex'
-import * as AtiprotoTip from '../../tip.defs.js'
+import * as AtiprotoSubscription from '../../subscription.defs.js'
 
-const $nsid = 'com.atiproto.repo.tip.search'
+const $nsid = 'com.atiproto.account.subscription.list'
 
 export { $nsid }
 
-/** Search for tips sent to a user (tips where subject matches the given DID) */
+/** List subscriptions received by the authenticated user (subscriptions where the authed user is the recipient/subject). Includes subscriptions marked private, which are only stored in atiproto's database. */
 const main = l.query(
   $nsid,
   l.params({
-    subject: l.string({ format: 'did' }),
     cursor: l.optional(l.string({ maxLength: 512 })),
     limit: l.optional(
       l.withDefault(l.integer({ minimum: 1, maximum: 100 }), 50),
     ),
   }),
   l.jsonPayload({
-    tips: l.array(l.ref<TipResponse>((() => tipResponse) as any)),
+    subscriptions: l.array(
+      l.ref<AtiprotoSubscription.View>(
+        (() => AtiprotoSubscription.view) as any,
+      ),
+    ),
     cursor: l.optional(l.string({ maxLength: 512 })),
   }),
 )
@@ -36,26 +39,3 @@ export type $OutputBody<B = l.BinaryData> = l.InferMethodOutputBody<
 export const $lxm = main.nsid,
   $params = main.parameters,
   $output = main.output
-
-type TipResponse = {
-  $type?: 'com.atiproto.repo.tip.search#tipResponse'
-
-  /**
-   * AT-URI of the tip record
-   */
-  uri: l.AtUriString
-  record: AtiprotoTip.View
-}
-
-export type { TipResponse }
-
-const tipResponse = l.typedObject<TipResponse>(
-  $nsid,
-  'tipResponse',
-  l.object({
-    uri: l.string({ format: 'at-uri' }),
-    record: l.ref<AtiprotoTip.View>((() => AtiprotoTip.view) as any),
-  }),
-)
-
-export { tipResponse }

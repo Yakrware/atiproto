@@ -15,7 +15,7 @@ type Main = {
   /**
    * DID of the user receiving the tip
    */
-  subject: l.DidString
+  subject?: l.DidString
 
   /**
    * AT-URI of specific record being tipped
@@ -60,7 +60,7 @@ const main = l.record<'any', Main>(
   'any',
   $nsid,
   l.object({
-    subject: l.string({ format: 'did' }),
+    subject: l.optional(l.string({ format: 'did' })),
     recordUri: l.optional(l.string({ format: 'at-uri' })),
     amount: l.integer({ minimum: 0 }),
     currency: l.string({ maxLength: 3 }),
@@ -99,7 +99,7 @@ type View = {
   /**
    * DID of the user receiving the tip
    */
-  subject: l.DidString
+  subject?: l.DidString
 
   /**
    * AT-URI of specific record being tipped
@@ -144,7 +144,7 @@ const view = l.typedObject<View>(
   $nsid,
   'view',
   l.object({
-    subject: l.string({ format: 'did' }),
+    subject: l.optional(l.string({ format: 'did' })),
     recordUri: l.optional(l.string({ format: 'at-uri' })),
     amount: l.integer({ minimum: 0 }),
     currency: l.string({ maxLength: 3 }),

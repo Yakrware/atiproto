@@ -15,24 +15,12 @@ export class ComAtiprotoRepoSubscriptionNS {
     this._client = client;
   }
 
-  search(
-    params: com.atiproto.repo.subscription.search.$Params,
+  count(
+    params: com.atiproto.repo.subscription.count.$Params,
     opts?: CallOptions,
-  ): TypedResponse<com.atiproto.repo.subscription.search.$OutputBody> {
+  ): TypedResponse<com.atiproto.repo.subscription.count.$OutputBody> {
     return this._client.call(
-      "com.atiproto.repo.subscription.search",
-      params as QueryParams,
-      undefined,
-      opts,
-    ) as any;
-  }
-
-  validate(
-    params: com.atiproto.repo.subscription.validate.$Params,
-    opts?: CallOptions,
-  ): TypedResponse<com.atiproto.repo.subscription.validate.$OutputBody> {
-    return this._client.call(
-      "com.atiproto.repo.subscription.validate",
+      "com.atiproto.repo.subscription.count",
       params as QueryParams,
       undefined,
       opts,

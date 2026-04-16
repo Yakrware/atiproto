@@ -4,18 +4,16 @@
 
 import { l } from '@atproto/lex'
 
-const $nsid = 'com.atiproto.repo.tip.validate'
+const $nsid = 'com.atiproto.account.subscription.validate'
 
 export { $nsid }
 
-/** Validate that a sender has completed tip payment(s). Looks up by tipUri (a specific tip record), recordUri (sums all tips for that record), or subject (recipient DID). These are mutually exclusive and resolved in that order. */
+/** Validate that a sender has an active, Stripe-verified subscription to the authenticated user (as the recipient/subject). Looks up by subscriptionUri (a specific subscription record) or sender (subscriber DID). These are mutually exclusive; subscriptionUri takes precedence. */
 const main = l.query(
   $nsid,
   l.params({
-    sender: l.string({ format: 'did' }),
-    tipUri: l.optional(l.string({ format: 'at-uri' })),
-    recordUri: l.optional(l.string({ format: 'at-uri' })),
-    subject: l.optional(l.string({ format: 'did' })),
+    subscriptionUri: l.optional(l.string({ format: 'at-uri' })),
+    sender: l.optional(l.string({ format: 'did' })),
     amount: l.optional(l.integer()),
   }),
   l.jsonPayload({
