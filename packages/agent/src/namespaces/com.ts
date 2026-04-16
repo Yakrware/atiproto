@@ -6,11 +6,9 @@ function hasComNS(client: XrpcClient): client is XrpcClient & { com: object } {
 }
 
 export class ComNS {
-  _client: XrpcClient;
   atiproto: ComAtiprotoNS;
 
   constructor(client: XrpcClient, underlying?: XrpcClient) {
-    this._client = client;
     this.atiproto = new ComAtiprotoNS(client);
 
     if (underlying && hasComNS(underlying)) {

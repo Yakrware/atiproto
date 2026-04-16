@@ -183,9 +183,9 @@ describe("Agent", () => {
       const atpAgent = createMockApiAgent();
       const agent = new Agent(atpAgent);
 
-      // _client should come from our ComNS, not the ApiAgent's ComNS
-      expect(agent.com._client).not.toBe(atpAgent);
-      expect(agent.com._client).toBeInstanceOf(XrpcClient);
+      // atiproto._client should be our agent, not the ApiAgent
+      expect(agent.com.atiproto._client).not.toBe(atpAgent);
+      expect(agent.com.atiproto._client).toBeInstanceOf(XrpcClient);
     });
   });
 
