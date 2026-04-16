@@ -165,9 +165,9 @@ describe("Agent", () => {
       const agent = new Agent(atpAgent);
 
       // com.atproto should fall through to the ApiAgent's com.atproto
-      expect((agent.com as any).atproto).toBeDefined();
-      expect((agent.com as any).atproto.repo).toBeDefined();
-      expect((agent.com as any).atproto.server).toBeDefined();
+      expect(agent.com.atproto).toBeDefined();
+      expect(agent.com.atproto.repo).toBeDefined();
+      expect(agent.com.atproto.server).toBeDefined();
     });
 
     it("preserves our atiproto namespace on com", () => {
