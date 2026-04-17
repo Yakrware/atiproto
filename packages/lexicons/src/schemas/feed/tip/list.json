@@ -39,9 +39,9 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": ["records"],
+          "required": ["tips"],
           "properties": {
-            "records": {
+            "tips": {
               "type": "array",
               "items": {
                 "type": "ref",
