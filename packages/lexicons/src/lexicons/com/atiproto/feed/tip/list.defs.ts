@@ -9,7 +9,7 @@ const $nsid = 'com.atiproto.feed.tip.list'
 
 export { $nsid }
 
-/** List tips for the authenticated user */
+/** List tips sent by the authenticated user */
 const main = l.query(
   $nsid,
   l.params(),

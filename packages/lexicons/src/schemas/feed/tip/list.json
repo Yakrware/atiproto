@@ -4,12 +4,22 @@
   "defs": {
     "main": {
       "type": "query",
-      "description": "List tips for the authenticated user",
+      "description": "List tips sent by the authenticated user",
       "input": {
         "encoding": "application/json",
         "schema": {
           "type": "object",
           "properties": {
+            "subject": {
+              "type": "string",
+              "format": "did",
+              "description": "Optional: only return tips sent to this recipient DID"
+            },
+            "recordUri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "Optional: only return tips for this specific record"
+            },
             "cursor": {
               "type": "string",
               "maxLength": 512,

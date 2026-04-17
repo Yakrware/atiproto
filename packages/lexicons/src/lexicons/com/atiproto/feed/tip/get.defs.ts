@@ -9,10 +9,14 @@ const $nsid = 'com.atiproto.feed.tip.get'
 
 export { $nsid }
 
-/** Get a specific tip by URI */
+/** Get a specific tip sent by the authenticated user. Looks up by tip record uri, subject (recipient) DID, or record uri. These are mutually exclusive and resolved in that order. */
 const main = l.query(
   $nsid,
-  l.params({ uri: l.string({ format: 'at-uri' }) }),
+  l.params({
+    uri: l.optional(l.string({ format: 'at-uri' })),
+    subject: l.optional(l.string({ format: 'did' })),
+    recordUri: l.optional(l.string({ format: 'at-uri' })),
+  }),
   l.jsonPayload({
     uri: l.string({ format: 'at-uri' }),
     cid: l.string({ format: 'cid' }),
