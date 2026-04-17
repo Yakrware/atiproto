@@ -3,7 +3,7 @@ import { schemas } from "@atiproto/lexicons";
 export interface NavItem {
   label: string;
   href?: string;
-  type?: "query" | "procedure" | "record";
+  type?: "query" | "procedure" | "record" | "permission-set";
   children?: NavItem[];
 }
 
@@ -121,6 +121,7 @@ export function buildNavTree(): NavItem[] {
   ];
 
   const records: NavItem[] = [];
+  const permissionSets: NavItem[] = [];
   const namespaceMap = new Map<string, NavItem[]>();
 
   for (const schema of schemas) {
@@ -137,6 +138,16 @@ export function buildNavTree(): NavItem[] {
         label: shortId,
         href: `/docs/lexicon/${schema.id}`,
         type: "record",
+      });
+      continue;
+    }
+
+    if (type === "permission-set") {
+      const title = (def.title as string) ?? shortId;
+      permissionSets.push({
+        label: title,
+        href: `/docs/lexicon/${schema.id}`,
+        type: "permission-set",
       });
       continue;
     }
@@ -168,6 +179,10 @@ export function buildNavTree(): NavItem[] {
     {
       label: "Record Types",
       children: records.sort((a, b) => a.label.localeCompare(b.label)),
+    },
+    {
+      label: "Permission Sets",
+      children: permissionSets.sort((a, b) => a.label.localeCompare(b.label)),
     },
     { label: "API Reference", children: apiGroups },
   ];

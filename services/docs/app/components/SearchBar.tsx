@@ -16,10 +16,15 @@ function TypeBadge({ type }: { type: string }) {
     query: "text-badge-query",
     procedure: "text-badge-procedure",
     record: "text-badge-record",
+    "permission-set": "text-badge-permission",
   };
   return (
     <span className={`text-[10px] font-medium ${colors[type] ?? ""}`}>
-      {type === "procedure" ? "proc" : type}
+      {type === "procedure"
+        ? "proc"
+        : type === "permission-set"
+          ? "perm"
+          : type}
     </span>
   );
 }
