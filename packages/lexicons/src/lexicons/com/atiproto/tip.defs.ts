@@ -97,6 +97,11 @@ type View = {
   $type?: 'com.atiproto.tip#view'
 
   /**
+   * AT-URI of the tip record
+   */
+  uri: l.AtUriString
+
+  /**
    * DID of the user receiving the tip
    */
   subject?: l.DidString
@@ -144,6 +149,7 @@ const view = l.typedObject<View>(
   $nsid,
   'view',
   l.object({
+    uri: l.string({ format: 'at-uri' }),
     subject: l.optional(l.string({ format: 'did' })),
     recordUri: l.optional(l.string({ format: 'at-uri' })),
     amount: l.integer({ minimum: 0 }),

@@ -79,6 +79,11 @@ export const $assert = /*#__PURE__*/ main.assert.bind(main),
 /** View of a cart record for use in API responses */
 type View = {
   $type?: 'com.atiproto.cart#view'
+
+  /**
+   * AT-URI of the cart record
+   */
+  uri: l.AtUriString
   items: CartItem[]
 
   /**
@@ -119,6 +124,7 @@ const view = l.typedObject<View>(
   $nsid,
   'view',
   l.object({
+    uri: l.string({ format: 'at-uri' }),
     items: l.array(l.ref<CartItem>((() => cartItem) as any)),
     currency: l.string({ maxLength: 3 }),
     total: l.integer(),

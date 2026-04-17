@@ -61,6 +61,7 @@
       "type": "object",
       "description": "View of a cart record for use in API responses",
       "required": [
+        "uri",
         "items",
         "currency",
         "total",
@@ -69,6 +70,11 @@
         "expiresAt"
       ],
       "properties": {
+        "uri": {
+          "type": "string",
+          "format": "at-uri",
+          "description": "AT-URI of the cart record"
+        },
         "items": {
           "type": "array",
           "items": {
