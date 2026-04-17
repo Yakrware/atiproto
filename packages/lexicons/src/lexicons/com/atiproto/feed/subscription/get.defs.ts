@@ -9,10 +9,13 @@ const $nsid = 'com.atiproto.feed.subscription.get'
 
 export { $nsid }
 
-/** Get a specific subscription by URI */
+/** Get a specific subscription sent by the authenticated user. Looks up by subscription record uri or subject (recipient) DID. These are mutually exclusive; uri takes precedence. */
 const main = l.query(
   $nsid,
-  l.params({ uri: l.string({ format: 'at-uri' }) }),
+  l.params({
+    uri: l.optional(l.string({ format: 'at-uri' })),
+    subject: l.optional(l.string({ format: 'did' })),
+  }),
   l.jsonPayload({
     uri: l.string({ format: 'at-uri' }),
     cid: l.string({ format: 'cid' }),
