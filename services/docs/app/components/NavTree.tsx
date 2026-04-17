@@ -7,12 +7,17 @@ function TypeBadge({ type }: { type: string }) {
     query: "bg-badge-query/15 text-badge-query",
     procedure: "bg-badge-procedure/15 text-badge-procedure",
     record: "bg-badge-record/15 text-badge-record",
+    "permission-set": "bg-badge-permission/15 text-badge-permission",
   };
   return (
     <span
       className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${colors[type] ?? ""}`}
     >
-      {type === "procedure" ? "proc" : type}
+      {type === "procedure"
+        ? "proc"
+        : type === "permission-set"
+          ? "perm"
+          : type}
     </span>
   );
 }
