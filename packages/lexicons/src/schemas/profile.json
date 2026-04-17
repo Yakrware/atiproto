@@ -38,8 +38,13 @@
     "view": {
       "type": "object",
       "description": "View of a user's profile settings for use in API responses",
-      "required": ["createdAt"],
+      "required": ["uri", "createdAt"],
       "properties": {
+        "uri": {
+          "type": "string",
+          "format": "at-uri",
+          "description": "AT-URI of the profile record"
+        },
         "acceptsTips": {
           "type": "boolean",
           "description": "Whether user accepts tips (default: true)"

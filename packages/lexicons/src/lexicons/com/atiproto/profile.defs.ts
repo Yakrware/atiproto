@@ -73,6 +73,11 @@ type View = {
   $type?: 'com.atiproto.profile#view'
 
   /**
+   * AT-URI of the profile record
+   */
+  uri: l.AtUriString
+
+  /**
    * Whether user accepts tips (default: true)
    */
   acceptsTips?: boolean
@@ -105,6 +110,7 @@ const view = l.typedObject<View>(
   $nsid,
   'view',
   l.object({
+    uri: l.string({ format: 'at-uri' }),
     acceptsTips: l.optional(l.boolean()),
     acceptsSubscriptions: l.optional(l.boolean()),
     disableReceiptNotifications: l.optional(l.boolean()),

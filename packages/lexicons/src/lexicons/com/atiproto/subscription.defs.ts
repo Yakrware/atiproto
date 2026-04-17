@@ -97,6 +97,11 @@ type View = {
   $type?: 'com.atiproto.subscription#view'
 
   /**
+   * AT-URI of the subscription record
+   */
+  uri: l.AtUriString
+
+  /**
    * DID of the user being subscribed to
    */
   subject?: l.DidString
@@ -149,6 +154,7 @@ const view = l.typedObject<View>(
   $nsid,
   'view',
   l.object({
+    uri: l.string({ format: 'at-uri' }),
     subject: l.optional(l.string({ format: 'did' })),
     amount: l.integer({ minimum: 0 }),
     currency: l.string({ maxLength: 3 }),

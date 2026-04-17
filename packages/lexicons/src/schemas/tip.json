@@ -56,8 +56,13 @@
     "view": {
       "type": "object",
       "description": "View of a tip record for use in API responses",
-      "required": ["amount", "currency", "status", "createdAt"],
+      "required": ["uri", "amount", "currency", "status", "createdAt"],
       "properties": {
+        "uri": {
+          "description": "AT-URI of the tip record",
+          "format": "at-uri",
+          "type": "string"
+        },
         "subject": {
           "description": "DID of the user receiving the tip",
           "format": "did",

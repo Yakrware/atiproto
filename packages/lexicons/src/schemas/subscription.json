@@ -70,6 +70,7 @@
       "type": "object",
       "description": "View of a subscription record for use in API responses",
       "required": [
+        "uri",
         "amount",
         "currency",
         "interval",
@@ -78,6 +79,11 @@
         "createdAt"
       ],
       "properties": {
+        "uri": {
+          "description": "AT-URI of the subscription record",
+          "format": "at-uri",
+          "type": "string"
+        },
         "subject": {
           "description": "DID of the user being subscribed to",
           "format": "did",
