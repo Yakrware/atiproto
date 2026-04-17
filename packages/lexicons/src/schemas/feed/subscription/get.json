@@ -20,25 +20,15 @@
       "output": {
         "encoding": "application/json",
         "schema": {
+          "type": "object",
+          "required": ["subscription"],
           "properties": {
-            "uri": {
-              "description": "Subscription record URI",
-              "format": "at-uri",
-              "type": "string"
-            },
-            "cid": {
-              "description": "Subscription record CID",
-              "format": "cid",
-              "type": "string"
-            },
-            "record": {
-              "description": "The subscription record data",
+            "subscription": {
               "type": "ref",
-              "ref": "com.atiproto.subscription#view"
+              "ref": "com.atiproto.subscription#view",
+              "description": "The subscription record data"
             }
-          },
-          "required": ["uri", "cid", "record"],
-          "type": "object"
+          }
         }
       },
       "type": "query"

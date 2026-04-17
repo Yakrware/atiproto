@@ -18,9 +18,7 @@ const main = l.query(
     recordUri: l.optional(l.string({ format: 'at-uri' })),
   }),
   l.jsonPayload({
-    uri: l.string({ format: 'at-uri' }),
-    cid: l.string({ format: 'cid' }),
-    value: l.ref<AtiprotoTip.View>((() => AtiprotoTip.view) as any),
+    tip: l.ref<AtiprotoTip.View>((() => AtiprotoTip.view) as any),
   }),
 )
 export { main }

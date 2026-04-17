@@ -25,25 +25,15 @@
       "output": {
         "encoding": "application/json",
         "schema": {
+          "type": "object",
+          "required": ["tip"],
           "properties": {
-            "uri": {
-              "description": "Tip record URI",
-              "format": "at-uri",
-              "type": "string"
-            },
-            "cid": {
-              "description": "Tip record CID",
-              "format": "cid",
-              "type": "string"
-            },
-            "value": {
-              "description": "The tip record data",
+            "tip": {
               "type": "ref",
-              "ref": "com.atiproto.tip#view"
+              "ref": "com.atiproto.tip#view",
+              "description": "The tip record data"
             }
-          },
-          "required": ["uri", "cid", "value"],
-          "type": "object"
+          }
         }
       },
       "type": "query"

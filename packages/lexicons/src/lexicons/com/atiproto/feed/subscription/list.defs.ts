@@ -15,7 +15,9 @@ const main = l.query(
   l.params(),
   l.jsonPayload({
     subscriptions: l.array(
-      l.ref<SubscriptionResponse>((() => subscriptionResponse) as any),
+      l.ref<AtiprotoSubscription.View>(
+        (() => AtiprotoSubscription.view) as any,
+      ),
     ),
     cursor: l.optional(l.string({ maxLength: 512 })),
   }),
@@ -32,28 +34,3 @@ export type $OutputBody<B = l.BinaryData> = l.InferMethodOutputBody<
 export const $lxm = main.nsid,
   $params = main.parameters,
   $output = main.output
-
-type SubscriptionResponse = {
-  $type?: 'com.atiproto.feed.subscription.list#subscriptionResponse'
-
-  /**
-   * AT-URI of the subscription record
-   */
-  uri: l.AtUriString
-  record: AtiprotoSubscription.View
-}
-
-export type { SubscriptionResponse }
-
-const subscriptionResponse = l.typedObject<SubscriptionResponse>(
-  $nsid,
-  'subscriptionResponse',
-  l.object({
-    uri: l.string({ format: 'at-uri' }),
-    record: l.ref<AtiprotoSubscription.View>(
-      (() => AtiprotoSubscription.view) as any,
-    ),
-  }),
-)
-
-export { subscriptionResponse }

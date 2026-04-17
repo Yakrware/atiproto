@@ -35,7 +35,7 @@
               "type": "array",
               "items": {
                 "type": "ref",
-                "ref": "#subscriptionResponse"
+                "ref": "com.atiproto.subscription#view"
               }
             },
             "cursor": {
@@ -44,21 +44,6 @@
               "description": "Pagination cursor for next page"
             }
           }
-        }
-      }
-    },
-    "subscriptionResponse": {
-      "type": "object",
-      "required": ["uri", "record"],
-      "properties": {
-        "uri": {
-          "type": "string",
-          "format": "at-uri",
-          "description": "AT-URI of the subscription record"
-        },
-        "record": {
-          "type": "ref",
-          "ref": "com.atiproto.subscription#view"
         }
       }
     }
