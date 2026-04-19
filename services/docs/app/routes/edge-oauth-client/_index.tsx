@@ -202,6 +202,30 @@ function createOAuthClient(env: Env) {
           </li>
           <li>
             <a
+              href="/docs/edge-oauth-client/getKeyset"
+              className="text-primary dark:text-primary-dark hover:underline font-mono"
+            >
+              getKeyset
+            </a>{" "}
+            <span className="text-text-muted dark:text-text-muted-dark">
+              — Builds and caches a Keyset from a private JWK for confidential
+              clients
+            </span>
+          </li>
+          <li>
+            <a
+              href="/docs/edge-oauth-client/getKeyset"
+              className="text-primary dark:text-primary-dark hover:underline font-mono"
+            >
+              getKeyset
+            </a>{" "}
+            <span className="text-text-muted dark:text-text-muted-dark">
+              — Builds and caches a Keyset from a private JWK for confidential
+              clients
+            </span>
+          </li>
+          <li>
+            <a
               href="/docs/edge-oauth-client/patchGlobalRequestObject"
               className="text-primary dark:text-primary-dark hover:underline font-mono"
             >
