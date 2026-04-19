@@ -20,6 +20,10 @@ export default [
       "routes/edge-oauth-client/EdgeRuntimeImplementation.tsx",
     ),
     route(
+      "edge-oauth-client/getKeyset",
+      "routes/edge-oauth-client/getKeyset.tsx",
+    ),
+    route(
       "edge-oauth-client/patchGlobalRequestObject",
       "routes/edge-oauth-client/patchGlobalRequestObject.tsx",
     ),

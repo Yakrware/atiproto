@@ -50,6 +50,10 @@ export function buildNavTree(): NavItem[] {
           href: "/docs/edge-oauth-client/EdgeRuntimeImplementation",
         },
         {
+          label: "getKeyset",
+          href: "/docs/edge-oauth-client/getKeyset",
+        },
+        {
           label: "patchGlobalRequestObject",
           href: "/docs/edge-oauth-client/patchGlobalRequestObject",
         },

@@ -116,6 +116,26 @@ export default function EdgeOAuthClientClass() {
                 </td>
               </tr>
               <tr className="border-b border-border dark:border-border-dark">
+                <td className="px-3 py-2 font-mono text-xs">keyset</td>
+                <td className="px-3 py-2 font-mono text-xs">Keyset</td>
+                <td className="px-3 py-2 text-xs">optional</td>
+                <td className="px-3 py-2 text-xs">
+                  Required for confidential clients. Build one from a private
+                  JWK with{" "}
+                  <a
+                    href="/docs/edge-oauth-client/getKeyset"
+                    className="text-primary dark:text-primary-dark hover:underline font-mono"
+                  >
+                    getKeyset
+                  </a>
+                  . Public clients (
+                  <code className="bg-surface-alt dark:bg-surface-alt-dark px-1 rounded font-mono">
+                    token_endpoint_auth_method: "none"
+                  </code>
+                  ) omit this option.
+                </td>
+              </tr>
+              <tr className="border-b border-border dark:border-border-dark">
                 <td className="px-3 py-2 font-mono text-xs">responseMode</td>
                 <td className="px-3 py-2 font-mono text-xs">
                   "query" | "fragment"
