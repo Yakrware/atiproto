@@ -111,7 +111,7 @@ export default function PermissionSets() {
         </AnchorHeading>
         <CodeBlock
           language="text"
-          code="include:com.atiproto.authGeneral?aud=did:web:atiproto.com%23payments"
+          code="include:com.atiproto.authGeneral?aud=did:web:atiproto.com"
         />
       </section>
 
@@ -162,7 +162,7 @@ export default function PermissionSets() {
         </AnchorHeading>
         <CodeBlock
           language="text"
-          code="include:com.atiproto.authEnhanced?aud=did:web:atiproto.com%23payments"
+          code="include:com.atiproto.authEnhanced?aud=did:web:atiproto.com"
         />
       </section>
 
@@ -175,7 +175,7 @@ export default function PermissionSets() {
         </p>
         <CodeBlock
           code={`const url = await oauthClient.authorize(handle, {
-  scope: "atproto transition:generic include:com.atiproto.authGeneral?aud=did:web:atiproto.com%23payments",
+  scope: "atproto transition:generic include:com.atiproto.authGeneral?aud=did:web:atiproto.com",
 });`}
         />
       </section>
