@@ -13,7 +13,12 @@ export { $nsid }
 /** List tips and subscriptions for the authenticated user. Always returns tips given by the user and subscriptions the user has created. */
 const main = l.query(
   $nsid,
-  l.params(),
+  l.params({
+    cursor: l.optional(l.string({ maxLength: 512 })),
+    limit: l.optional(
+      l.withDefault(l.integer({ minimum: 1, maximum: 100 }), 50),
+    ),
+  }),
   l.jsonPayload({
     items: l.array(
       l.typedUnion(
