@@ -19,7 +19,7 @@
         {
           "type": "permission",
           "resource": "rpc",
-          "inheritAud": true,
+          "aud": "*",
           "lxm": [
             "com.atiproto.account.cart.clone",
             "com.atiproto.account.cart.create",
