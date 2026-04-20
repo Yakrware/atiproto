@@ -5,23 +5,20 @@
     "main": {
       "type": "query",
       "description": "List subscriptions for the authenticated user",
-      "input": {
-        "encoding": "application/json",
-        "schema": {
-          "type": "object",
-          "properties": {
-            "cursor": {
-              "type": "string",
-              "maxLength": 512,
-              "description": "Pagination cursor"
-            },
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 50,
-              "description": "Results per page (1-100, default: 50)"
-            }
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "maxLength": 512,
+            "description": "Pagination cursor"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 50,
+            "description": "Results per page (1-100, default: 50)"
           }
         }
       },

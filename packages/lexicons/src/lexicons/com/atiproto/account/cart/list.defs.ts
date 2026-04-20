@@ -12,7 +12,13 @@ export { $nsid }
 /** List carts for the authenticated user */
 const main = l.query(
   $nsid,
-  l.params(),
+  l.params({
+    status: l.optional(l.enum(['open', 'completed', 'expired', 'abandoned'])),
+    cursor: l.optional(l.string({ maxLength: 512 })),
+    limit: l.optional(
+      l.withDefault(l.integer({ minimum: 1, maximum: 100 }), 20),
+    ),
+  }),
   l.jsonPayload({
     carts: l.array(l.ref<CartResponse>((() => cartResponse) as any)),
     cursor: l.optional(l.string({ maxLength: 512 })),

@@ -12,7 +12,12 @@ export { $nsid }
 /** List subscriptions for the authenticated user */
 const main = l.query(
   $nsid,
-  l.params(),
+  l.params({
+    cursor: l.optional(l.string({ maxLength: 512 })),
+    limit: l.optional(
+      l.withDefault(l.integer({ minimum: 1, maximum: 100 }), 50),
+    ),
+  }),
   l.jsonPayload({
     subscriptions: l.array(
       l.ref<AtiprotoSubscription.View>(
