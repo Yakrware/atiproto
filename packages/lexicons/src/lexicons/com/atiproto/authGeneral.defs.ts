@@ -19,7 +19,7 @@ const main = l.permissionSet(
       ],
     }),
     l.permission('rpc', {
-      inheritAud: true,
+      aud: '*',
       lxm: [
         'com.atiproto.account.cart.clone',
         'com.atiproto.account.cart.create',
