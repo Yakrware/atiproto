@@ -12,7 +12,14 @@ export { $nsid }
 /** List tips sent by the authenticated user */
 const main = l.query(
   $nsid,
-  l.params(),
+  l.params({
+    subject: l.optional(l.string({ format: 'did' })),
+    recordUri: l.optional(l.string({ format: 'at-uri' })),
+    cursor: l.optional(l.string({ maxLength: 512 })),
+    limit: l.optional(
+      l.withDefault(l.integer({ minimum: 1, maximum: 100 }), 50),
+    ),
+  }),
   l.jsonPayload({
     tips: l.array(l.ref<AtiprotoTip.View>((() => AtiprotoTip.view) as any)),
     cursor: l.optional(l.string({ maxLength: 512 })),

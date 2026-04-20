@@ -1,6 +1,6 @@
 {
   "name": "@atiproto/lexicons",
-  "version": "0.5.3",
+  "version": "0.7.0",
   "description": "ATProto lexicon types and utilities",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

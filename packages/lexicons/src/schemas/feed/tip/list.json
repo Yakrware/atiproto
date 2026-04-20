@@ -5,33 +5,30 @@
     "main": {
       "type": "query",
       "description": "List tips sent by the authenticated user",
-      "input": {
-        "encoding": "application/json",
-        "schema": {
-          "type": "object",
-          "properties": {
-            "subject": {
-              "type": "string",
-              "format": "did",
-              "description": "Optional: only return tips sent to this recipient DID"
-            },
-            "recordUri": {
-              "type": "string",
-              "format": "at-uri",
-              "description": "Optional: only return tips for this specific record"
-            },
-            "cursor": {
-              "type": "string",
-              "maxLength": 512,
-              "description": "Pagination cursor"
-            },
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 50,
-              "description": "Results per page (1-100, default: 50)"
-            }
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "subject": {
+            "type": "string",
+            "format": "did",
+            "description": "Optional: only return tips sent to this recipient DID"
+          },
+          "recordUri": {
+            "type": "string",
+            "format": "at-uri",
+            "description": "Optional: only return tips for this specific record"
+          },
+          "cursor": {
+            "type": "string",
+            "maxLength": 512,
+            "description": "Pagination cursor"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 50,
+            "description": "Results per page (1-100, default: 50)"
           }
         }
       },
