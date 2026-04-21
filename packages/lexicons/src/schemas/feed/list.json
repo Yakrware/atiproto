@@ -32,7 +32,10 @@
               "type": "array",
               "items": {
                 "type": "union",
-                "refs": ["com.atiproto.tip", "com.atiproto.subscription"]
+                "refs": [
+                  "com.atiproto.tip#view",
+                  "com.atiproto.subscription#view"
+                ]
               }
             },
             "cursor": {

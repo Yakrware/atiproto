@@ -23,9 +23,9 @@ const main = l.query(
     items: l.array(
       l.typedUnion(
         [
-          l.typedRef<AtiprotoTip.Main>((() => AtiprotoTip.main) as any),
-          l.typedRef<AtiprotoSubscription.Main>(
-            (() => AtiprotoSubscription.main) as any,
+          l.typedRef<AtiprotoTip.View>((() => AtiprotoTip.view) as any),
+          l.typedRef<AtiprotoSubscription.View>(
+            (() => AtiprotoSubscription.view) as any,
           ),
         ],
         false,
