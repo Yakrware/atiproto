@@ -3,6 +3,7 @@
  */
 
 import { l } from '@atproto/lex'
+import * as AtiprotoActions from '../../actions.defs.js'
 import * as AtiprotoSubscription from '../../subscription.defs.js'
 import * as AtiprotoCart from '../../cart.defs.js'
 
@@ -22,11 +23,23 @@ const main = l.procedure(
     cartUri: l.optional(l.string({ format: 'at-uri' })),
     redirectUrl: l.optional(l.string({ format: 'uri' })),
     isPrivate: l.optional(l.boolean()),
+    $workflow: l.optional(
+      l.ref<AtiprotoActions.InboundWorkflow>(
+        (() => AtiprotoActions.inboundWorkflow) as any,
+      ),
+    ),
   }),
   l.jsonPayload({
-    subscriptionUri: l.string({ format: 'at-uri' }),
-    subscription: l.ref<AtiprotoSubscription.View>(
-      (() => AtiprotoSubscription.view) as any,
+    $workflow: l.optional(
+      l.ref<AtiprotoActions.OutboundWorkflow>(
+        (() => AtiprotoActions.outboundWorkflow) as any,
+      ),
+    ),
+    subscriptionUri: l.optional(l.string({ format: 'at-uri' })),
+    subscription: l.optional(
+      l.ref<AtiprotoSubscription.View>(
+        (() => AtiprotoSubscription.view) as any,
+      ),
     ),
     cartUri: l.optional(l.string({ format: 'at-uri' })),
     cart: l.optional(

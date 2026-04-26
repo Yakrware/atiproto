@@ -3,6 +3,7 @@
  */
 
 import { l } from '@atproto/lex'
+import * as AtiprotoActions from '../../actions.defs.js'
 import * as AtiprotoSubscription from '../../subscription.defs.js'
 
 const $nsid = 'com.atiproto.feed.subscription.cancel'
@@ -13,13 +14,27 @@ export { $nsid }
 const main = l.procedure(
   $nsid,
   l.params(),
-  l.jsonPayload({ subscriptionUri: l.string({ format: 'at-uri' }) }),
   l.jsonPayload({
     subscriptionUri: l.string({ format: 'at-uri' }),
-    subscription: l.ref<AtiprotoSubscription.View>(
-      (() => AtiprotoSubscription.view) as any,
+    $workflow: l.optional(
+      l.ref<AtiprotoActions.InboundWorkflow>(
+        (() => AtiprotoActions.inboundWorkflow) as any,
+      ),
     ),
-    accessUntil: l.string({ format: 'datetime' }),
+  }),
+  l.jsonPayload({
+    $workflow: l.optional(
+      l.ref<AtiprotoActions.OutboundWorkflow>(
+        (() => AtiprotoActions.outboundWorkflow) as any,
+      ),
+    ),
+    subscriptionUri: l.optional(l.string({ format: 'at-uri' })),
+    subscription: l.optional(
+      l.ref<AtiprotoSubscription.View>(
+        (() => AtiprotoSubscription.view) as any,
+      ),
+    ),
+    accessUntil: l.optional(l.string({ format: 'datetime' })),
   }),
 )
 export { main }

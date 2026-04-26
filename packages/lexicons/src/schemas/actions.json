@@ -1,0 +1,203 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.actions",
+  "description": "Workflow envelope shared between atiproto XRPC endpoints and the agent interpreter. The server emits an outboundWorkflow when it needs the agent to execute repo writes against the user's PDS; the agent runs the actions and calls back with an inboundWorkflow.",
+  "defs": {
+    "create": {
+      "type": "object",
+      "description": "Instructs the agent to call com.atproto.repo.createRecord on the user's PDS.",
+      "required": ["repo", "name", "collection", "rkey", "record"],
+      "properties": {
+        "repo": {
+          "type": "string",
+          "format": "did",
+          "description": "DID of the repo to write to. The PDS auth check is the source of truth for whether the write is allowed."
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "Server-assigned name for this action; echoed back on the corresponding response so the server can correlate."
+        },
+        "collection": {
+          "type": "string",
+          "format": "nsid"
+        },
+        "rkey": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "record": {
+          "type": "unknown"
+        }
+      }
+    },
+    "update": {
+      "type": "object",
+      "description": "Instructs the agent to call com.atproto.repo.putRecord on the user's PDS.",
+      "required": ["repo", "name", "collection", "rkey", "record"],
+      "properties": {
+        "repo": {
+          "type": "string",
+          "format": "did"
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "collection": {
+          "type": "string",
+          "format": "nsid"
+        },
+        "rkey": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "record": {
+          "type": "unknown"
+        },
+        "swapCommit": {
+          "type": "string",
+          "format": "cid"
+        }
+      }
+    },
+    "delete": {
+      "type": "object",
+      "description": "Instructs the agent to call com.atproto.repo.deleteRecord on the user's PDS.",
+      "required": ["repo", "name", "collection", "rkey"],
+      "properties": {
+        "repo": {
+          "type": "string",
+          "format": "did"
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "collection": {
+          "type": "string",
+          "format": "nsid"
+        },
+        "rkey": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "swapCommit": {
+          "type": "string",
+          "format": "cid"
+        }
+      }
+    },
+    "raise": {
+      "type": "object",
+      "description": "Terminal action: the agent throws a WorkflowRaisedError carrying message and code. Subsequent actions in the same batch are not executed.",
+      "required": ["message"],
+      "properties": {
+        "message": {
+          "type": "string",
+          "maxLength": 1024
+        },
+        "code": {
+          "type": "string",
+          "maxLength": 64
+        }
+      }
+    },
+    "response": {
+      "type": "object",
+      "description": "Result of executing one action. Carries the verb (so the server can branch without inspecting result shape) plus the action name and the resulting record reference.",
+      "required": ["action", "name", "result"],
+      "properties": {
+        "action": {
+          "type": "string",
+          "knownValues": ["create", "update", "delete"]
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "result": {
+          "type": "ref",
+          "ref": "#recordResult"
+        }
+      }
+    },
+    "recordResult": {
+      "type": "object",
+      "required": ["uri"],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid",
+          "description": "Present on create/update responses; absent on delete (the record is gone)."
+        }
+      }
+    },
+    "error": {
+      "type": "object",
+      "description": "Populated by the agent when an action fails. The server's error branch uses this to construct compensating actions and a final raise.",
+      "required": ["action", "message"],
+      "properties": {
+        "action": {
+          "type": "string",
+          "description": "The verb of the action that failed (create/update/delete)."
+        },
+        "name": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string",
+          "maxLength": 1024
+        },
+        "code": {
+          "type": "string",
+          "maxLength": 64
+        }
+      }
+    },
+    "inboundWorkflow": {
+      "type": "object",
+      "description": "Agent → server callback envelope. Echoes the server's intent verbatim, except when the agent overrides to \"error\" after an action failure.",
+      "required": ["intent", "responses"],
+      "properties": {
+        "intent": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "responses": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#response"
+          }
+        },
+        "error": {
+          "type": "ref",
+          "ref": "#error"
+        }
+      }
+    },
+    "outboundWorkflow": {
+      "type": "object",
+      "description": "Server → agent envelope. Server-defined intent string acts as a phase marker; the agent treats it as opaque. Each item in `actions` is discriminated by `$type` against `#create` / `#update` / `#delete` / `#raise`.",
+      "required": ["intent", "actions"],
+      "properties": {
+        "intent": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "union",
+            "refs": ["#create", "#update", "#delete", "#raise"]
+          }
+        }
+      }
+    }
+  }
+}

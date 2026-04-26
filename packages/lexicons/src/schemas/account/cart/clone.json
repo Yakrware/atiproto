@@ -20,6 +20,11 @@
               "type": "string",
               "format": "uri",
               "description": "URI to redirect to after checkout is complete/cancelled"
+            },
+            "$workflow": {
+              "type": "ref",
+              "ref": "com.atiproto.actions#inboundWorkflow",
+              "description": "Workflow callback envelope. Present on agent-driven callbacks; absent on initial calls."
             }
           }
         }
@@ -28,14 +33,12 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": [
-            "cart",
-            "cartUri",
-            "checkoutUrl",
-            "tips",
-            "subscriptions"
-          ],
           "properties": {
+            "$workflow": {
+              "type": "ref",
+              "ref": "com.atiproto.actions#outboundWorkflow",
+              "description": "Workflow envelope. When present, the agent runs the actions and calls back. When absent, this is the final native result."
+            },
             "cart": {
               "type": "ref",
               "ref": "com.atiproto.cart#view",

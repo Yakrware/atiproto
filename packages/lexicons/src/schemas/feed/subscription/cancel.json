@@ -15,6 +15,11 @@
               "type": "string",
               "format": "at-uri",
               "description": "AT-URI of the subscription to cancel"
+            },
+            "$workflow": {
+              "type": "ref",
+              "ref": "com.atiproto.actions#inboundWorkflow",
+              "description": "Workflow callback envelope. Present on agent-driven callbacks; absent on initial calls."
             }
           }
         }
@@ -23,8 +28,12 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": ["subscriptionUri", "subscription", "accessUntil"],
           "properties": {
+            "$workflow": {
+              "type": "ref",
+              "ref": "com.atiproto.actions#outboundWorkflow",
+              "description": "Workflow envelope. When present, the agent runs the actions and calls back. When absent, this is the final native result."
+            },
             "subscriptionUri": {
               "type": "string",
               "format": "at-uri",

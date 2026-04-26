@@ -1,12 +1,22 @@
 import { Agent as ApiAgent } from "@atproto/api";
 import {
   XrpcClient,
+  type CallOptions,
   type FetchHandler,
   type FetchHandlerObject,
   type FetchHandlerOptions,
+  type QueryParams,
+  type XRPCResponse,
 } from "@atproto/xrpc";
 import { schemas } from "@atiproto/lexicons";
 import { ComNS } from "./namespaces/com.js";
+import {
+  WORKFLOW_FIELD,
+  WorkflowActionFailed,
+  WorkflowRaisedError,
+  extractWorkflow,
+  runActions,
+} from "./workflow.js";
 
 // Mirrors @atproto/api's SessionManager interface; declared locally to avoid
 // importing from @atproto/api's internal dist directory.
@@ -16,6 +26,8 @@ interface SessionManager extends FetchHandlerObject {
 
 const SERVICE_DID = "did:web:atiproto.com";
 const SERVICE_TYPE = "payments";
+
+const DEFAULT_MAX_WORKFLOW_STEPS = 10;
 
 function createFetchHandler(client: XrpcClient): FetchHandler {
   if (client instanceof ApiAgent) {
@@ -34,20 +46,40 @@ function createFetchHandler(client: XrpcClient): FetchHandler {
 
 type ComOf<T> = T extends { com: infer C extends object } ? C : {};
 
-export class Agent<TClient extends XrpcClient = ApiAgent> extends XrpcClient {
-  com: ComNS & ComOf<TClient>;
+export interface AgentOptions {
+  /** Cap the workflow callback loop. Default 10. */
+  maxWorkflowSteps?: number;
+}
 
-  constructor(options: TClient);
-  constructor(options: SessionManager | FetchHandler | FetchHandlerOptions);
+export class Agent<TClient extends XrpcClient = XrpcClient> extends XrpcClient {
+  com: ComNS & ComOf<TClient>;
+  private readonly _maxWorkflowSteps: number;
+
+  // The override is assigned in the constructor (bound version of _call);
+  // this declaration just tells TS the public surface still matches XrpcClient.
+  declare call: XrpcClient["call"];
+
+  constructor(options: TClient, agentOpts?: AgentOptions);
+  constructor(
+    options: SessionManager | FetchHandler | FetchHandlerOptions,
+    agentOpts?: AgentOptions,
+  );
   constructor(
     options: SessionManager | XrpcClient | FetchHandler | FetchHandlerOptions,
+    { maxWorkflowSteps = DEFAULT_MAX_WORKFLOW_STEPS }: AgentOptions = {},
   ) {
     const client =
       options instanceof XrpcClient ? options : new ApiAgent(options);
 
     super(createFetchHandler(client), schemas);
 
+    this._maxWorkflowSteps = maxWorkflowSteps;
     this.com = new ComNS(this, client) as ComNS & ComOf<TClient>;
+
+    // Same closure-capture pattern as the Proxy below — keep `client` and
+    // `superCall` in scope without promoting them to instance fields.
+    const superCall = super.call.bind(this) as XrpcClient["call"];
+    this.call = this._call.bind(this, superCall, client);
 
     // Root proxy: our own properties take priority, everything else falls
     // through to the underlying client.
@@ -57,5 +89,77 @@ export class Agent<TClient extends XrpcClient = ApiAgent> extends XrpcClient {
         return Reflect.get(client, prop, receiver);
       },
     });
+  }
+
+  private async _call(
+    superCall: XrpcClient["call"],
+    client: XrpcClient,
+    nsid: string,
+    params?: QueryParams,
+    data?: unknown,
+    opts?: CallOptions,
+  ): Promise<XRPCResponse> {
+    const baseInput =
+      data && typeof data === "object" ? (data as Record<string, unknown>) : {};
+    let nextData: unknown = data;
+    let steps = 0;
+    let res: XRPCResponse;
+    let workflow: ReturnType<typeof extractWorkflow>;
+
+    do {
+      res = await superCall(nsid, params, nextData, opts);
+      workflow = extractWorkflow(res.data);
+
+      // Final response — workflow absent or actions empty.
+      if (!workflow || workflow.actions.length === 0) {
+        workflow = undefined;
+        break;
+      }
+
+      try {
+        const responses = await runActions(client, workflow.actions);
+        nextData = {
+          ...baseInput,
+          [WORKFLOW_FIELD]: { intent: workflow.intent, responses },
+        };
+      } catch (err) {
+        if (err instanceof WorkflowRaisedError) throw err;
+        if (err instanceof WorkflowActionFailed) {
+          nextData = {
+            ...baseInput,
+            [WORKFLOW_FIELD]: {
+              intent: "error",
+              responses: err.partial,
+              error: {
+                action: err.action,
+                name: err.actionName,
+                message: err.message,
+                code: err.code,
+              },
+            },
+          };
+          continue;
+        }
+        throw err;
+      }
+    } while (++steps < this._maxWorkflowSteps);
+
+    // Loop exited via while-condition (not break) → workflow is still pending.
+    if (workflow) {
+      throw new Error(
+        `Workflow exceeded max steps (${this._maxWorkflowSteps}) for ${nsid}`,
+      );
+    }
+
+    // Strip $workflow from the final data so callers see the clean native output.
+    const finalData =
+      res.data && typeof res.data === "object"
+        ? (res.data as Record<string, unknown>)
+        : undefined;
+    if (finalData && WORKFLOW_FIELD in finalData) {
+      const { [WORKFLOW_FIELD]: _strip, ...clean } = finalData;
+      return { ...res, data: clean };
+    }
+    return res;
   }
 }

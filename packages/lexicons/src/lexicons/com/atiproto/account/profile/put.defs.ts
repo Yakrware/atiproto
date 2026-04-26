@@ -3,6 +3,7 @@
  */
 
 import { l } from '@atproto/lex'
+import * as AtiprotoActions from '../../actions.defs.js'
 import * as AtiprotoProfile from '../../profile.defs.js'
 
 const $nsid = 'com.atiproto.account.profile.put'
@@ -17,13 +18,25 @@ const main = l.procedure(
     acceptsTips: l.optional(l.boolean()),
     acceptsSubscriptions: l.optional(l.boolean()),
     disableReceiptNotifications: l.optional(l.boolean()),
+    $workflow: l.optional(
+      l.ref<AtiprotoActions.InboundWorkflow>(
+        (() => AtiprotoActions.inboundWorkflow) as any,
+      ),
+    ),
   }),
   l.jsonPayload({
-    uri: l.string({ format: 'at-uri' }),
-    cid: l.string({ format: 'cid' }),
-    profile: l.ref<AtiprotoProfile.View>((() => AtiprotoProfile.view) as any),
-    hasProfile: l.boolean(),
-    readyForPayment: l.boolean(),
+    $workflow: l.optional(
+      l.ref<AtiprotoActions.OutboundWorkflow>(
+        (() => AtiprotoActions.outboundWorkflow) as any,
+      ),
+    ),
+    uri: l.optional(l.string({ format: 'at-uri' })),
+    cid: l.optional(l.string({ format: 'cid' })),
+    profile: l.optional(
+      l.ref<AtiprotoProfile.View>((() => AtiprotoProfile.view) as any),
+    ),
+    hasProfile: l.optional(l.boolean()),
+    readyForPayment: l.optional(l.boolean()),
   }),
 )
 export { main }

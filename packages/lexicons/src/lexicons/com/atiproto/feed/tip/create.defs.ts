@@ -3,6 +3,7 @@
  */
 
 import { l } from '@atproto/lex'
+import * as AtiprotoActions from '../../actions.defs.js'
 import * as AtiprotoTip from '../../tip.defs.js'
 import * as AtiprotoCart from '../../cart.defs.js'
 
@@ -23,10 +24,20 @@ const main = l.procedure(
     redirectUrl: l.optional(l.string({ format: 'uri' })),
     message: l.optional(l.string({ maxGraphemes: 500, maxLength: 5000 })),
     isPrivate: l.optional(l.boolean()),
+    $workflow: l.optional(
+      l.ref<AtiprotoActions.InboundWorkflow>(
+        (() => AtiprotoActions.inboundWorkflow) as any,
+      ),
+    ),
   }),
   l.jsonPayload({
-    tipUri: l.string({ format: 'at-uri' }),
-    tip: l.ref<AtiprotoTip.View>((() => AtiprotoTip.view) as any),
+    $workflow: l.optional(
+      l.ref<AtiprotoActions.OutboundWorkflow>(
+        (() => AtiprotoActions.outboundWorkflow) as any,
+      ),
+    ),
+    tipUri: l.optional(l.string({ format: 'at-uri' })),
+    tip: l.optional(l.ref<AtiprotoTip.View>((() => AtiprotoTip.view) as any)),
     cartUri: l.optional(l.string({ format: 'at-uri' })),
     cart: l.optional(
       l.ref<AtiprotoCart.View>((() => AtiprotoCart.view) as any),
