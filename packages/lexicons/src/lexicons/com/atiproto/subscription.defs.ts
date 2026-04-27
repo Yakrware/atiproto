@@ -132,6 +132,11 @@ type View = {
   billingStartDate: l.DatetimeString
 
   /**
+   * Next scheduled renewal/billing date. Server-derived from the billing schedule; not stored in PDS. Omitted when not applicable (e.g. cancelled or unauthenticated views).
+   */
+  renewalDate?: l.DatetimeString
+
+  /**
    * Cancellation timestamp
    */
   cancelledAt?: l.DatetimeString
@@ -161,6 +166,7 @@ const view = l.typedObject<View>(
     interval: l.enum(['monthly', 'yearly']),
     status: l.enum(['pending', 'active', 'past_due', 'cancelled', 'expired']),
     billingStartDate: l.string({ format: 'datetime' }),
+    renewalDate: l.optional(l.string({ format: 'datetime' })),
     cancelledAt: l.optional(l.string({ format: 'datetime' })),
     accessUntil: l.optional(l.string({ format: 'datetime' })),
     createdAt: l.string({ format: 'datetime' }),

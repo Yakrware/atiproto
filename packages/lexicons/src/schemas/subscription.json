@@ -116,6 +116,11 @@
           "format": "datetime",
           "type": "string"
         },
+        "renewalDate": {
+          "description": "Next scheduled renewal/billing date. Server-derived from the billing schedule; not stored in PDS. Omitted when not applicable (e.g. cancelled or unauthenticated views).",
+          "format": "datetime",
+          "type": "string"
+        },
         "cancelledAt": {
           "description": "Cancellation timestamp",
           "format": "datetime",
