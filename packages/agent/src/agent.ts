@@ -81,7 +81,7 @@ export interface AgentOptions {
  * callers receive, but TypeScript can't see that — callers will need a
  * runtime check or non-null assertion (`res.data.tipUri!`).
  */
-export class Agent<TClient extends XrpcClient = XrpcClient> extends XrpcClient {
+export class Agent<TClient extends XrpcClient = ApiAgent> extends XrpcClient {
   com: ComNS & ComOf<TClient>;
   private readonly _maxWorkflowSteps: number;
 
