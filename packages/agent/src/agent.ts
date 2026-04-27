@@ -47,10 +47,40 @@ function createFetchHandler(client: XrpcClient): FetchHandler {
 type ComOf<T> = T extends { com: infer C extends object } ? C : {};
 
 export interface AgentOptions {
-  /** Cap the workflow callback loop. Default 10. */
+  /**
+   * Cap the workflow callback loop. Default 10.
+   *
+   * One "step" = one action batch the agent executes between server calls.
+   * A typical workflow today is 1–3 steps (e.g. tip-with-cart is two:
+   * createTip → createCart). The default 10 is generous; lowering it makes
+   * sense in environments where you'd rather fail fast than tolerate a
+   * misbehaving server emitting an unbounded chain. Raising it past ~15 is
+   * a smell — investigate the workflow shape first.
+   *
+   * When exceeded, `Agent.call` throws `Error("Workflow exceeded max
+   * steps (N) for <nsid>")`.
+   */
   maxWorkflowSteps?: number;
 }
 
+/**
+ * XRPC agent for atiproto endpoints.
+ *
+ * `Agent.call` transparently runs the workflow protocol: when a response
+ * carries a `$workflow` envelope, the agent executes the actions against the
+ * user's PDS and calls back until the server returns a workflow-free result.
+ * The `$workflow` field is stripped from the data before returning to the
+ * caller, so caller-facing values match the lexicon's native output shape.
+ *
+ * **Note on output types.** Orchestrating endpoints (the 9 workflow-capable
+ * procedures — feed.tip.create/put, feed.subscription.*, account.cart.*,
+ * account.profile.put) drop `required` from their output schemas so workflow
+ * envelopes and native results both validate. As a result, generated
+ * `$OutputBody` types mark all native fields optional (`tipUri?: string` etc).
+ * The interpreter guarantees the native fields are populated on the value
+ * callers receive, but TypeScript can't see that — callers will need a
+ * runtime check or non-null assertion (`res.data.tipUri!`).
+ */
 export class Agent<TClient extends XrpcClient = XrpcClient> extends XrpcClient {
   com: ComNS & ComOf<TClient>;
   private readonly _maxWorkflowSteps: number;

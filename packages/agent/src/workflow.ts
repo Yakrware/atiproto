@@ -66,6 +66,11 @@ function actionName(a: WorkflowAction): string | undefined {
   return "name" in a && typeof a.name === "string" ? a.name : undefined;
 }
 
+// `com.atproto.repo.createRecord` and `putRecord` are specified to return
+// both `uri` and `cid`; the reference @atproto/pds implementation always
+// does. If a non-conformant PDS ever omits `cid`, surface it as a workflow
+// failure rather than silently passing `undefined` to the server's response
+// correlation — the server expects a CID for create/update.
 function repoWriteResult(data: unknown): com.atiproto.actions.RecordResult {
   const o = asRecord(data);
   if (!o || typeof o.uri !== "string" || typeof o.cid !== "string") {
