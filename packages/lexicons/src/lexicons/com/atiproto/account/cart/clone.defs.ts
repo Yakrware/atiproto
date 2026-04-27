@@ -3,6 +3,7 @@
  */
 
 import { l } from '@atproto/lex'
+import * as AtiprotoActions from '../../actions.defs.js'
 import * as AtiprotoCart from '../../cart.defs.js'
 import * as AtiprotoTip from '../../tip.defs.js'
 import * as AtiprotoSubscription from '../../subscription.defs.js'
@@ -18,15 +19,31 @@ const main = l.procedure(
   l.jsonPayload({
     uri: l.string({ format: 'at-uri' }),
     redirectUrl: l.optional(l.string({ format: 'uri' })),
+    workflow: l.optional(
+      l.ref<AtiprotoActions.InboundWorkflow>(
+        (() => AtiprotoActions.inboundWorkflow) as any,
+      ),
+    ),
   }),
   l.jsonPayload({
-    cart: l.ref<AtiprotoCart.View>((() => AtiprotoCart.view) as any),
-    cartUri: l.string({ format: 'at-uri' }),
-    checkoutUrl: l.string({ format: 'uri' }),
-    tips: l.array(l.ref<AtiprotoTip.View>((() => AtiprotoTip.view) as any)),
-    subscriptions: l.array(
-      l.ref<AtiprotoSubscription.View>(
-        (() => AtiprotoSubscription.view) as any,
+    workflow: l.optional(
+      l.ref<AtiprotoActions.OutboundWorkflow>(
+        (() => AtiprotoActions.outboundWorkflow) as any,
+      ),
+    ),
+    cart: l.optional(
+      l.ref<AtiprotoCart.View>((() => AtiprotoCart.view) as any),
+    ),
+    cartUri: l.optional(l.string({ format: 'at-uri' })),
+    checkoutUrl: l.optional(l.string({ format: 'uri' })),
+    tips: l.optional(
+      l.array(l.ref<AtiprotoTip.View>((() => AtiprotoTip.view) as any)),
+    ),
+    subscriptions: l.optional(
+      l.array(
+        l.ref<AtiprotoSubscription.View>(
+          (() => AtiprotoSubscription.view) as any,
+        ),
       ),
     ),
   }),

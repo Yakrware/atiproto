@@ -21,6 +21,11 @@
             "disableReceiptNotifications": {
               "type": "boolean",
               "description": "Opt out of payment receipt DMs"
+            },
+            "workflow": {
+              "type": "ref",
+              "ref": "com.atiproto.actions#inboundWorkflow",
+              "description": "Workflow callback envelope. Present on agent-driven callbacks; absent on initial calls."
             }
           }
         }
@@ -29,14 +34,12 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": [
-            "uri",
-            "cid",
-            "profile",
-            "hasProfile",
-            "readyForPayment"
-          ],
           "properties": {
+            "workflow": {
+              "type": "ref",
+              "ref": "com.atiproto.actions#outboundWorkflow",
+              "description": "Workflow envelope. When present, the agent runs the actions and calls back. When absent, this is the final native result."
+            },
             "uri": {
               "type": "string",
               "format": "at-uri",

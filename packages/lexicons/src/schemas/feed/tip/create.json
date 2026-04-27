@@ -49,6 +49,11 @@
             "isPrivate": {
               "type": "boolean",
               "description": "If true, the recipient (subject) and recordUri are stored only in atiproto's private database and are omitted from the PDS tip record."
+            },
+            "workflow": {
+              "type": "ref",
+              "ref": "com.atiproto.actions#inboundWorkflow",
+              "description": "Workflow callback envelope. Present on agent-driven callbacks; absent on initial calls."
             }
           }
         }
@@ -57,8 +62,12 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": ["tipUri", "tip"],
           "properties": {
+            "workflow": {
+              "type": "ref",
+              "ref": "com.atiproto.actions#outboundWorkflow",
+              "description": "Workflow envelope. When present, the agent runs the actions and calls back. When absent, this is the final native result."
+            },
             "tipUri": {
               "type": "string",
               "format": "at-uri",

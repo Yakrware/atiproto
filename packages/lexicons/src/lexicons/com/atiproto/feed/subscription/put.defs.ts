@@ -4,6 +4,7 @@
 
 import { l } from '@atproto/lex'
 import * as AtiprotoSubscription from '../../subscription.defs.js'
+import * as AtiprotoActions from '../../actions.defs.js'
 
 const $nsid = 'com.atiproto.feed.subscription.put'
 
@@ -18,10 +19,20 @@ const main = l.procedure(
     record: l.ref<AtiprotoSubscription.Main>(
       (() => AtiprotoSubscription.main) as any,
     ),
+    workflow: l.optional(
+      l.ref<AtiprotoActions.InboundWorkflow>(
+        (() => AtiprotoActions.inboundWorkflow) as any,
+      ),
+    ),
   }),
   l.jsonPayload({
-    uri: l.string({ format: 'at-uri' }),
-    cid: l.string({ format: 'cid' }),
+    workflow: l.optional(
+      l.ref<AtiprotoActions.OutboundWorkflow>(
+        (() => AtiprotoActions.outboundWorkflow) as any,
+      ),
+    ),
+    uri: l.optional(l.string({ format: 'at-uri' })),
+    cid: l.optional(l.string({ format: 'cid' })),
   }),
 )
 export { main }

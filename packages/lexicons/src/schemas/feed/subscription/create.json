@@ -1,87 +1,96 @@
 {
+  "lexicon": 1,
+  "id": "com.atiproto.feed.subscription.create",
   "defs": {
     "main": {
+      "type": "procedure",
       "description": "Create a subscription to a user. Returns a one-off cart with checkout URL.",
       "input": {
         "encoding": "application/json",
         "schema": {
+          "type": "object",
+          "required": ["subject", "currency", "interval"],
           "properties": {
             "subject": {
-              "description": "DID of the user to subscribe to",
+              "type": "string",
               "format": "did",
-              "type": "string"
+              "description": "DID of the user to subscribe to"
             },
             "amount": {
-              "description": "Custom amount in cents (if pay-as-you-want enabled)",
-              "type": "integer"
+              "type": "integer",
+              "description": "Custom amount in cents (if pay-as-you-want enabled)"
             },
             "currency": {
-              "description": "ISO 4217 currency code",
+              "type": "string",
               "maxLength": 3,
-              "type": "string"
+              "description": "ISO 4217 currency code"
             },
             "interval": {
-              "description": "Billing interval",
+              "type": "string",
               "maxLength": 64,
               "enum": ["monthly", "yearly"],
-              "type": "string"
+              "description": "Billing interval"
             },
             "cartUri": {
-              "description": "AT-URI of an existing cart to add this subscription to. If omitted, a new cart is created.",
+              "type": "string",
               "format": "at-uri",
-              "type": "string"
+              "description": "AT-URI of an existing cart to add this subscription to. If omitted, a new cart is created."
             },
             "redirectUrl": {
-              "description": "URL to redirect to after checkout completes",
+              "type": "string",
               "format": "uri",
-              "type": "string"
+              "description": "URL to redirect to after checkout completes"
             },
             "isPrivate": {
-              "description": "If true, the recipient (subject) is stored only in atiproto's private database and is omitted from the PDS subscription record.",
-              "type": "boolean"
+              "type": "boolean",
+              "description": "If true, the recipient (subject) is stored only in atiproto's private database and is omitted from the PDS subscription record."
+            },
+            "workflow": {
+              "type": "ref",
+              "ref": "com.atiproto.actions#inboundWorkflow",
+              "description": "Workflow callback envelope. Present on agent-driven callbacks; absent on initial calls."
             }
-          },
-          "required": ["subject", "currency", "interval"],
-          "type": "object"
+          }
         }
       },
       "output": {
         "encoding": "application/json",
         "schema": {
+          "type": "object",
           "properties": {
+            "workflow": {
+              "type": "ref",
+              "ref": "com.atiproto.actions#outboundWorkflow",
+              "description": "Workflow envelope. When present, the agent runs the actions and calls back. When absent, this is the final native result."
+            },
             "subscriptionUri": {
-              "description": "URI of the subscription record in PDS",
+              "type": "string",
               "format": "at-uri",
-              "type": "string"
+              "description": "URI of the subscription record in PDS"
             },
             "subscription": {
-              "description": "The created subscription record (status: pending)",
               "type": "ref",
-              "ref": "com.atiproto.subscription#view"
+              "ref": "com.atiproto.subscription#view",
+              "description": "The created subscription record (status: pending)"
             },
             "cartUri": {
-              "description": "URI of the cart record in PDS",
+              "type": "string",
               "format": "at-uri",
-              "type": "string"
+              "description": "URI of the cart record in PDS"
             },
             "cart": {
-              "description": "The created cart record (status: open)",
               "type": "ref",
-              "ref": "com.atiproto.cart#view"
+              "ref": "com.atiproto.cart#view",
+              "description": "The created cart record (status: open)"
             },
             "checkoutUrl": {
-              "description": "Checkout URL hosted by atiproto",
+              "type": "string",
               "format": "uri",
-              "type": "string"
+              "description": "Checkout URL hosted by atiproto"
             }
-          },
-          "required": ["subscriptionUri", "subscription"],
-          "type": "object"
+          }
         }
-      },
-      "type": "procedure"
+      }
     }
-  },
-  "id": "com.atiproto.feed.subscription.create",
-  "lexicon": 1
+  }
 }

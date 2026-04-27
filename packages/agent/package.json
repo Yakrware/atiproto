@@ -1,6 +1,6 @@
 {
   "name": "@atiproto/agent",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "ATProto agent",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -30,7 +30,7 @@
   "bugs": "https://github.com/Yakrware/atiproto/issues",
   "license": "MIT",
   "dependencies": {
-    "@atiproto/lexicons": "*",
+    "@atiproto/lexicons": "^0.8.0",
     "@atproto/api": "^0.19.6",
     "@atproto/xrpc": "^0.7.7"
   },

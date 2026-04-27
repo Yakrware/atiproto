@@ -1,5 +1,6 @@
 import type { LexiconDoc } from "@atproto/lexicon";
 
+import Actions from "./schemas/actions.json";
 import AccountCartClone from "./schemas/account/cart/clone.json";
 import AccountCartCreate from "./schemas/account/cart/create.json";
 import AccountCartGet from "./schemas/account/cart/get.json";
@@ -36,6 +37,7 @@ import Subscription from "./schemas/subscription.json";
 import Tip from "./schemas/tip.json";
 
 export const schemas: LexiconDoc[] = [
+  Actions,
   AccountCartClone,
   AccountCartCreate,
   AccountCartGet,

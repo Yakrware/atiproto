@@ -3,6 +3,7 @@
  */
 
 import { l } from '@atproto/lex'
+import * as AtiprotoActions from '../../actions.defs.js'
 import * as AtiprotoCart from '../../cart.defs.js'
 
 const $nsid = 'com.atiproto.account.cart.create'
@@ -16,11 +17,23 @@ const main = l.procedure(
   l.jsonPayload({
     currency: l.string({ maxLength: 3 }),
     redirectUrl: l.optional(l.string({ format: 'uri' })),
+    workflow: l.optional(
+      l.ref<AtiprotoActions.InboundWorkflow>(
+        (() => AtiprotoActions.inboundWorkflow) as any,
+      ),
+    ),
   }),
   l.jsonPayload({
-    cart: l.ref<AtiprotoCart.View>((() => AtiprotoCart.view) as any),
-    cartUri: l.string({ format: 'at-uri' }),
-    checkoutUrl: l.string({ format: 'uri' }),
+    workflow: l.optional(
+      l.ref<AtiprotoActions.OutboundWorkflow>(
+        (() => AtiprotoActions.outboundWorkflow) as any,
+      ),
+    ),
+    cart: l.optional(
+      l.ref<AtiprotoCart.View>((() => AtiprotoCart.view) as any),
+    ),
+    cartUri: l.optional(l.string({ format: 'at-uri' })),
+    checkoutUrl: l.optional(l.string({ format: 'uri' })),
   }),
 )
 export { main }

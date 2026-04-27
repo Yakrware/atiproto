@@ -4,6 +4,7 @@
 
 import { l } from '@atproto/lex'
 import * as AtiprotoCart from '../../cart.defs.js'
+import * as AtiprotoActions from '../../actions.defs.js'
 
 const $nsid = 'com.atiproto.account.cart.put'
 
@@ -16,10 +17,20 @@ const main = l.procedure(
   l.jsonPayload({
     uri: l.string({ format: 'at-uri' }),
     record: l.ref<AtiprotoCart.Main>((() => AtiprotoCart.main) as any),
+    workflow: l.optional(
+      l.ref<AtiprotoActions.InboundWorkflow>(
+        (() => AtiprotoActions.inboundWorkflow) as any,
+      ),
+    ),
   }),
   l.jsonPayload({
-    uri: l.string({ format: 'at-uri' }),
-    cid: l.string({ format: 'cid' }),
+    workflow: l.optional(
+      l.ref<AtiprotoActions.OutboundWorkflow>(
+        (() => AtiprotoActions.outboundWorkflow) as any,
+      ),
+    ),
+    uri: l.optional(l.string({ format: 'at-uri' })),
+    cid: l.optional(l.string({ format: 'cid' })),
   }),
 )
 export { main }
