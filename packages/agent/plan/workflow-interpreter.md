@@ -28,7 +28,7 @@ Below, "the spec" refers to that document. What follows here is the slice of wor
 Two packages change:
 
 - **`@atiproto/lexicons`** — add a new shared fragment `com.atiproto.actions`, and update every orchestrating endpoint's lexicon to reference its `inboundWorkflow`/`outboundWorkflow` wrapper.
-- **`@atiproto/agent`** — add a workflow interpreter wired into `Agent.call()` itself, so **any** response carrying a `$workflow` envelope is intercepted, the actions executed against the user's PDS, and the endpoint called back until the server returns a direct (non-workflow) result. No per-namespace-method wiring.
+- **`@atiproto/agent`** — add a workflow interpreter wired into `Agent.call()` itself, so **any** response carrying a `workflow` envelope is intercepted, the actions executed against the user's PDS, and the endpoint called back until the server returns a direct (non-workflow) result. No per-namespace-method wiring.
 
 No changes needed to `@atiproto/edge-resolvers` or the OAuth packages.
 
@@ -152,26 +152,26 @@ Notes:
 
 ### Endpoint updates
 
-Every orchestrating endpoint (9 of them, listed in the server plan) needs the `$workflow` property added as optional to both `input.schema` and `output.schema`:
+Every orchestrating endpoint (9 of them, listed in the server plan) needs the `workflow` property added as optional to both `input.schema` and `output.schema`:
 
 ```json
-"$workflow": { "type": "ref", "ref": "com.atiproto.actions#inboundWorkflow" }
+"workflow": { "type": "ref", "ref": "com.atiproto.actions#inboundWorkflow" }
 ```
 on input, and
 ```json
-"$workflow": { "type": "ref", "ref": "com.atiproto.actions#outboundWorkflow" }
+"workflow": { "type": "ref", "ref": "com.atiproto.actions#outboundWorkflow" }
 ```
 on output.
 
-The `$` prefix mirrors atproto's existing convention for protocol-level metadata (`$type`) and reserves the field name across every endpoint that participates. **Verify during implementation** that `@atproto/lex` accepts `$`-prefixed property names — if it rejects them, fall back to plain `$workflow`. The structural `isOutboundWorkflow` check guards against shape collisions either way.
+The `$` prefix mirrors atproto's existing convention for protocol-level metadata (`$type`) and reserves the field name across every endpoint that participates. **Verify during implementation** that `@atproto/lex` accepts `$`-prefixed property names — if it rejects them, fall back to plain `workflow`. The structural `isOutboundWorkflow` check guards against shape collisions either way.
 
-Because `$workflow` is optional everywhere, initial calls (no workflow) and direct-result responses (no workflow) both validate. The union is enforced at runtime by server + agent, not by the lexicon.
+Because `workflow` is optional everywhere, initial calls (no workflow) and direct-result responses (no workflow) both validate. The union is enforced at runtime by server + agent, not by the lexicon.
 
-**Drop the existing `required` arrays from these endpoints' output schemas.** In workflow mode the server emits `$workflow` *instead of* the native output fields (e.g. `tipUri`, `tip`); with the current `"required": ["tipUri", "tip"]` constraint in `feed/tip/create.json`, the workflow response fails lexicon validation. The server plan calls this out at line 227: *"Lexicon validation is loose (all fields optional on output) — the server controls at runtime whether it emits `$workflow` or the native fields."* Apply the same to the other eight endpoints: keep all native output properties under `properties`, but no `required` array on `output.schema`.
+**Drop the existing `required` arrays from these endpoints' output schemas.** In workflow mode the server emits `workflow` *instead of* the native output fields (e.g. `tipUri`, `tip`); with the current `"required": ["tipUri", "tip"]` constraint in `feed/tip/create.json`, the workflow response fails lexicon validation. The server plan calls this out at line 227: *"Lexicon validation is loose (all fields optional on output) — the server controls at runtime whether it emits `workflow` or the native fields."* Apply the same to the other eight endpoints: keep all native output properties under `properties`, but no `required` array on `output.schema`.
 
 Input schemas keep their existing `required` arrays — the native input fields stay required on initial calls and on every callback (the agent echoes the initial input on every round).
 
-**TS-DX consequence.** With `required` removed from output, the generated `$OutputBody` types shift from `{ tipUri: string; tip: View }` to `{ tipUri?: string; tip?: View; $workflow?: OutboundWorkflow }`. After the interpreter loop completes the agent guarantees the native fields are populated and `$workflow` is stripped — but TypeScript can't see that, so callers will need a runtime check or non-null assertion (`res.data.tipUri!`). Acceptable for v0; if it becomes a pain we can add a narrow-result type wrapper later. Note this in the package README so it isn't surprising.
+**TS-DX consequence.** With `required` removed from output, the generated `$OutputBody` types shift from `{ tipUri: string; tip: View }` to `{ tipUri?: string; tip?: View; workflow?: OutboundWorkflow }`. After the interpreter loop completes the agent guarantees the native fields are populated and `workflow` is stripped — but TypeScript can't see that, so callers will need a runtime check or non-null assertion (`res.data.tipUri!`). Acceptable for v0; if it becomes a pain we can add a narrow-result type wrapper later. Note this in the package README so it isn't surprising.
 
 Endpoints to update in `packages/lexicons/src/schemas/`:
 
@@ -180,9 +180,9 @@ Endpoints to update in `packages/lexicons/src/schemas/`:
 - `account/cart/create.json`, `account/cart/put.json`, `account/cart/clone.json`
 - `account/profile/put.json`
 
-For each: add `$workflow` (optional) to input + output `properties`, **remove the `required` array on `output.schema`** (input stays as-is). Don't touch the list/get endpoints — they stay read-only.
+For each: add `workflow` (optional) to input + output `properties`, **remove the `required` array on `output.schema`** (input stays as-is). Don't touch the list/get endpoints — they stay read-only.
 
-**Procedure-only.** All 9 endpoints are procedures with `input.schema` + `output.schema`. If a future query gets a workflow output, the recipe is different: queries have `parameters` instead of `input.schema`, so the inbound `$workflow` would have to ride on the request body via a hybrid procedure conversion. Out of scope today — flag it when the case arises.
+**Procedure-only.** All 9 endpoints are procedures with `input.schema` + `output.schema`. If a future query gets a workflow output, the recipe is different: queries have `parameters` instead of `input.schema`, so the inbound `workflow` would have to ride on the request body via a hybrid procedure conversion. Out of scope today — flag it when the case arises.
 
 ### Version bump + publish
 
@@ -201,12 +201,12 @@ Two new files:
 
 ### Why override `call()` instead of wrapping each namespace method
 
-The namespace files under `src/namespaces/**` are hand-written. Every one of them ends with `this._client.call(nsid, params, data, opts)`. The `_client` they're handed is the `Agent` itself (see `ComNS(this, client)` in `src/agent.ts:50`). So if `Agent.call` is the seam that notices a `$workflow` envelope and drives the interpreter loop, **every namespace method benefits automatically**:
+The namespace files under `src/namespaces/**` are hand-written. Every one of them ends with `this._client.call(nsid, params, data, opts)`. The `_client` they're handed is the `Agent` itself (see `ComNS(this, client)` in `src/agent.ts:50`). So if `Agent.call` is the seam that notices a `workflow` envelope and drives the interpreter loop, **every namespace method benefits automatically**:
 
 - No per-method edits today for the nine orchestrating endpoints.
 - No namespace edits when a tenth endpoint grows a workflow output later — only the lexicon changes.
-- The interpreter is keyed on the **response shape** (`data.$workflow.intent` + `data.$workflow.actions` array), not a hardcoded NSID list. A shape-based check is tolerant of additive schema evolution.
-- Non-workflow endpoints (queries, data lexicons, hybrids) simply don't have `data.$workflow` in the response and pass straight through. Zero extra cost on the hot path.
+- The interpreter is keyed on the **response shape** (`data.workflow.intent` + `data.workflow.actions` array), not a hardcoded NSID list. A shape-based check is tolerant of additive schema evolution.
+- Non-workflow endpoints (queries, data lexicons, hybrids) simply don't have `data.workflow` in the response and pass straight through. Zero extra cost on the hot path.
 
 The same approach handles recursion naturally: the server can chain any number of intent phases, the agent's while-loop keeps running until a workflow-free response arrives. Recursion was the other option — `executeWorkflow` calling itself — but a while-loop is flatter, stack-safe, and easier to cap with a max-depth guard.
 
@@ -255,7 +255,7 @@ export class WorkflowActionFailed extends Error {
   }
 }
 
-const WORKFLOW_FIELD = "$workflow";
+const WORKFLOW_FIELD = "workflow";
 
 function asRecord(x: unknown): Record<string, unknown> | undefined {
   return x && typeof x === "object" ? (x as Record<string, unknown>) : undefined;
@@ -269,7 +269,7 @@ export function isOutboundWorkflow(x: unknown): x is com.atiproto.actions.Outbou
   return !!o && typeof o.intent === "string" && Array.isArray(o.actions);
 }
 
-// Extract a $workflow envelope from response data, or undefined if absent / malformed.
+// Extract a workflow envelope from response data, or undefined if absent / malformed.
 export function extractWorkflow(data: unknown): com.atiproto.actions.OutboundWorkflow | undefined {
   const o = asRecord(data);
   if (!o) return undefined;
@@ -495,7 +495,7 @@ export class Agent<TClient extends XrpcClient = XrpcClient> extends XrpcClient {
       );
     }
 
-    // Strip $workflow from the final data so callers see the clean native output.
+    // Strip workflow from the final data so callers see the clean native output.
     const finalData = asRecord(res.data);
     if (finalData && WORKFLOW_FIELD in finalData) {
       const { [WORKFLOW_FIELD]: _, ...clean } = finalData;
@@ -515,7 +515,7 @@ Notes on this approach:
 - **`repo` comes from the server, per action.** Each `create`/`update`/`delete` carries its own `repo` DID. The agent passes it to the PDS verbatim; if the server gets it wrong, the PDS auth check rejects and the failure surfaces via the error callback. The agent does no DID resolution.
 - `data` passed in by namespace methods is spread into the callback payload, preserving the caller's original input on every round (the "initialInput echo" the server depends on).
 - The `params` argument is kept across callbacks unchanged — matters only for hybrid endpoints (none of the 9 today, but correct by construction).
-- The final response has `$workflow` deleted so caller-facing types stay clean. Generated TypeScript still has `$workflow?: OutboundWorkflow | undefined` as an optional field, but at runtime it's never present on the value the caller receives.
+- The final response has `workflow` deleted so caller-facing types stay clean. Generated TypeScript still has `workflow?: OutboundWorkflow | undefined` as an optional field, but at runtime it's never present on the value the caller receives.
 
 ### Error handling
 
@@ -546,7 +546,7 @@ Cover `runActions`, `isOutboundWorkflow`, and the error classes in isolation. Fa
 
 ### Integration tests — `packages/agent/__tests__/workflow.integration.test.ts` (new)
 
-The integration tests exercise the full `Agent.call` → XrpcClient → fetch → interpreter → PDS write → callback chain. The goal is to catch any regression where the wiring (lexicon validation, header injection, callback payload shape, `$workflow` strip) breaks even when each unit passes.
+The integration tests exercise the full `Agent.call` → XrpcClient → fetch → interpreter → PDS write → callback chain. The goal is to catch any regression where the wiring (lexicon validation, header injection, callback payload shape, `workflow` strip) breaks even when each unit passes.
 
 **Setup helpers** (top of file or in `__tests__/helpers/scripted-fetch.ts`):
 
@@ -582,13 +582,13 @@ function jsonRes(body: unknown, status = 200) {
 
 **Scenarios:**
 
-1. **Single round, single action.** Server emits one `create` → fetch handler asserts the PDS request (collection, rkey, repo) and returns a uri/cid → callback fetch handler asserts intent + responses[0].result.uri → server returns `{ tipUri, tip }`. Caller receives `data.tipUri` and `data` does **not** have `$workflow`.
+1. **Single round, single action.** Server emits one `create` → fetch handler asserts the PDS request (collection, rkey, repo) and returns a uri/cid → callback fetch handler asserts intent + responses[0].result.uri → server returns `{ tipUri, tip }`. Caller receives `data.tipUri` and `data` does **not** have `workflow`.
 
 2. **Multi-round chain.** Server emits `intent: "createCart"` → callback → server emits `intent: "createTip"` with another `create` → callback → server emits final result. Verify intent echoed verbatim each round, and the right number of XRPC + PDS calls fire (3 XRPC, 2 PDS).
 
-3. **Direct result, no workflow.** Server returns native output with no `$workflow`. Caller receives data immediately. Zero PDS calls. (Post-#4877 happy path.)
+3. **Direct result, no workflow.** Server returns native output with no `workflow`. Caller receives data immediately. Zero PDS calls. (Post-#4877 happy path.)
 
-4. **Empty actions array exits the loop.** Server returns `{ $workflow: { intent: "x", actions: [] } }`. No PDS calls; `$workflow` stripped from returned data.
+4. **Empty actions array exits the loop.** Server returns `{ workflow: { intent: "x", actions: [] } }`. No PDS calls; `workflow` stripped from returned data.
 
 5. **Action failure → error callback → raise.** Server emits `create` → PDS returns 401 → agent callbacks with `intent: "error"`, error payload populated → server emits `raise` → caller catches `WorkflowRaisedError` with the server's message and code.
 
@@ -596,29 +596,29 @@ function jsonRes(body: unknown, status = 200) {
 
 7. **`raise` as terminal action.** Server emits an `actions` batch starting with `raise`. No PDS calls fire; `WorkflowRaisedError` thrown.
 
-8. **Initial input preserved.** Server's callback handler asserts that every original input field (`subject`, `amount`, `currency`, ...) is present alongside `$workflow` on the callback body.
+8. **Initial input preserved.** Server's callback handler asserts that every original input field (`subject`, `amount`, `currency`, ...) is present alongside `workflow` on the callback body.
 
-9. **Extensibility — arbitrary NSID with a workflow.** Mock a `feed.tip.list` response that injects `$workflow` even though today's lexicon doesn't include it. The interpreter must still run. This is the "any future endpoint just works" regression test — pin the shape-driven contract. (Verified against `@atproto/lexicon`'s `validators/complex.js#object` — it iterates declared properties and passes extra keys through unchanged, neither stripping nor rejecting. Test will exercise the agent layer end-to-end.)
+9. **Extensibility — arbitrary NSID with a workflow.** Mock a `feed.tip.list` response that injects `workflow` even though today's lexicon doesn't include it. The interpreter must still run. This is the "any future endpoint just works" regression test — pin the shape-driven contract. (Verified against `@atproto/lexicon`'s `validators/complex.js#object` — it iterates declared properties and passes extra keys through unchanged, neither stripping nor rejecting. Test will exercise the agent layer end-to-end.)
 
 10. **Max-steps guard.** Server replies with a workflow on every call. Construct `new Agent(client, { maxWorkflowSteps: 2 })`. Verify the agent throws `Workflow exceeded max steps (2)` and does not enter a third action batch.
 
-11. **`$workflow` strip on final data.** Two sub-cases:
-    - Final response has no `$workflow` at all → `data` matches the lexicon's native output exactly.
-    - Final response has `$workflow: { intent, actions: [] }` → loop exits via the empty-actions branch and `$workflow` is removed before the return.
+11. **`workflow` strip on final data.** Two sub-cases:
+    - Final response has no `workflow` at all → `data` matches the lexicon's native output exactly.
+    - Final response has `workflow: { intent, actions: [] }` → loop exits via the empty-actions branch and `workflow` is removed before the return.
 
 12. **Auth failure only when workflow arrives.** Use an unauthenticated `ApiAgent`. Calls to read-only endpoints work normally. A workflow-emitting endpoint with an authentic-failure on `assertDid` produces a clean `intent: "error"` callback; if the server then `raise`s, the caller sees a `WorkflowRaisedError` (not a raw `assertDid` throw).
 
 13. **Proxy header still set.** Verify the XRPC fetch carries `atproto-proxy: did:web:atiproto.com#payments`. Existing test at `__tests__/agent.test.ts:62-78` covers the simple case; the integration variant proves it survives the workflow callback path too.
 
-14. **Lexicon validation passes for the new `$workflow` field.** Two layers:
-    - **Agent-side** integration assertion: the fetch handler returns a payload with `$workflow` populated; XrpcClient parses without throwing.
+14. **Lexicon validation passes for the new `workflow` field.** Two layers:
+    - **Agent-side** integration assertion: the fetch handler returns a payload with `workflow` populated; XrpcClient parses without throwing.
     - **Lexicons-package** assertion (`packages/lexicons/__tests__/actions.test.ts` or similar): import `schemas` from `@atiproto/lexicons`, assert `com.atiproto.actions` is in the array and that its `defs` include `inboundWorkflow`, `outboundWorkflow`, and the action union with `refs: ["#create", "#update", "#delete", "#raise"]`. Cheap snapshot — catches a build pipeline that drops the new schema or renames a def.
 
 ### Notes
 
 - Don't pin specific CID strings in assertions — the agent forwards whatever the PDS returns, so use a regex (`/^bafy/`) or `expect.any(String)`.
 - Use `vi.fn()` to wrap each scripted route so the test can assert call counts and inspect bodies after the fact.
-- Tests should consume the **bundled** lexicons (`@atiproto/lexicons` types + schemas), not stub them. If the lexicon publishing pipeline doesn't include `$workflow` in the output validation, the integration test will fail loud — exactly what we want.
+- Tests should consume the **bundled** lexicons (`@atiproto/lexicons` types + schemas), not stub them. If the lexicon publishing pipeline doesn't include `workflow` in the output validation, the integration test will fail loud — exactly what we want.
 
 ---
 
@@ -626,7 +626,7 @@ function jsonRes(body: unknown, status = 200) {
 
 1. **`@atiproto/lexicons` 0.8.0.**
    1. Add `com.atiproto.actions` schema (this doc's lexicon).
-   2. Update the 9 endpoint schemas: add `$workflow` to input + output, drop output `required` arrays.
+   2. Update the 9 endpoint schemas: add `workflow` to input + output, drop output `required` arrays.
    3. Run `npm run build:lexicons` to regenerate types — **this must complete before agent code can typecheck against `com.atiproto.actions.Action` etc.** Treat this as the implicit dependency between sub-steps.
    4. Run lexicons unit tests, including the new bundled-validator assertion (test list, scenario 14).
    5. Build, publish.
@@ -643,13 +643,13 @@ function jsonRes(body: unknown, status = 200) {
 
 Server agent and this package need to agree on:
 
-- **Lexicon NSIDs and field names.** `com.atiproto.actions` is the name. `inboundWorkflow` / `outboundWorkflow` are the wrapper refs. The envelope key on inputs and outputs is `$workflow` (fall back to plain `workflow` if `@atproto/lex` rejects `$`-prefixed property names).
+- **Lexicon NSIDs and field names.** `com.atiproto.actions` is the name. `inboundWorkflow` / `outboundWorkflow` are the wrapper refs. The envelope key on inputs and outputs is `workflow` (fall back to plain `workflow` if `@atproto/lex` rejects `$`-prefixed property names).
 - **Output schema `required` arrays.** The 9 orchestrating endpoints drop their output `required` arrays so workflow responses validate alongside native responses. Server plan §Per-endpoint contract spells this out at line 227.
 - **`repo` source.** Server populates `repo` on every `create`/`update`/`delete` action with the DID it intends the write to land in. Agent passes verbatim to the PDS; the PDS's auth check is the source of truth for whether the write is allowed. Note: this is a divergence from the server-side plan's pseudo-code (which currently shows actions without a `repo` field) — the server-side handler authoring pattern needs the same update.
 - **`rkey` source.** Server generates (typically `TID.nextStr()`), includes on every `create` action. Agent does not generate rkeys.
 - **Intent strings.** Server-defined per handler; agent only overrides to `"error"`. No shared enum. Server plan uses `"createTip"`, `"createCart"`, `"rollback"` as illustrative phase markers — the agent treats them all as opaque strings.
 - **Error payload shape.** Agent constructs `error` with `action` (failed action verb), `name`, `message`, `code` (if extractable from XrpcError).
-- **Initial-input echo.** Agent sends `{ ...initialInput, $workflow: {...} }` on every callback. Server handlers can assume the initial fields are present on callbacks.
+- **Initial-input echo.** Agent sends `{ ...initialInput, workflow: {...} }` on every callback. Server handlers can assume the initial fields are present on callbacks.
 - **Orphan records on interruption.** V0 leaves orphans alone; reconciliation is offline (server plan §Orphan records). The agent does not retry, dedupe, or stamp idempotency keys.
 - **`@atiproto/lexicons` minimum version.** Agent will import types from the new `com.atiproto.actions` namespace; server pins the same minimum.
 
@@ -659,12 +659,12 @@ If the server agent needs a schema change mid-flight (e.g., "we actually want an
 
 ## Resolved decisions
 
-- **Field name.** `$workflow`, prefixed to namespace it like `$type`. Verify `@atproto/lex` accepts `$`-prefixed property names during implementation; fall back to plain `$workflow` if not.
+- **Field name.** `workflow`, prefixed to namespace it like `$type`. Verify `@atproto/lex` accepts `$`-prefixed property names during implementation; fall back to plain `workflow` if not.
 - **`repo` is server-supplied per action.** Each `create`/`update`/`delete` carries `repo` as a required field. The agent passes it through to the PDS without inspection. PDS auth rejects writes to repos the OAuth scope doesn't cover — that natural failure surfaces via the error callback. No `assertDid` reads, no session inspection in the agent.
 - **Constructor signature.** `new Agent(client, { maxWorkflowSteps?: number })`. Additive second argument, no breaking change. (Open to revisit if more options accumulate.)
 - **Auth handling.** No precheck. PDS auth runs at write time — if the OAuth scope doesn't cover the requested `repo`, the PDS rejects, the rejection becomes a `WorkflowActionFailed`, and the error callback fires. Non-workflow calls are never affected.
 - **Underlying client typed as `XrpcClient` throughout.** Helpers and `runActions` operate on `XrpcClient`, calling `pds.call("com.atproto.repo.createRecord", ...)` directly. No `instanceof ApiAgent`, no namespace-method dependency, no DID resolution.
-- **`$workflow` strip on return.** `Agent.call` removes `$workflow` from the final response data so caller-facing values match the lexicon's native output type.
+- **`workflow` strip on return.** `Agent.call` removes `workflow` from the final response data so caller-facing values match the lexicon's native output type.
 - **Loop, not recursion.** While-loop with a `maxWorkflowSteps` guard (default 10).
 - **Interpreter location.** `Agent.call()` override, not per-namespace-method. Adding a workflow output to any future endpoint is a lexicon-only change.
 - **Namespace files.** Hand-written, confirmed (see `packages/agent/src/namespaces/com/atiproto/feed/tip.ts`). No edits needed for this feature.
@@ -673,4 +673,4 @@ If the server agent needs a schema change mid-flight (e.g., "we actually want an
 
 - **TID generation.** Server uses `TID.nextStr()` from `@atproto/common`. Server plan assumes that. Agent never generates rkeys. Confirm with the server-side plan.
 - **Lexicon version number.** 0.8.0 (minor bump for additive schema). Server plan references the version; pick the same number.
-- **Generated `$Input`/`$Output` type carries `$workflow?`.** Callers using TS will see an optional `$workflow` field on every orchestrating endpoint's input/output type. The `call()`-level strip removes it from runtime values, so callers can ignore it. Worth a one-liner in the package README so it's not surprising.
+- **Generated `$Input`/`$Output` type carries `workflow?`.** Callers using TS will see an optional `workflow` field on every orchestrating endpoint's input/output type. The `call()`-level strip removes it from runtime values, so callers can ignore it. Worth a one-liner in the package README so it's not surprising.

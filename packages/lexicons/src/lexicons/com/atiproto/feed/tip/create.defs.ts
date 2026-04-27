@@ -24,14 +24,14 @@ const main = l.procedure(
     redirectUrl: l.optional(l.string({ format: 'uri' })),
     message: l.optional(l.string({ maxGraphemes: 500, maxLength: 5000 })),
     isPrivate: l.optional(l.boolean()),
-    $workflow: l.optional(
+    workflow: l.optional(
       l.ref<AtiprotoActions.InboundWorkflow>(
         (() => AtiprotoActions.inboundWorkflow) as any,
       ),
     ),
   }),
   l.jsonPayload({
-    $workflow: l.optional(
+    workflow: l.optional(
       l.ref<AtiprotoActions.OutboundWorkflow>(
         (() => AtiprotoActions.outboundWorkflow) as any,
       ),

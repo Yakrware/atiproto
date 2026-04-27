@@ -67,9 +67,9 @@ export interface AgentOptions {
  * XRPC agent for atiproto endpoints.
  *
  * `Agent.call` transparently runs the workflow protocol: when a response
- * carries a `$workflow` envelope, the agent executes the actions against the
+ * carries a `workflow` envelope, the agent executes the actions against the
  * user's PDS and calls back until the server returns a workflow-free result.
- * The `$workflow` field is stripped from the data before returning to the
+ * The `workflow` field is stripped from the data before returning to the
  * caller, so caller-facing values match the lexicon's native output shape.
  *
  * **Note on output types.** Orchestrating endpoints (the 9 workflow-capable
@@ -181,7 +181,7 @@ export class Agent<TClient extends XrpcClient = XrpcClient> extends XrpcClient {
       );
     }
 
-    // Strip $workflow from the final data so callers see the clean native output.
+    // Strip workflow from the final data so callers see the clean native output.
     const finalData =
       res.data && typeof res.data === "object"
         ? (res.data as Record<string, unknown>)

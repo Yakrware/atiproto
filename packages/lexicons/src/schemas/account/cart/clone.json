@@ -21,7 +21,7 @@
               "format": "uri",
               "description": "URI to redirect to after checkout is complete/cancelled"
             },
-            "$workflow": {
+            "workflow": {
               "type": "ref",
               "ref": "com.atiproto.actions#inboundWorkflow",
               "description": "Workflow callback envelope. Present on agent-driven callbacks; absent on initial calls."
@@ -34,7 +34,7 @@
         "schema": {
           "type": "object",
           "properties": {
-            "$workflow": {
+            "workflow": {
               "type": "ref",
               "ref": "com.atiproto.actions#outboundWorkflow",
               "description": "Workflow envelope. When present, the agent runs the actions and calls back. When absent, this is the final native result."

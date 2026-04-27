@@ -54,16 +54,16 @@ describe("isOutboundWorkflow", () => {
 });
 
 describe("extractWorkflow", () => {
-  it("returns the envelope when present under $workflow", () => {
+  it("returns the envelope when present under workflow", () => {
     const w = { intent: "createTip", actions: [] };
-    expect(extractWorkflow({ $workflow: w, foo: "bar" })).toEqual(w);
+    expect(extractWorkflow({ workflow: w, foo: "bar" })).toEqual(w);
   });
 
-  it("returns undefined when $workflow is malformed", () => {
-    expect(extractWorkflow({ $workflow: { intent: "x" } })).toBeUndefined();
+  it("returns undefined when workflow is malformed", () => {
+    expect(extractWorkflow({ workflow: { intent: "x" } })).toBeUndefined();
   });
 
-  it("returns undefined when $workflow is absent", () => {
+  it("returns undefined when workflow is absent", () => {
     expect(extractWorkflow({ foo: "bar" })).toBeUndefined();
   });
 

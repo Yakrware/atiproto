@@ -139,7 +139,10 @@ const response = l.typedObject<Response>(
   $nsid,
   'response',
   l.object({
-    action: l.string<{ knownValues: ['create', 'update', 'delete'] }>(),
+    action: l.string<{
+      maxLength: 32
+      knownValues: ['create', 'update', 'delete']
+    }>({ maxLength: 32 }),
     name: l.string({ maxLength: 64 }),
     result: l.ref<RecordResult>((() => recordResult) as any),
   }),
@@ -190,8 +193,8 @@ const error = l.typedObject<Error>(
   $nsid,
   'error',
   l.object({
-    action: l.string(),
-    name: l.optional(l.string()),
+    action: l.string({ maxLength: 32 }),
+    name: l.optional(l.string({ maxLength: 64 })),
     message: l.string({ maxLength: 1024 }),
     code: l.optional(l.string({ maxLength: 64 })),
   }),

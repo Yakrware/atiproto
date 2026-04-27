@@ -17,14 +17,14 @@ const main = l.procedure(
   l.jsonPayload({
     currency: l.string({ maxLength: 3 }),
     redirectUrl: l.optional(l.string({ format: 'uri' })),
-    $workflow: l.optional(
+    workflow: l.optional(
       l.ref<AtiprotoActions.InboundWorkflow>(
         (() => AtiprotoActions.inboundWorkflow) as any,
       ),
     ),
   }),
   l.jsonPayload({
-    $workflow: l.optional(
+    workflow: l.optional(
       l.ref<AtiprotoActions.OutboundWorkflow>(
         (() => AtiprotoActions.outboundWorkflow) as any,
       ),

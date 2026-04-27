@@ -19,14 +19,14 @@ const main = l.procedure(
     record: l.ref<AtiprotoSubscription.Main>(
       (() => AtiprotoSubscription.main) as any,
     ),
-    $workflow: l.optional(
+    workflow: l.optional(
       l.ref<AtiprotoActions.InboundWorkflow>(
         (() => AtiprotoActions.inboundWorkflow) as any,
       ),
     ),
   }),
   l.jsonPayload({
-    $workflow: l.optional(
+    workflow: l.optional(
       l.ref<AtiprotoActions.OutboundWorkflow>(
         (() => AtiprotoActions.outboundWorkflow) as any,
       ),

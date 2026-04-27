@@ -18,14 +18,14 @@ const main = l.procedure(
     acceptsTips: l.optional(l.boolean()),
     acceptsSubscriptions: l.optional(l.boolean()),
     disableReceiptNotifications: l.optional(l.boolean()),
-    $workflow: l.optional(
+    workflow: l.optional(
       l.ref<AtiprotoActions.InboundWorkflow>(
         (() => AtiprotoActions.inboundWorkflow) as any,
       ),
     ),
   }),
   l.jsonPayload({
-    $workflow: l.optional(
+    workflow: l.optional(
       l.ref<AtiprotoActions.OutboundWorkflow>(
         (() => AtiprotoActions.outboundWorkflow) as any,
       ),

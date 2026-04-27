@@ -17,14 +17,14 @@ const main = l.procedure(
   l.jsonPayload({
     uri: l.string({ format: 'at-uri' }),
     record: l.ref<AtiprotoTip.Main>((() => AtiprotoTip.main) as any),
-    $workflow: l.optional(
+    workflow: l.optional(
       l.ref<AtiprotoActions.InboundWorkflow>(
         (() => AtiprotoActions.inboundWorkflow) as any,
       ),
     ),
   }),
   l.jsonPayload({
-    $workflow: l.optional(
+    workflow: l.optional(
       l.ref<AtiprotoActions.OutboundWorkflow>(
         (() => AtiprotoActions.outboundWorkflow) as any,
       ),

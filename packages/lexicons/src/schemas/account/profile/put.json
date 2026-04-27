@@ -22,7 +22,7 @@
               "type": "boolean",
               "description": "Opt out of payment receipt DMs"
             },
-            "$workflow": {
+            "workflow": {
               "type": "ref",
               "ref": "com.atiproto.actions#inboundWorkflow",
               "description": "Workflow callback envelope. Present on agent-driven callbacks; absent on initial calls."
@@ -35,7 +35,7 @@
         "schema": {
           "type": "object",
           "properties": {
-            "$workflow": {
+            "workflow": {
               "type": "ref",
               "ref": "com.atiproto.actions#outboundWorkflow",
               "description": "Workflow envelope. When present, the agent runs the actions and calls back. When absent, this is the final native result."

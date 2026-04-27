@@ -30,7 +30,7 @@ export class WorkflowActionFailed extends Error {
   }
 }
 
-export const WORKFLOW_FIELD = "$workflow";
+export const WORKFLOW_FIELD = "workflow";
 
 export type WorkflowAction =
   com.atiproto.actions.OutboundWorkflow["actions"][number];

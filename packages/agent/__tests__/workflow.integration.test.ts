@@ -65,7 +65,7 @@ describe("workflow interpreter — integration", () => {
         xrpcCalls++;
         if (xrpcCalls === 1) {
           return jsonRes({
-            $workflow: {
+            workflow: {
               intent: "createTip",
               actions: [
                 {
@@ -87,9 +87,9 @@ describe("workflow interpreter — integration", () => {
           });
         }
         // Callback
-        expect(body.$workflow.intent).toBe("createTip");
-        expect(body.$workflow.responses).toHaveLength(1);
-        expect(body.$workflow.responses[0]).toMatchObject({
+        expect(body.workflow.intent).toBe("createTip");
+        expect(body.workflow.responses).toHaveLength(1);
+        expect(body.workflow.responses[0]).toMatchObject({
           action: "create",
           name: "tip",
           result: {
@@ -132,7 +132,7 @@ describe("workflow interpreter — integration", () => {
     });
 
     expect(res.data.tipUri).toBe(`at://${USER_DID}/${TIP_COLLECTION}/tipkey1`);
-    expect((res.data as any).$workflow).toBeUndefined();
+    expect((res.data as any).workflow).toBeUndefined();
     expect(calls).toHaveLength(3); // initial XRPC + 1 PDS create + callback XRPC
   });
 
@@ -144,7 +144,7 @@ describe("workflow interpreter — integration", () => {
         xrpcCalls++;
         if (xrpcCalls === 1) {
           return jsonRes({
-            $workflow: {
+            workflow: {
               intent: "createTip",
               actions: [
                 {
@@ -160,9 +160,9 @@ describe("workflow interpreter — integration", () => {
           });
         }
         if (xrpcCalls === 2) {
-          expect(body.$workflow.intent).toBe("createTip");
+          expect(body.workflow.intent).toBe("createTip");
           return jsonRes({
-            $workflow: {
+            workflow: {
               intent: "createCart",
               actions: [
                 {
@@ -178,7 +178,7 @@ describe("workflow interpreter — integration", () => {
           });
         }
         // Final
-        expect(body.$workflow.intent).toBe("createCart");
+        expect(body.workflow.intent).toBe("createCart");
         return jsonRes({
           tipUri: `at://${USER_DID}/${TIP_COLLECTION}/tipkey1`,
           cartUri: `at://${USER_DID}/${CART_COLLECTION}/cartkey1`,
@@ -202,7 +202,7 @@ describe("workflow interpreter — integration", () => {
     });
 
     expect(res.data.checkoutUrl).toBe("https://stripe.example/checkout/xyz");
-    expect((res.data as any).$workflow).toBeUndefined();
+    expect((res.data as any).workflow).toBeUndefined();
   });
 
   it("direct result on first call: no workflow → return immediately, no PDS calls", async () => {
@@ -237,11 +237,11 @@ describe("workflow interpreter — integration", () => {
     expect(pdsCalls).not.toHaveBeenCalled();
   });
 
-  it("empty actions array exits the loop and strips $workflow", async () => {
+  it("empty actions array exits the loop and strips workflow", async () => {
     const { fetchHandler } = scriptedFetch({
       "/xrpc/com.atiproto.feed.tip.create": async () =>
         jsonRes({
-          $workflow: { intent: "noop", actions: [] },
+          workflow: { intent: "noop", actions: [] },
           tipUri: `at://${USER_DID}/${TIP_COLLECTION}/abc`,
         }),
     });
@@ -254,7 +254,7 @@ describe("workflow interpreter — integration", () => {
     });
 
     expect(res.data.tipUri).toBeDefined();
-    expect((res.data as any).$workflow).toBeUndefined();
+    expect((res.data as any).workflow).toBeUndefined();
   });
 
   it("action failure → error callback → server raise → caller throws WorkflowRaisedError", async () => {
@@ -265,7 +265,7 @@ describe("workflow interpreter — integration", () => {
         const body = await req.json();
         if (xrpcCalls === 1) {
           return jsonRes({
-            $workflow: {
+            workflow: {
               intent: "createTip",
               actions: [
                 {
@@ -281,11 +281,11 @@ describe("workflow interpreter — integration", () => {
           });
         }
         // Callback with error
-        expect(body.$workflow.intent).toBe("error");
-        expect(body.$workflow.error.action).toBe("create");
-        expect(body.$workflow.error.name).toBe("tip");
+        expect(body.workflow.intent).toBe("error");
+        expect(body.workflow.error.action).toBe("create");
+        expect(body.workflow.error.name).toBe("tip");
         return jsonRes({
-          $workflow: {
+          workflow: {
             intent: "rollback",
             actions: [
               {
@@ -324,7 +324,7 @@ describe("workflow interpreter — integration", () => {
         const body = await req.json();
         if (xrpcCalls === 1) {
           return jsonRes({
-            $workflow: {
+            workflow: {
               intent: "createTip",
               actions: [
                 {
@@ -348,11 +348,11 @@ describe("workflow interpreter — integration", () => {
           });
         }
         // Error callback — agent has partial responses [first]
-        expect(body.$workflow.intent).toBe("error");
-        expect(body.$workflow.responses).toHaveLength(1);
-        expect(body.$workflow.responses[0].name).toBe("first");
+        expect(body.workflow.intent).toBe("error");
+        expect(body.workflow.responses).toHaveLength(1);
+        expect(body.workflow.responses[0].name).toBe("first");
         return jsonRes({
-          $workflow: {
+          workflow: {
             intent: "rollback",
             actions: [
               {
@@ -409,7 +409,7 @@ describe("workflow interpreter — integration", () => {
     const { fetchHandler } = scriptedFetch({
       "/xrpc/com.atiproto.feed.tip.create": async () =>
         jsonRes({
-          $workflow: {
+          workflow: {
             intent: "loop",
             actions: [
               {
@@ -449,13 +449,13 @@ describe("workflow interpreter — integration", () => {
         xrpcCalls++;
         if (xrpcCalls === 1) {
           // feed.tip.list isn't a workflow endpoint today; the agent should
-          // still handle a $workflow in the response purely on shape.
+          // still handle a workflow in the response purely on shape.
           // We include `tips: []` so the lexicon validator accepts the
           // response — the point of this test is the shape-driven loop, not
           // bypassing validation.
           return jsonRes({
             tips: [],
-            $workflow: {
+            workflow: {
               intent: "extensibilityProbe",
               actions: [
                 {
@@ -497,7 +497,7 @@ describe("workflow interpreter — integration", () => {
         if (proxy) proxyHeaders.push(proxy);
         if (xrpcCalls === 1) {
           return jsonRes({
-            $workflow: {
+            workflow: {
               intent: "go",
               actions: [
                 {

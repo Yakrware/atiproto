@@ -111,6 +111,7 @@
       "properties": {
         "action": {
           "type": "string",
+          "maxLength": 32,
           "knownValues": ["create", "update", "delete"]
         },
         "name": {
@@ -145,10 +146,12 @@
       "properties": {
         "action": {
           "type": "string",
+          "maxLength": 32,
           "description": "The verb of the action that failed (create/update/delete)."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 64
         },
         "message": {
           "type": "string",
