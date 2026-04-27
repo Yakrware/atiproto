@@ -22,7 +22,11 @@ type Create = {
    */
   name: string
   collection: l.NsidString
-  rkey: string
+
+  /**
+   * Optional. When omitted (the default), the PDS generates the rkey and returns the resulting URI on the response. Server-assigned rkeys are reserved for fixed-rkey records like com.atiproto.profile/self.
+   */
+  rkey?: string
   record: l.LexMap
 }
 
@@ -36,7 +40,7 @@ const create = l.typedObject<Create>(
     repo: l.string({ format: 'did' }),
     name: l.string({ maxLength: 64 }),
     collection: l.string({ format: 'nsid' }),
-    rkey: l.string({ maxLength: 128 }),
+    rkey: l.optional(l.string({ maxLength: 128 })),
     record: l.lexMap(),
   }),
 )

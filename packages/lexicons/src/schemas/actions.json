@@ -6,7 +6,7 @@
     "create": {
       "type": "object",
       "description": "Instructs the agent to call com.atproto.repo.createRecord on the user's PDS.",
-      "required": ["repo", "name", "collection", "rkey", "record"],
+      "required": ["repo", "name", "collection", "record"],
       "properties": {
         "repo": {
           "type": "string",
@@ -24,7 +24,8 @@
         },
         "rkey": {
           "type": "string",
-          "maxLength": 128
+          "maxLength": 128,
+          "description": "Optional. When omitted (the default), the PDS generates the rkey and returns the resulting URI on the response. Server-assigned rkeys are reserved for fixed-rkey records like com.atiproto.profile/self."
         },
         "record": {
           "type": "unknown"

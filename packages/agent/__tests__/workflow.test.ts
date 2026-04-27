@@ -114,6 +114,31 @@ describe("runActions — happy paths", () => {
     });
   });
 
+  it("create without rkey lets the PDS generate one; response URI flows through", async () => {
+    const { client, calls } = mockClient({
+      "com.atproto.repo.createRecord": [
+        { uri: `at://${REPO}/${COLLECTION}/pds-gen-key`, cid: "bafyfakegen" },
+      ],
+    });
+
+    const responses = await runActions(client, [
+      {
+        $type: "com.atiproto.actions#create",
+        repo: REPO,
+        name: "tip",
+        collection: COLLECTION,
+        record: { foo: "bar" },
+      } as any,
+    ]);
+
+    // PDS sees no rkey; it picks one and returns the resulting uri.
+    expect((calls[0].data as Record<string, unknown>).rkey).toBeUndefined();
+    expect(responses[0].result.uri).toBe(
+      `at://${REPO}/${COLLECTION}/pds-gen-key`,
+    );
+    expect(responses[0].result.cid).toBe("bafyfakegen");
+  });
+
   it("update calls putRecord and returns { uri, cid }", async () => {
     const { client, calls } = mockClient({
       "com.atproto.repo.putRecord": [
