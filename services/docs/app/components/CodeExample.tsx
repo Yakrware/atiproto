@@ -101,7 +101,7 @@ export function CodeExample({
     'import { Agent } from "@atiproto/agent";',
     "",
     "// Create a TipAgent from any XrpcClient",
-    "const tipAgent = new Agent(authenticatedClient);",
+    "const paymentAgent = new Agent(authenticatedClient);",
     "",
   ];
 
@@ -128,12 +128,12 @@ export function CodeExample({
     const required = (argSchema.required as string[]) ?? [];
     if (props && (required.length > 0 || Object.keys(props).length > 0)) {
       const args = buildObjectLiteral(argSchema, "", true);
-      callCode = `const response = await tipAgent.com.${agentPath}(${args});`;
+      callCode = `const response = await paymentAgent.com.${agentPath}(${args});`;
     } else {
-      callCode = `const response = await tipAgent.com.${agentPath}();`;
+      callCode = `const response = await paymentAgent.com.${agentPath}();`;
     }
   } else {
-    callCode = `const response = await tipAgent.com.${agentPath}();`;
+    callCode = `const response = await paymentAgent.com.${agentPath}();`;
   }
 
   lines.push(`// Call ${methodName}`);

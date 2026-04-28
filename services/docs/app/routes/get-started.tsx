@@ -8,7 +8,7 @@ export default function GetStarted() {
       <p className="text-text-muted dark:text-text-muted-dark mb-8">
         Set up the a
         <span className="text-primary dark:text-primary-dark">TIP</span>roto
-        agent to integrate tipping and subscriptions into your ATProto
+        agent to integrate payments and subscriptions into your ATProto
         application.
       </p>
 
@@ -73,10 +73,10 @@ const oauthSession = await oauthClient.restore("did:plc:123");
 const bskyAgent = new BskyAgent(oauthSession);
 
 // Create a TipAgent — automatically uses withProxy()
-const tipAgent = new TipAgent(bskyAgent);
+const paymentAgent = new TipAgent(bskyAgent);
 
 // Now you can call tipping APIs
-const profile = await tipAgent.com.atiproto.account.profile.get();`}
+const profile = await paymentAgent.com.atiproto.recipient.profile.get();`}
         />
       </section>
 
@@ -100,7 +100,7 @@ import { Agent as TipAgent } from "@atiproto/agent";
 const client = new XrpcClient("https://your-pds.example.com", mySchemas);
 
 // Wrap it with the TipAgent
-const tipAgent = new TipAgent(client);`}
+const paymentAgent = new TipAgent(client);`}
         />
       </section>
 
@@ -127,7 +127,7 @@ const tipAgent = new TipAgent(client);`}
         </p>
         <CodeBlock
           code={`// All methods are fully typed
-const { data } = await tipAgent.com.atiproto.feed.tip.create({
+const { data } = await paymentAgent.com.atiproto.payment.item.create({
   subject: "did:plc:recipient123",
   amount: 500,       // 500 cents = $5.00
   currency: "USD",
@@ -151,7 +151,7 @@ console.log(data.checkoutUrl);`}
             >
               checkout flow
             </a>{" "}
-            for creating carts, tips, and subscriptions
+            for creating carts, payments, and subscriptions
           </li>
           <li>
             Set up{" "}

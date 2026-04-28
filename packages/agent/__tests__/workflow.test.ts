@@ -8,7 +8,7 @@ import {
 } from "../src/workflow.js";
 
 const REPO = "did:plc:user";
-const COLLECTION = "com.atiproto.tip";
+const COLLECTION = "com.atiproto.item";
 
 function mockClient(scripted: Record<string, unknown[]>) {
   const calls: Array<{ nsid: string; data: unknown }> = [];
@@ -86,7 +86,7 @@ describe("runActions — happy paths", () => {
       {
         $type: "com.atiproto.actions#create",
         repo: REPO,
-        name: "tip",
+        name: "item",
         collection: COLLECTION,
         rkey: "abc",
         record: { foo: "bar" },
@@ -96,7 +96,7 @@ describe("runActions — happy paths", () => {
     expect(responses).toEqual([
       {
         action: "create",
-        name: "tip",
+        name: "item",
         result: {
           uri: `at://${REPO}/${COLLECTION}/abc`,
           cid: "bafyfake1",
@@ -125,7 +125,7 @@ describe("runActions — happy paths", () => {
       {
         $type: "com.atiproto.actions#create",
         repo: REPO,
-        name: "tip",
+        name: "item",
         collection: COLLECTION,
         record: { foo: "bar" },
       } as any,
@@ -150,7 +150,7 @@ describe("runActions — happy paths", () => {
       {
         $type: "com.atiproto.actions#update",
         repo: REPO,
-        name: "tip",
+        name: "item",
         collection: COLLECTION,
         rkey: "abc",
         record: { foo: "baz" },
@@ -176,7 +176,7 @@ describe("runActions — happy paths", () => {
       {
         $type: "com.atiproto.actions#delete",
         repo: REPO,
-        name: "old-tip",
+        name: "old-item",
         collection: COLLECTION,
         rkey: "abc",
       } as any,
@@ -185,7 +185,7 @@ describe("runActions — happy paths", () => {
     expect(responses).toEqual([
       {
         action: "delete",
-        name: "old-tip",
+        name: "old-item",
         result: { uri: `at://${REPO}/${COLLECTION}/abc` },
       },
     ]);
@@ -343,7 +343,7 @@ describe("runActions — error paths", () => {
         {
           $type: "com.atiproto.actions#create",
           repo: REPO,
-          name: "tip",
+          name: "item",
           collection: COLLECTION,
           rkey: "a",
           record: {},

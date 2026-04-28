@@ -6,7 +6,7 @@ export default function StripeConnect() {
     <div>
       <h1 className="text-2xl font-bold mb-2">Stripe Connect</h1>
       <p className="text-text-muted dark:text-text-muted-dark mb-8">
-        Before a user can receive tips or subscriptions, they need to connect
+        Before a user can receive payments or subscriptions, they need to connect
         their Stripe account through atiproto.
       </p>
 
@@ -17,10 +17,10 @@ export default function StripeConnect() {
         <p className="mb-3">
           Use the{" "}
           <a
-            href="/docs/lexicon/com.atiproto.account.profile.get"
+            href="/docs/lexicon/com.atiproto.recipient.profile.get"
             className="text-primary dark:text-primary-dark hover:underline font-mono text-sm"
           >
-            account.profile.get
+            recipient.profile.get
           </a>{" "}
           endpoint to check whether the current user has connected their Stripe
           account. The{" "}
@@ -31,7 +31,7 @@ export default function StripeConnect() {
           payments.
         </p>
         <CodeBlock
-          code={`const { data } = await tipAgent.com.atiproto.account.profile.get();
+          code={`const { data } = await paymentAgent.com.atiproto.recipient.profile.get();
 
 if (!data.readyForPayment) {
   // User needs to connect their Stripe account
@@ -76,12 +76,12 @@ if (!data.readyForPayment) {
         <CodeBlock
           code={`import { Agent as TipAgent } from "@atiproto/agent";
 
-async function ensurePaymentReady(tipAgent: TipAgent) {
-  const { data } = await tipAgent.com.atiproto.account.profile.get();
+async function ensurePaymentReady(paymentAgent: TipAgent) {
+  const { data } = await paymentAgent.com.atiproto.recipient.profile.get();
 
   // User has no profile yet — create one with defaults
   if (!data.hasProfile) {
-    await tipAgent.com.atiproto.account.profile.put({
+    await paymentAgent.com.atiproto.recipient.profile.put({
       acceptsTips: true,
       acceptsSubscriptions: true,
     });
@@ -105,7 +105,7 @@ async function ensurePaymentReady(tipAgent: TipAgent) {
         </AnchorHeading>
         <p className="mb-3">
           To check if another user can receive payments (e.g., before showing a
-          tip button), use{" "}
+          payment button), use{" "}
           <a
             href="/docs/lexicon/com.atiproto.repo.profile.get"
             className="text-primary dark:text-primary-dark hover:underline font-mono text-sm"
@@ -115,12 +115,12 @@ async function ensurePaymentReady(tipAgent: TipAgent) {
           :
         </p>
         <CodeBlock
-          code={`const { data } = await tipAgent.com.atiproto.repo.profile.get({
+          code={`const { data } = await paymentAgent.com.atiproto.repo.profile.get({
   user: "did:plc:creator123",
 });
 
 if (data.profile?.acceptsTips) {
-  // Show the tip button
+  // Show the payment button
 }`}
         />
       </section>

@@ -10,9 +10,9 @@
         "type": "object",
         "required": ["createdAt"],
         "properties": {
-          "acceptsTips": {
+          "acceptsItems": {
             "type": "boolean",
-            "description": "Whether user accepts tips (default: true)"
+            "description": "Whether user accepts items (default: true)"
           },
           "acceptsSubscriptions": {
             "type": "boolean",
@@ -45,9 +45,9 @@
           "format": "at-uri",
           "description": "AT-URI of the profile record"
         },
-        "acceptsTips": {
+        "acceptsItems": {
           "type": "boolean",
-          "description": "Whether user accepts tips (default: true)"
+          "description": "Whether user accepts items (default: true)"
         },
         "acceptsSubscriptions": {
           "type": "boolean",

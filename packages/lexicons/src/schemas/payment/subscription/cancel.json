@@ -1,0 +1,57 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.payment.subscription.cancel",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Cancel an active subscription",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["subscriptionUri"],
+          "properties": {
+            "subscriptionUri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "AT-URI of the subscription to cancel"
+            },
+            "workflow": {
+              "type": "ref",
+              "ref": "com.atiproto.actions#inboundWorkflow",
+              "description": "Workflow callback envelope. Present on agent-driven callbacks; absent on initial calls."
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "workflow": {
+              "type": "ref",
+              "ref": "com.atiproto.actions#outboundWorkflow",
+              "description": "Workflow envelope. When present, the agent runs the actions and calls back. When absent, this is the final native result."
+            },
+            "subscriptionUri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "URI of the updated subscription record"
+            },
+            "subscription": {
+              "type": "ref",
+              "ref": "com.atiproto.subscription#view",
+              "description": "Updated subscription record"
+            },
+            "accessUntil": {
+              "type": "string",
+              "format": "datetime",
+              "description": "Timestamp when access expires"
+            }
+          }
+        }
+      }
+    }
+  }
+}

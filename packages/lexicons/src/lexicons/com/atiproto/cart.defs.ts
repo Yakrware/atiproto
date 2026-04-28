@@ -8,7 +8,7 @@ const $nsid = 'com.atiproto.cart'
 
 export { $nsid }
 
-/** A record representing a shopping cart for tips/subscriptions */
+/** A record representing a shopping cart for items/subscriptions */
 type Main = {
   $type: 'com.atiproto.cart'
   items: CartItem[]
@@ -46,7 +46,7 @@ type Main = {
 
 export type { Main }
 
-/** A record representing a shopping cart for tips/subscriptions */
+/** A record representing a shopping cart for items/subscriptions */
 const main = l.record<'any', Main>(
   'any',
   $nsid,
@@ -141,12 +141,12 @@ type CartItem = {
   $type?: 'com.atiproto.cart#cartItem'
 
   /**
-   * Item type: tip or subscription
+   * Type of cart item: item or subscription
    */
-  type: 'com.atiproto.tip' | 'com.atiproto.subscription'
+  type: 'com.atiproto.item' | 'com.atiproto.subscription'
 
   /**
-   * AT-URI for tip on record
+   * AT-URI for item on record
    */
   recordUri: l.AtUriString
 }
@@ -157,7 +157,7 @@ const cartItem = l.typedObject<CartItem>(
   $nsid,
   'cartItem',
   l.object({
-    type: l.enum(['com.atiproto.tip', 'com.atiproto.subscription']),
+    type: l.enum(['com.atiproto.item', 'com.atiproto.subscription']),
     recordUri: l.string({ format: 'at-uri' }),
   }),
 )

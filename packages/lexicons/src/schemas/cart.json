@@ -4,7 +4,7 @@
   "defs": {
     "main": {
       "type": "record",
-      "description": "A record representing a shopping cart for tips/subscriptions",
+      "description": "A record representing a shopping cart for items/subscriptions",
       "key": "any",
       "record": {
         "type": "object",
@@ -121,13 +121,13 @@
         "type": {
           "type": "string",
           "maxLength": 128,
-          "description": "Item type: tip or subscription",
-          "enum": ["com.atiproto.tip", "com.atiproto.subscription"]
+          "description": "Type of cart item: item or subscription",
+          "enum": ["com.atiproto.item", "com.atiproto.subscription"]
         },
         "recordUri": {
           "type": "string",
           "format": "at-uri",
-          "description": "AT-URI for tip on record"
+          "description": "AT-URI for item on record"
         }
       }
     }

@@ -13,9 +13,9 @@ type Main = {
   $type: 'com.atiproto.profile'
 
   /**
-   * Whether user accepts tips (default: true)
+   * Whether user accepts items (default: true)
    */
-  acceptsTips?: boolean
+  acceptsItems?: boolean
 
   /**
    * Whether user accepts subscriptions (default: true)
@@ -45,7 +45,7 @@ const main = l.record<'literal:self', Main>(
   'literal:self',
   $nsid,
   l.object({
-    acceptsTips: l.optional(l.boolean()),
+    acceptsItems: l.optional(l.boolean()),
     acceptsSubscriptions: l.optional(l.boolean()),
     disableReceiptNotifications: l.optional(l.boolean()),
     createdAt: l.string({ format: 'datetime' }),
@@ -78,9 +78,9 @@ type View = {
   uri: l.AtUriString
 
   /**
-   * Whether user accepts tips (default: true)
+   * Whether user accepts items (default: true)
    */
-  acceptsTips?: boolean
+  acceptsItems?: boolean
 
   /**
    * Whether user accepts subscriptions (default: true)
@@ -111,7 +111,7 @@ const view = l.typedObject<View>(
   'view',
   l.object({
     uri: l.string({ format: 'at-uri' }),
-    acceptsTips: l.optional(l.boolean()),
+    acceptsItems: l.optional(l.boolean()),
     acceptsSubscriptions: l.optional(l.boolean()),
     disableReceiptNotifications: l.optional(l.boolean()),
     createdAt: l.string({ format: 'datetime' }),

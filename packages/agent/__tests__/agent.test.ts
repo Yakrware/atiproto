@@ -36,20 +36,20 @@ describe("Agent", () => {
       expect(agent.com).toBeDefined();
       expect(agent.com.atiproto).toBeDefined();
 
-      expect(agent.com.atiproto.account).toBeDefined();
-      expect(agent.com.atiproto.account.cart).toBeDefined();
-      expect(agent.com.atiproto.account.profile).toBeDefined();
-      expect(agent.com.atiproto.account.subscription).toBeDefined();
-      expect(agent.com.atiproto.account.tip).toBeDefined();
+      expect(agent.com.atiproto.recipient).toBeDefined();
+      expect(agent.com.atiproto.payment.cart).toBeDefined();
+      expect(agent.com.atiproto.recipient.profile).toBeDefined();
+      expect(agent.com.atiproto.recipient.payment.subscription).toBeDefined();
+      expect(agent.com.atiproto.recipient.payment.item).toBeDefined();
 
-      expect(agent.com.atiproto.feed).toBeDefined();
-      expect(agent.com.atiproto.feed.subscription).toBeDefined();
-      expect(agent.com.atiproto.feed.tip).toBeDefined();
+      expect(agent.com.atiproto.payment).toBeDefined();
+      expect(agent.com.atiproto.payment.subscription).toBeDefined();
+      expect(agent.com.atiproto.payment.item).toBeDefined();
 
       expect(agent.com.atiproto.repo).toBeDefined();
       expect(agent.com.atiproto.repo.profile).toBeDefined();
       expect(agent.com.atiproto.repo.subscription).toBeDefined();
-      expect(agent.com.atiproto.repo.tip).toBeDefined();
+      expect(agent.com.atiproto.repo.item).toBeDefined();
     });
 
     it("is an instance of XrpcClient", () => {
@@ -63,7 +63,7 @@ describe("Agent", () => {
       const client = createMockClient();
       const agent = new Agent(client);
 
-      await agent.fetchHandler("/xrpc/com.atiproto.feed.tip.list", {
+      await agent.fetchHandler("/xrpc/com.atiproto.payment.item.list", {
         method: "GET",
         headers: new Headers(),
       });
@@ -81,7 +81,7 @@ describe("Agent", () => {
       const client = createMockClient();
       const agent = new Agent(client);
 
-      await agent.fetchHandler("/xrpc/com.atiproto.feed.tip.list", {
+      await agent.fetchHandler("/xrpc/com.atiproto.payment.item.list", {
         method: "GET",
         headers: new Headers({ "atproto-proxy": "custom#value" }),
       });
@@ -130,7 +130,7 @@ describe("Agent", () => {
       const client = createMockClient();
       const agent = new Agent(client);
 
-      await agent.fetchHandler("/xrpc/com.atiproto.feed.tip.list", {
+      await agent.fetchHandler("/xrpc/com.atiproto.payment.item.list", {
         method: "GET",
         headers: new Headers(),
       });
@@ -180,8 +180,8 @@ describe("Agent", () => {
       const agent = new Agent(atpAgent);
 
       expect(agent.com.atiproto).toBeDefined();
-      expect(agent.com.atiproto.feed).toBeDefined();
-      expect(agent.com.atiproto.account).toBeDefined();
+      expect(agent.com.atiproto.payment).toBeDefined();
+      expect(agent.com.atiproto.recipient).toBeDefined();
     });
 
     it("prefers our com properties over the client's", () => {
@@ -207,77 +207,77 @@ describe("Agent", () => {
       });
     });
 
-    it("calls com.atiproto.feed.tip.create with correct NSID and data", async () => {
+    it("calls com.atiproto.payment.item.create with correct NSID and data", async () => {
       const data = {
         subject: "did:plc:test" as const,
         amount: 500,
         currency: "USD",
       };
 
-      await agent.com.atiproto.feed.tip.create(data);
+      await agent.com.atiproto.payment.item.create(data);
 
       expect(agent.call).toHaveBeenCalledWith(
-        "com.atiproto.feed.tip.create",
+        "com.atiproto.payment.item.create",
         undefined,
         data,
         undefined,
       );
     });
 
-    it("calls com.atiproto.feed.tip.get with correct NSID and params", async () => {
+    it("calls com.atiproto.payment.item.get with correct NSID and params", async () => {
       const params = {
-        uri: "at://did:plc:test/com.atiproto.tip/abc" as any,
+        uri: "at://did:plc:test/com.atiproto.item/abc" as any,
       };
 
-      await agent.com.atiproto.feed.tip.get(params);
+      await agent.com.atiproto.payment.item.get(params);
 
       expect(agent.call).toHaveBeenCalledWith(
-        "com.atiproto.feed.tip.get",
+        "com.atiproto.payment.item.get",
         params,
         undefined,
         undefined,
       );
     });
 
-    it("calls com.atiproto.account.cart.clone with correct NSID", async () => {
+    it("calls com.atiproto.payment.cart.clone with correct NSID", async () => {
       const data = {
         uri: "at://did:plc:test/com.atiproto.cart/xyz" as any,
       };
 
-      await agent.com.atiproto.account.cart.clone(data);
+      await agent.com.atiproto.payment.cart.clone(data);
 
       expect(agent.call).toHaveBeenCalledWith(
-        "com.atiproto.account.cart.clone",
+        "com.atiproto.payment.cart.clone",
         undefined,
         data,
         undefined,
       );
     });
 
-    it("calls com.atiproto.account.subscription.validate with correct NSID and params", async () => {
+    it("calls com.atiproto.recipient.payment.subscription.validate with correct NSID and params", async () => {
       const params = {
         sender: "did:plc:sender" as const,
       };
 
-      await agent.com.atiproto.account.subscription.validate(params);
+      await agent.com.atiproto.recipient.payment.subscription.validate(params);
 
       expect(agent.call).toHaveBeenCalledWith(
-        "com.atiproto.account.subscription.validate",
+        "com.atiproto.recipient.payment.subscription.validate",
         params,
         undefined,
         undefined,
       );
     });
 
-    it("calls com.atiproto.feed.subscription.validate with correct NSID and params", async () => {
+    it("calls com.atiproto.payment.subscription.validate with correct NSID and params", async () => {
       const params = {
         subject: "did:plc:subject" as const,
       };
 
-      await agent.com.atiproto.feed.subscription.validate(params);
+      await agent.com.atiproto.payment.subscription.validate(params);
 
       expect(agent.call).toHaveBeenCalledWith(
-        "com.atiproto.feed.subscription.validate",
+        "com.atiproto.payment.subscription.validate",
         params,
         undefined,
         undefined,
@@ -299,83 +299,83 @@ describe("Agent", () => {
       );
     });
 
-    it("calls com.atiproto.feed.subscription.cancel with correct NSID", async () => {
+    it("calls com.atiproto.payment.subscription.cancel with correct NSID", async () => {
       const data = {
         subscriptionUri:
           "at://did:plc:test/com.atiproto.subscription/abc" as any,
       };
 
-      await agent.com.atiproto.feed.subscription.cancel(data);
+      await agent.com.atiproto.payment.subscription.cancel(data);
 
       expect(agent.call).toHaveBeenCalledWith(
-        "com.atiproto.feed.subscription.cancel",
+        "com.atiproto.payment.subscription.cancel",
         undefined,
         data,
         undefined,
       );
     });
 
-    it("calls com.atiproto.account.tip.list with correct NSID and params", async () => {
+    it("calls com.atiproto.recipient.payment.item.list with correct NSID and params", async () => {
       const params = {
         limit: 50,
       };
 
-      await agent.com.atiproto.account.tip.list(params);
+      await agent.com.atiproto.recipient.payment.item.list(params);
 
       expect(agent.call).toHaveBeenCalledWith(
-        "com.atiproto.account.tip.list",
+        "com.atiproto.recipient.payment.item.list",
         params,
         undefined,
         undefined,
       );
     });
 
-    it("calls com.atiproto.feed.tip.validate with correct NSID and params", async () => {
+    it("calls com.atiproto.payment.item.validate with correct NSID and params", async () => {
       const params = {
         recordUri: "at://did:plc:creator/app.bsky.feed.post/abc" as any,
       };
 
-      await agent.com.atiproto.feed.tip.validate(params);
+      await agent.com.atiproto.payment.item.validate(params);
 
       expect(agent.call).toHaveBeenCalledWith(
-        "com.atiproto.feed.tip.validate",
+        "com.atiproto.payment.item.validate",
         params,
         undefined,
         undefined,
       );
     });
 
-    it("calls com.atiproto.repo.tip.count with correct NSID and params", async () => {
+    it("calls com.atiproto.repo.item.count with correct NSID and params", async () => {
       const params = {
         subject: "did:plc:recipient" as const,
       };
 
-      await agent.com.atiproto.repo.tip.count(params);
+      await agent.com.atiproto.repo.item.count(params);
 
       expect(agent.call).toHaveBeenCalledWith(
-        "com.atiproto.repo.tip.count",
+        "com.atiproto.repo.item.count",
         params,
         undefined,
         undefined,
       );
     });
 
-    it("calls com.atiproto.account.profile.get with no params", async () => {
-      await agent.com.atiproto.account.profile.get();
+    it("calls com.atiproto.recipient.profile.get with no params", async () => {
+      await agent.com.atiproto.recipient.profile.get();
 
       expect(agent.call).toHaveBeenCalledWith(
-        "com.atiproto.account.profile.get",
+        "com.atiproto.recipient.profile.get",
         undefined,
         undefined,
         undefined,
       );
     });
 
-    it("calls com.atiproto.feed.list with no params", async () => {
-      await agent.com.atiproto.feed.list();
+    it("calls com.atiproto.payment.list with no params", async () => {
+      await agent.com.atiproto.payment.list();
 
       expect(agent.call).toHaveBeenCalledWith(
-        "com.atiproto.feed.list",
+        "com.atiproto.payment.list",
         undefined,
         undefined,
         undefined,

@@ -1,0 +1,56 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.payment.subscription.validate",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Validate that the authenticated user (as the sender/subscriber) has an active, Stripe-verified subscription. Looks up by subscriptionUri (a specific subscription record) or subject (recipient DID). These are mutually exclusive; subscriptionUri takes precedence.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "subscriptionUri": {
+            "type": "string",
+            "format": "at-uri",
+            "description": "AT-URI of a specific subscription record. Takes precedence over subject."
+          },
+          "subject": {
+            "type": "string",
+            "format": "did",
+            "description": "DID of the creator being subscribed to. Ignored if subscriptionUri is provided."
+          },
+          "amount": {
+            "type": "integer",
+            "description": "Expected subscription amount in cents. If omitted, only checks that a subscription exists."
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["valid"],
+          "properties": {
+            "valid": {
+              "type": "boolean",
+              "description": "Whether the authed sender has an active, verified subscription"
+            },
+            "amount": {
+              "type": "integer",
+              "description": "Subscription amount in cents"
+            },
+            "currency": {
+              "type": "string",
+              "maxLength": 3,
+              "description": "Currency of the subscription"
+            },
+            "reason": {
+              "type": "string",
+              "maxLength": 1024,
+              "description": "If invalid, reason for rejection"
+            }
+          }
+        }
+      }
+    }
+  }
+}

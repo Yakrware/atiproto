@@ -1,0 +1,61 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.recipient.payment.item.validate",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Validate that a sender has completed item payment(s) to the authenticated user (as the recipient/subject). Looks up by itemUri (a specific item record), recordUri (sums all items for that record), or sender (sender DID). These are mutually exclusive and resolved in that order.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "itemUri": {
+            "type": "string",
+            "format": "at-uri",
+            "description": "AT-URI of a specific item record. Takes precedence over recordUri and sender."
+          },
+          "recordUri": {
+            "type": "string",
+            "format": "at-uri",
+            "description": "AT-URI of the record being tipped. Takes precedence over sender."
+          },
+          "sender": {
+            "type": "string",
+            "format": "did",
+            "description": "DID of the item sender. Ignored if itemUri or recordUri is provided."
+          },
+          "amount": {
+            "type": "integer",
+            "description": "Expected item amount in cents. If omitted, only checks that a item exists."
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["valid"],
+          "properties": {
+            "valid": {
+              "type": "boolean",
+              "description": "Whether a sender has completed and verified item(s) to the authed recipient"
+            },
+            "amount": {
+              "type": "integer",
+              "description": "Sum of all verified completed item amounts in cents"
+            },
+            "currency": {
+              "type": "string",
+              "maxLength": 3,
+              "description": "Currency of the items"
+            },
+            "reason": {
+              "type": "string",
+              "maxLength": 1024,
+              "description": "If invalid, reason for rejection"
+            }
+          }
+        }
+      }
+    }
+  }
+}

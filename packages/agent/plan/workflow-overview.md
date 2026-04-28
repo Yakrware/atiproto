@@ -10,7 +10,7 @@ Until that changes (see discussion [#4877](https://github.com/bluesky-social/atp
 
 The XRPC server and the client's agent library agree on a small shared lexicon that lets responses carry either a final result or a set of instructions for the client to execute:
 
-- **Initial call.** The client calls the XRPC endpoint normally (e.g. "create a tip for $5").
+- **Initial call.** The client calls the XRPC endpoint normally (e.g. "create a payment for $5").
 - **Server response, case A — direct result.** If the server has nothing for the client to do, it returns the native lexicon output (the same shape it would return after #4877 ships).
 - **Server response, case B — workflow.** Otherwise the response includes a `workflow` envelope with:
   - an `intent` string (server-defined phase marker — e.g. `"createTip"`, `"createCart"`)
@@ -28,7 +28,7 @@ On failure — any action the agent tried to run fails — the agent overrides t
 
 - **The client must use the matching agent library.** Third-party clients that don't implement the interpreter can't call these endpoints. This is the main reason a PDS-side fix is preferable: lexicon-consuming clients should be universally interoperable.
 - **Business logic splits across handler branches.** A single user-facing operation becomes a state machine keyed on intent. Readable, but noisier than a single in-line handler.
-- **Each user action = N HTTP round trips.** Latency grows linearly with chain depth. A tip-with-cart flow takes three calls where one would do.
+- **Each user action = N HTTP round trips.** Latency grows linearly with chain depth. A payment-with-cart flow takes three calls where one would do.
 - **Orphan records on interruption.** If the client crashes or times out after running an action but before calling back, the record is in the user's PDS with no corresponding server state. V0 leaves these alone and relies on offline reconciliation; idempotency keys can be bolted on later.
 - **Server retains authority.** All orchestration decisions happen on the server. The client follows instructions; it doesn't decide on its own when to create a cart or charge a card. OAuth scopes cap what the agent will actually execute against the PDS, limiting the blast radius.
 - **Forward-compatible with a PDS-side fix.** Once the PDS can verify service-signed tokens against the user's OAuth scopes, the server simply stops emitting `workflow` and returns direct results on the initial call. Clients with the interpreter still work — they treat the no-workflow response as the final result branch of the union. No lexicon change, no client update required.
