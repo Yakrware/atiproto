@@ -10,7 +10,7 @@ import {
 } from "@atproto/xrpc";
 import { schemas } from "@atiproto/lexicons";
 import { ComNS } from "./namespaces/com.js";
-import { prepChat } from "./prep-chat.js";
+import { firePrepChat, type PrepChatOption } from "./prep-chat.js";
 import {
   WORKFLOW_FIELD,
   WorkflowActionFailed,
@@ -29,16 +29,6 @@ const SERVICE_DID = "did:web:atiproto.com";
 const SERVICE_TYPE = "payments";
 
 const DEFAULT_MAX_WORKFLOW_STEPS = 10;
-
-function resolvePrepChatMembers(
-  opt: AgentOptions["prepChat"],
-): readonly string[] | undefined {
-  if (opt === false) return undefined;
-  if (typeof opt === "string") return opt ? [opt] : undefined;
-  if (Array.isArray(opt)) return opt.length > 0 ? opt : undefined;
-  // true or undefined → default bot
-  return [SERVICE_DID];
-}
 
 function createFetchHandler(client: XrpcClient): FetchHandler {
   if (client instanceof ApiAgent) {
@@ -79,7 +69,7 @@ export interface AgentOptions {
    * in the user's Requests folder. Runs in the background on construction
    * via the user's authed agent — fire-and-forget; failures are swallowed.
    *
-   * - `true` (default): pre-authorize a convo with the atiproto service DID.
+   * - `true` (default): pre-authorize a convo with the atiproto bsky bot.
    * - `false`: skip entirely.
    * - `string` / `string[]`: pre-authorize with these specific bot DIDs.
    *
@@ -87,7 +77,7 @@ export interface AgentOptions {
    * `withProxy` and the `chat.bsky.convo.*` namespace). Plain XrpcClient
    * agents — used in tests — silently skip.
    */
-  prepChat?: boolean | string | string[];
+  prepChat?: PrepChatOption;
 }
 
 /**
@@ -144,12 +134,7 @@ export class Agent<TClient extends XrpcClient = ApiAgent> extends XrpcClient {
     // Best-effort chat pre-authorization. Fire-and-forget — failures here
     // (no session, network blip, chat disabled) shouldn't block construction
     // or surface to callers.
-    const chatMembers = resolvePrepChatMembers(prepChatOpt);
-    if (chatMembers && client instanceof ApiAgent) {
-      void prepChat(client, chatMembers).catch(() => {
-        /* swallow; best-effort */
-      });
-    }
+    firePrepChat(client, prepChatOpt);
 
     // Root proxy: our own properties take priority, everything else falls
     // through to the underlying client.

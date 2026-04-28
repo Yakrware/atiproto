@@ -4,7 +4,7 @@ import { Agent } from "../src/agent.js";
 import { prepChat } from "../src/prep-chat.js";
 
 const USER_DID = "did:plc:user";
-const BOT_DID = "did:web:atiproto.com";
+const BOT_DID = "did:plc:4x5dcv6u4wlkjcssto7f22nu";
 
 type Route = (req: Request) => Response | Promise<Response>;
 
@@ -190,7 +190,7 @@ describe("Agent constructor — prepChat option", () => {
     await new Promise((r) => setTimeout(r, 10));
   }
 
-  it("fires by default with the atiproto service DID as the bot", async () => {
+  it("fires by default with the atiproto bsky bot DID", async () => {
     const { fetchHandler, calls } = scriptedFetch({
       "/xrpc/chat.bsky.convo.getConvoAvailability": async () =>
         jsonRes({ canChat: false }),
@@ -201,6 +201,7 @@ describe("Agent constructor — prepChat option", () => {
 
     expect(calls).toHaveLength(1);
     expect(calls[0].path).toBe("/xrpc/chat.bsky.convo.getConvoAvailability");
+    expect(calls[0].params?.members).toBe(BOT_DID);
   });
 
   it("skips entirely when prepChat: false", async () => {

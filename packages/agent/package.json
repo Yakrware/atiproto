@@ -1,6 +1,6 @@
 {
   "name": "@atiproto/agent",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "ATProto agent",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
