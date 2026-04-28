@@ -1,5 +1,6 @@
 export { Agent, type AgentOptions } from "./agent.js";
 export * from "./namespaces/index.js";
+export { prepChat } from "./prep-chat.js";
 export {
   WORKFLOW_FIELD,
   WorkflowActionFailed,
