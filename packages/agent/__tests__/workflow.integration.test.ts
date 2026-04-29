@@ -104,7 +104,7 @@ describe("workflow interpreter — integration", () => {
         expect(body.amount).toBe(500);
         return jsonRes({
           itemUri: `at://${USER_DID}/${ITEM_COLLECTION}/tipkey1`,
-          tip: {
+          item: {
             $type: `${ITEM_COLLECTION}#view`,
             uri: `at://${USER_DID}/${ITEM_COLLECTION}/tipkey1`,
             amount: 500,
@@ -133,7 +133,9 @@ describe("workflow interpreter — integration", () => {
       currency: "USD",
     });
 
-    expect(res.data.itemUri).toBe(`at://${USER_DID}/${ITEM_COLLECTION}/tipkey1`);
+    expect(res.data.itemUri).toBe(
+      `at://${USER_DID}/${ITEM_COLLECTION}/tipkey1`,
+    );
     expect((res.data as any).workflow).toBeUndefined();
     expect(calls).toHaveLength(3); // initial XRPC + 1 PDS create + callback XRPC
   });
@@ -213,7 +215,7 @@ describe("workflow interpreter — integration", () => {
       "/xrpc/com.atiproto.payment.item.create": async () =>
         jsonRes({
           itemUri: `at://${USER_DID}/${ITEM_COLLECTION}/abc`,
-          tip: {
+          item: {
             $type: `${ITEM_COLLECTION}#view`,
             uri: `at://${USER_DID}/${ITEM_COLLECTION}/abc`,
             amount: 0,
@@ -235,7 +237,7 @@ describe("workflow interpreter — integration", () => {
       currency: "USD",
     });
 
-    expect(res.data.tip).toBeDefined();
+    expect(res.data.item).toBeDefined();
     expect(pdsCalls).not.toHaveBeenCalled();
   });
 
