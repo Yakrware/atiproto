@@ -13,10 +13,12 @@ test.describe("Search", () => {
     await page.waitForLoadState("networkidle");
     const input = page.getByTestId("search-input");
     await input.click();
-    await input.pressSequentially("tip", { delay: 50 });
+    await input.pressSequentially("subscription", { delay: 50 });
     const results = page.getByTestId("search-results");
     await expect(results).toBeVisible({ timeout: 10000 });
-    await expect(results.getByText("com.atiproto.tip")).toBeVisible();
+    await expect(
+      results.getByText("com.atiproto.subscription").first(),
+    ).toBeVisible();
   });
 
   test("navigates to a result on click", async ({ page }) => {
@@ -37,10 +39,14 @@ test.describe("Search", () => {
     const input = page.getByTestId("search-input");
     await input.click();
     await input.pressSequentially("profile", { delay: 50 });
-    await expect(page.getByTestId("search-results")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByTestId("search-results")).toBeVisible({
+      timeout: 10000,
+    });
     await input.press("ArrowDown");
     await input.press("Enter");
-    await expect(page).toHaveURL(/\/docs\/lexicon\/com\.atiproto/, { timeout: 10000 });
+    await expect(page).toHaveURL(/\/docs\/lexicon\/com\.atiproto/, {
+      timeout: 10000,
+    });
   });
 
   test("clears results on Escape", async ({ page }) => {
@@ -48,8 +54,10 @@ test.describe("Search", () => {
     await page.waitForLoadState("networkidle");
     const input = page.getByTestId("search-input");
     await input.click();
-    await input.pressSequentially("tip", { delay: 50 });
-    await expect(page.getByTestId("search-results")).toBeVisible({ timeout: 10000 });
+    await input.pressSequentially("payment", { delay: 50 });
+    await expect(page.getByTestId("search-results")).toBeVisible({
+      timeout: 10000,
+    });
     await input.press("Escape");
     await expect(page.getByTestId("search-results")).not.toBeVisible();
   });

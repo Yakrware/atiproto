@@ -1,0 +1,57 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.repo.item.count",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Count active (completed) items. If recordUri is provided, counts items for that record. If subject is provided, counts items received by that DID. If neither is provided, counts items sent by the authenticated user. Optionally filtered by a start/end datetime window. When the authenticated user is the subject/owner of the target, the response also includes the sum of amounts.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "recordUri": {
+            "type": "string",
+            "format": "at-uri",
+            "description": "AT-URI of the record being tipped. Takes precedence over subject."
+          },
+          "subject": {
+            "type": "string",
+            "format": "did",
+            "description": "DID of the item recipient. Ignored if recordUri is provided. If omitted (and recordUri is omitted), the query counts items sent by the authenticated user."
+          },
+          "startDate": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Only count items completed at or after this timestamp"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Only count items completed at or before this timestamp"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["count"],
+          "properties": {
+            "count": {
+              "type": "integer",
+              "description": "Number of active (completed) items matching the filter"
+            },
+            "amount": {
+              "type": "integer",
+              "description": "Sum of all item amounts in cents. Only returned when the authenticated user is the subject/owner of the target (or when counting their own sent items)."
+            },
+            "currency": {
+              "type": "string",
+              "maxLength": 3,
+              "description": "Currency of the summed amount. Only returned when the authenticated user is the subject/owner of the target (or when counting their own sent items)."
+            }
+          }
+        }
+      }
+    }
+  }
+}

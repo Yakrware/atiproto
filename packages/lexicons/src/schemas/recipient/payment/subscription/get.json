@@ -1,0 +1,39 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.recipient.payment.subscription.get",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a specific subscription received by the authenticated user (as the recipient/subject). Looks up by subscription record uri or sender DID. These are mutually exclusive; uri takes precedence.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "uri": {
+            "type": "string",
+            "format": "at-uri",
+            "description": "AT-URI of the subscription record. Takes precedence over sender."
+          },
+          "sender": {
+            "type": "string",
+            "format": "did",
+            "description": "DID of the subscriber. Ignored if uri is provided."
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["subscription"],
+          "properties": {
+            "subscription": {
+              "type": "ref",
+              "ref": "com.atiproto.subscription#view",
+              "description": "The subscription record data"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -43,7 +43,7 @@ export default function PermissionSets() {
           com.atiproto.authGeneral
         </p>
         <p className="mb-4">
-          Write access to cart, subscription, and tip records, plus RPC access
+          Write access to cart, subscription, and item records, plus RPC access
           to payment, feed, and public profile lookup endpoints. Does not grant
           write access to the user's profile record or access to profile
           management endpoints.
@@ -65,7 +65,7 @@ export default function PermissionSets() {
           </li>
           <li>
             <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
-              com.atiproto.tip
+              com.atiproto.item
             </code>
           </li>
         </ul>
@@ -76,15 +76,15 @@ export default function PermissionSets() {
         <ul className="list-disc pl-6 space-y-1 mb-4">
           <li>
             <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
-              com.atiproto.account.cart.*
+              com.atiproto.payment.cart.*
             </code>{" "}
             &mdash; clone, create, get, list, put
           </li>
           <li>
             <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
-              com.atiproto.feed.*
+              com.atiproto.payment.*
             </code>{" "}
-            &mdash; list, tip and subscription CRUD
+            &mdash; list, payment and subscription CRUD
           </li>
           <li>
             <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
@@ -94,7 +94,7 @@ export default function PermissionSets() {
           </li>
           <li>
             <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
-              com.atiproto.repo.tip.*
+              com.atiproto.repo.item.*
             </code>{" "}
             &mdash; search, validate
           </li>
@@ -145,13 +145,13 @@ export default function PermissionSets() {
         <ul className="list-disc pl-6 space-y-1 mb-4">
           <li>
             <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
-              com.atiproto.account.profile.get
+              com.atiproto.recipient.profile.get
             </code>{" "}
             &mdash; get authenticated user's profile
           </li>
           <li>
             <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
-              com.atiproto.account.profile.put
+              com.atiproto.recipient.profile.put
             </code>{" "}
             &mdash; update profile settings
           </li>
@@ -186,13 +186,13 @@ export default function PermissionSets() {
         </AnchorHeading>
         <p className="mb-3">
           Use <strong>General Access</strong> when your application only needs
-          to create tips, subscriptions, and carts, and look up public profiles.
+          to create payments, subscriptions, and carts, and look up public profiles.
           This is the right choice for most integrations.
         </p>
         <p className="mb-3">
           Use <strong>Enhanced Access</strong> when your application also needs
           to manage the user's atiproto profile settings (e.g. toggling whether
-          they accept tips or subscriptions).
+          they accept payments or subscriptions).
         </p>
       </section>
     </div>

@@ -1,20 +1,20 @@
 import type { XrpcClient } from "@atproto/xrpc";
-import { ComAtiprotoAccountNS } from "./atiproto/account.js";
-import { ComAtiprotoFeedNS } from "./atiproto/feed.js";
+import { ComAtiprotoPaymentNS } from "./atiproto/payment.js";
+import { ComAtiprotoRecipientNS } from "./atiproto/recipient.js";
 import { ComAtiprotoRepoNS } from "./atiproto/repo.js";
 
 export class ComAtiprotoNS {
   _client: XrpcClient;
-  account: ComAtiprotoAccountNS;
-  feed: ComAtiprotoFeedNS;
+  payment: ComAtiprotoPaymentNS;
+  recipient: ComAtiprotoRecipientNS;
   repo: ComAtiprotoRepoNS;
 
   constructor(client: XrpcClient) {
     this._client = client;
-    this.account = new ComAtiprotoAccountNS(client);
-    this.feed = new ComAtiprotoFeedNS(client);
+    this.payment = new ComAtiprotoPaymentNS(client);
+    this.recipient = new ComAtiprotoRecipientNS(client);
     this.repo = new ComAtiprotoRepoNS(client);
   }
 }
 
-export { ComAtiprotoAccountNS, ComAtiprotoFeedNS, ComAtiprotoRepoNS };
+export { ComAtiprotoPaymentNS, ComAtiprotoRecipientNS, ComAtiprotoRepoNS };

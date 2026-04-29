@@ -43,8 +43,7 @@ export default function LexiconIndex() {
     <div>
       <h1 className="text-2xl font-bold mb-2">Lexicon Reference</h1>
       <p className="text-text-muted dark:text-text-muted-dark mb-8">
-        Complete API reference for the atiproto tipping and subscription
-        service.
+        Complete API reference for the atiproto payments lexicon
       </p>
 
       <section className="mb-8">

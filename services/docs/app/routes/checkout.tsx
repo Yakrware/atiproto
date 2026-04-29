@@ -6,7 +6,7 @@ export default function CheckoutFlow() {
     <div>
       <h1 className="text-2xl font-bold mb-2">Checkout Flow</h1>
       <p className="text-text-muted dark:text-text-muted-dark mb-8">
-        Learn how to create carts, add tips and subscriptions, and redirect
+        Learn how to create carts, add payments and subscriptions, and redirect
         users to checkout.
       </p>
 
@@ -15,7 +15,7 @@ export default function CheckoutFlow() {
           Cart-Based Checkout
         </AnchorHeading>
         <p className="mb-3">
-          The standard flow lets you build a cart with multiple tips and
+          The standard flow lets you build a cart with multiple payments and
           subscriptions before sending the user to checkout.
         </p>
 
@@ -27,7 +27,7 @@ export default function CheckoutFlow() {
           redirect URL for after checkout completes.
         </p>
         <CodeBlock
-          code={`const { data: cartData } = await tipAgent.com.atiproto.account.cart.create({
+          code={`const { data: cartData } = await paymentAgent.com.atiproto.payment.cart.create({
   currency: "USD",
   redirectUrl: "https://yourapp.com/checkout/complete",
 });
@@ -40,15 +40,15 @@ const checkoutUrl = cartData.checkoutUrl;`}
           2. Add Tips to the Cart
         </AnchorHeading>
         <p className="mb-3">
-          Add one or more tips by passing the{" "}
+          Add one or more payments by passing the{" "}
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
             cartUri
           </code>
-          . Each tip is added to the existing cart.
+          . Each payment is added to the existing cart.
         </p>
         <CodeBlock
           code={`// Tip a user $5.00
-await tipAgent.com.atiproto.feed.tip.create({
+await paymentAgent.com.atiproto.payment.item.create({
   subject: "did:plc:creator123",
   amount: 500,
   currency: "USD",
@@ -57,7 +57,7 @@ await tipAgent.com.atiproto.feed.tip.create({
 });
 
 // Tip another user on a specific record
-await tipAgent.com.atiproto.feed.tip.create({
+await paymentAgent.com.atiproto.payment.item.create({
   subject: "did:plc:creator456",
   amount: 1000,
   currency: "USD",
@@ -103,8 +103,8 @@ window.location.href = checkoutUrl;`}
           Quick Checkout
         </AnchorHeading>
         <p className="mb-3">
-          For a faster flow, skip cart creation entirely. When you create a tip
-          or subscription without a{" "}
+          For a faster flow, skip cart creation entirely. When you create a
+          payment or subscription without a{" "}
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
             cartUri
           </code>
@@ -119,8 +119,8 @@ window.location.href = checkoutUrl;`}
           Quick Tip
         </AnchorHeading>
         <CodeBlock
-          code={`// Create a tip — automatically creates a cart and returns checkoutUrl
-const { data } = await tipAgent.com.atiproto.feed.tip.create({
+          code={`// Create a payment — automatically creates a cart and returns checkoutUrl
+const { data } = await paymentAgent.com.atiproto.payment.item.create({
   subject: "did:plc:creator123",
   amount: 500,
   currency: "USD",
@@ -136,7 +136,7 @@ window.location.href = data.checkoutUrl;`}
         </AnchorHeading>
         <CodeBlock
           code={`// Create a subscription — goes straight to checkout
-const { data } = await tipAgent.com.atiproto.feed.subscription.create({
+const { data } = await paymentAgent.com.atiproto.payment.subscription.create({
   subject: "did:plc:creator123",
   amount: 999,
   currency: "USD",
@@ -160,10 +160,10 @@ window.location.href = data.checkoutUrl;`}
             </strong>{" "}
             —{" "}
             <a
-              href="/docs/lexicon/com.atiproto.account.cart.list"
+              href="/docs/lexicon/com.atiproto.payment.cart.list"
               className="text-primary dark:text-primary-dark hover:underline font-mono text-sm"
             >
-              account.cart.list
+              payment.cart.list
             </a>{" "}
             to view all carts, filterable by status
           </li>
@@ -173,12 +173,12 @@ window.location.href = data.checkoutUrl;`}
             </strong>{" "}
             —{" "}
             <a
-              href="/docs/lexicon/com.atiproto.account.cart.get"
+              href="/docs/lexicon/com.atiproto.payment.cart.get"
               className="text-primary dark:text-primary-dark hover:underline font-mono text-sm"
             >
-              account.cart.get
+              payment.cart.get
             </a>{" "}
-            to fetch a cart with resolved tips and subscriptions
+            to fetch a cart with resolved payments and subscriptions
           </li>
           <li>
             <strong className="text-text dark:text-text-dark">
@@ -186,12 +186,12 @@ window.location.href = data.checkoutUrl;`}
             </strong>{" "}
             —{" "}
             <a
-              href="/docs/lexicon/com.atiproto.account.cart.clone"
+              href="/docs/lexicon/com.atiproto.payment.cart.clone"
               className="text-primary dark:text-primary-dark hover:underline font-mono text-sm"
             >
-              account.cart.clone
+              payment.cart.clone
             </a>{" "}
-            to duplicate an existing cart (useful for re-tipping)
+            to duplicate an existing cart (useful for expired carts)
           </li>
         </ul>
       </section>

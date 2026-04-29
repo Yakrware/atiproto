@@ -3,7 +3,7 @@ import { Agent as ApiAgent } from "@atproto/api";
 import { Agent, WorkflowRaisedError } from "../src/index.js";
 
 const USER_DID = "did:plc:user";
-const TIP_COLLECTION = "com.atiproto.tip";
+const ITEM_COLLECTION = "com.atiproto.item";
 const CART_COLLECTION = "com.atiproto.cart";
 // Real CIDv1 — passes lex's `format: cid` validator (CID.parse).
 const FAKE_CID = "bafyreigh2akiscaildc3xqwmwx4tgabhgwd3xnpemivpknbplbeczj7yyy";
@@ -62,7 +62,7 @@ describe("workflow interpreter — integration", () => {
   it("single round, single action: server emits create → agent writes → callback → final", async () => {
     let xrpcCalls = 0;
     const { fetchHandler, calls } = scriptedFetch({
-      "/xrpc/com.atiproto.feed.tip.create": async (req) => {
+      "/xrpc/com.atiproto.payment.item.create": async (req) => {
         const body = await req.json();
         xrpcCalls++;
         if (xrpcCalls === 1) {
@@ -73,11 +73,11 @@ describe("workflow interpreter — integration", () => {
                 {
                   $type: "com.atiproto.actions#create",
                   repo: USER_DID,
-                  name: "tip",
-                  collection: TIP_COLLECTION,
+                  name: "item",
+                  collection: ITEM_COLLECTION,
                   rkey: "tipkey1",
                   record: {
-                    $type: TIP_COLLECTION,
+                    $type: ITEM_COLLECTION,
                     amount: 500,
                     currency: "USD",
                     status: "pending",
@@ -93,9 +93,9 @@ describe("workflow interpreter — integration", () => {
         expect(body.workflow.responses).toHaveLength(1);
         expect(body.workflow.responses[0]).toMatchObject({
           action: "create",
-          name: "tip",
+          name: "item",
           result: {
-            uri: `at://${USER_DID}/${TIP_COLLECTION}/tipkey1`,
+            uri: `at://${USER_DID}/${ITEM_COLLECTION}/tipkey1`,
             cid: FAKE_CID,
           },
         });
@@ -103,10 +103,10 @@ describe("workflow interpreter — integration", () => {
         expect(body.subject).toBe("did:plc:recipient");
         expect(body.amount).toBe(500);
         return jsonRes({
-          tipUri: `at://${USER_DID}/${TIP_COLLECTION}/tipkey1`,
-          tip: {
-            $type: `${TIP_COLLECTION}#view`,
-            uri: `at://${USER_DID}/${TIP_COLLECTION}/tipkey1`,
+          itemUri: `at://${USER_DID}/${ITEM_COLLECTION}/tipkey1`,
+          item: {
+            $type: `${ITEM_COLLECTION}#view`,
+            uri: `at://${USER_DID}/${ITEM_COLLECTION}/tipkey1`,
             amount: 500,
             currency: "USD",
             status: "pending",
@@ -117,7 +117,7 @@ describe("workflow interpreter — integration", () => {
       "/xrpc/com.atproto.repo.createRecord": async (req) => {
         const body = await req.json();
         expect(body.repo).toBe(USER_DID);
-        expect(body.collection).toBe(TIP_COLLECTION);
+        expect(body.collection).toBe(ITEM_COLLECTION);
         expect(body.rkey).toBe("tipkey1");
         return jsonRes({
           uri: `at://${body.repo}/${body.collection}/${body.rkey}`,
@@ -127,13 +127,15 @@ describe("workflow interpreter — integration", () => {
     });
 
     const agent = buildAgent(fetchHandler);
-    const res = await agent.com.atiproto.feed.tip.create({
+    const res = await agent.com.atiproto.payment.item.create({
       subject: "did:plc:recipient" as any,
       amount: 500,
       currency: "USD",
     });
 
-    expect(res.data.tipUri).toBe(`at://${USER_DID}/${TIP_COLLECTION}/tipkey1`);
+    expect(res.data.itemUri).toBe(
+      `at://${USER_DID}/${ITEM_COLLECTION}/tipkey1`,
+    );
     expect((res.data as any).workflow).toBeUndefined();
     expect(calls).toHaveLength(3); // initial XRPC + 1 PDS create + callback XRPC
   });
@@ -141,7 +143,7 @@ describe("workflow interpreter — integration", () => {
   it("multi-round chain: createTip → createCart → final", async () => {
     let xrpcCalls = 0;
     const { fetchHandler } = scriptedFetch({
-      "/xrpc/com.atiproto.feed.tip.create": async (req) => {
+      "/xrpc/com.atiproto.payment.item.create": async (req) => {
         const body = await req.json();
         xrpcCalls++;
         if (xrpcCalls === 1) {
@@ -152,10 +154,10 @@ describe("workflow interpreter — integration", () => {
                 {
                   $type: "com.atiproto.actions#create",
                   repo: USER_DID,
-                  name: "tip",
-                  collection: TIP_COLLECTION,
+                  name: "item",
+                  collection: ITEM_COLLECTION,
                   rkey: "tipkey1",
-                  record: { $type: TIP_COLLECTION },
+                  record: { $type: ITEM_COLLECTION },
                 },
               ],
             },
@@ -182,7 +184,7 @@ describe("workflow interpreter — integration", () => {
         // Final
         expect(body.workflow.intent).toBe("createCart");
         return jsonRes({
-          tipUri: `at://${USER_DID}/${TIP_COLLECTION}/tipkey1`,
+          itemUri: `at://${USER_DID}/${ITEM_COLLECTION}/tipkey1`,
           cartUri: `at://${USER_DID}/${CART_COLLECTION}/cartkey1`,
           checkoutUrl: "https://stripe.example/checkout/xyz",
         });
@@ -197,7 +199,7 @@ describe("workflow interpreter — integration", () => {
     });
 
     const agent = buildAgent(fetchHandler);
-    const res = await agent.com.atiproto.feed.tip.create({
+    const res = await agent.com.atiproto.payment.item.create({
       subject: "did:plc:recipient" as any,
       amount: 500,
       currency: "USD",
@@ -210,12 +212,12 @@ describe("workflow interpreter — integration", () => {
   it("direct result on first call: no workflow → return immediately, no PDS calls", async () => {
     const pdsCalls = vi.fn();
     const { fetchHandler } = scriptedFetch({
-      "/xrpc/com.atiproto.feed.tip.create": async () =>
+      "/xrpc/com.atiproto.payment.item.create": async () =>
         jsonRes({
-          tipUri: `at://${USER_DID}/${TIP_COLLECTION}/abc`,
-          tip: {
-            $type: `${TIP_COLLECTION}#view`,
-            uri: `at://${USER_DID}/${TIP_COLLECTION}/abc`,
+          itemUri: `at://${USER_DID}/${ITEM_COLLECTION}/abc`,
+          item: {
+            $type: `${ITEM_COLLECTION}#view`,
+            uri: `at://${USER_DID}/${ITEM_COLLECTION}/abc`,
             amount: 0,
             currency: "USD",
             status: "completed",
@@ -229,40 +231,40 @@ describe("workflow interpreter — integration", () => {
     });
 
     const agent = buildAgent(fetchHandler);
-    const res = await agent.com.atiproto.feed.tip.create({
+    const res = await agent.com.atiproto.payment.item.create({
       subject: "did:plc:recipient" as any,
       amount: 0,
       currency: "USD",
     });
 
-    expect(res.data.tip).toBeDefined();
+    expect(res.data.item).toBeDefined();
     expect(pdsCalls).not.toHaveBeenCalled();
   });
 
   it("empty actions array exits the loop and strips workflow", async () => {
     const { fetchHandler } = scriptedFetch({
-      "/xrpc/com.atiproto.feed.tip.create": async () =>
+      "/xrpc/com.atiproto.payment.item.create": async () =>
         jsonRes({
           workflow: { intent: "noop", actions: [] },
-          tipUri: `at://${USER_DID}/${TIP_COLLECTION}/abc`,
+          itemUri: `at://${USER_DID}/${ITEM_COLLECTION}/abc`,
         }),
     });
 
     const agent = buildAgent(fetchHandler);
-    const res = await agent.com.atiproto.feed.tip.create({
+    const res = await agent.com.atiproto.payment.item.create({
       subject: "did:plc:recipient" as any,
       amount: 0,
       currency: "USD",
     });
 
-    expect(res.data.tipUri).toBeDefined();
+    expect(res.data.itemUri).toBeDefined();
     expect((res.data as any).workflow).toBeUndefined();
   });
 
   it("action failure → error callback → server raise → caller throws WorkflowRaisedError", async () => {
     let xrpcCalls = 0;
     const { fetchHandler } = scriptedFetch({
-      "/xrpc/com.atiproto.feed.tip.create": async (req) => {
+      "/xrpc/com.atiproto.payment.item.create": async (req) => {
         xrpcCalls++;
         const body = await req.json();
         if (xrpcCalls === 1) {
@@ -273,10 +275,10 @@ describe("workflow interpreter — integration", () => {
                 {
                   $type: "com.atiproto.actions#create",
                   repo: USER_DID,
-                  name: "tip",
-                  collection: TIP_COLLECTION,
+                  name: "item",
+                  collection: ITEM_COLLECTION,
                   rkey: "tipkey1",
-                  record: { $type: TIP_COLLECTION },
+                  record: { $type: ITEM_COLLECTION },
                 },
               ],
             },
@@ -285,7 +287,7 @@ describe("workflow interpreter — integration", () => {
         // Callback with error
         expect(body.workflow.intent).toBe("error");
         expect(body.workflow.error.action).toBe("create");
-        expect(body.workflow.error.name).toBe("tip");
+        expect(body.workflow.error.name).toBe("item");
         return jsonRes({
           workflow: {
             intent: "rollback",
@@ -305,7 +307,7 @@ describe("workflow interpreter — integration", () => {
 
     const agent = buildAgent(fetchHandler);
     await expect(
-      agent.com.atiproto.feed.tip.create({
+      agent.com.atiproto.payment.item.create({
         subject: "did:plc:recipient" as any,
         amount: 500,
         currency: "USD",
@@ -321,7 +323,7 @@ describe("workflow interpreter — integration", () => {
     let xrpcCalls = 0;
     const pdsActions: Array<{ verb: string; rkey: string }> = [];
     const { fetchHandler } = scriptedFetch({
-      "/xrpc/com.atiproto.feed.tip.create": async (req) => {
+      "/xrpc/com.atiproto.payment.item.create": async (req) => {
         xrpcCalls++;
         const body = await req.json();
         if (xrpcCalls === 1) {
@@ -333,17 +335,17 @@ describe("workflow interpreter — integration", () => {
                   $type: "com.atiproto.actions#create",
                   repo: USER_DID,
                   name: "first",
-                  collection: TIP_COLLECTION,
+                  collection: ITEM_COLLECTION,
                   rkey: "first-rkey",
-                  record: { $type: TIP_COLLECTION },
+                  record: { $type: ITEM_COLLECTION },
                 },
                 {
                   $type: "com.atiproto.actions#create",
                   repo: USER_DID,
                   name: "second",
-                  collection: TIP_COLLECTION,
+                  collection: ITEM_COLLECTION,
                   rkey: "second-rkey",
-                  record: { $type: TIP_COLLECTION },
+                  record: { $type: ITEM_COLLECTION },
                 },
               ],
             },
@@ -361,7 +363,7 @@ describe("workflow interpreter — integration", () => {
                 $type: "com.atiproto.actions#delete",
                 repo: USER_DID,
                 name: "rollback-first",
-                collection: TIP_COLLECTION,
+                collection: ITEM_COLLECTION,
                 rkey: "first-rkey",
               },
               {
@@ -393,7 +395,7 @@ describe("workflow interpreter — integration", () => {
 
     const agent = buildAgent(fetchHandler);
     await expect(
-      agent.com.atiproto.feed.tip.create({
+      agent.com.atiproto.payment.item.create({
         subject: "did:plc:recipient" as any,
         amount: 500,
         currency: "USD",
@@ -409,7 +411,7 @@ describe("workflow interpreter — integration", () => {
 
   it("max-steps guard throws when server emits workflow forever", async () => {
     const { fetchHandler } = scriptedFetch({
-      "/xrpc/com.atiproto.feed.tip.create": async () =>
+      "/xrpc/com.atiproto.payment.item.create": async () =>
         jsonRes({
           workflow: {
             intent: "loop",
@@ -418,9 +420,9 @@ describe("workflow interpreter — integration", () => {
                 $type: "com.atiproto.actions#create",
                 repo: USER_DID,
                 name: "n",
-                collection: TIP_COLLECTION,
+                collection: ITEM_COLLECTION,
                 rkey: "key",
-                record: { $type: TIP_COLLECTION },
+                record: { $type: ITEM_COLLECTION },
               },
             ],
           },
@@ -436,7 +438,7 @@ describe("workflow interpreter — integration", () => {
 
     const agent = buildAgent(fetchHandler, { maxWorkflowSteps: 2 });
     await expect(
-      agent.com.atiproto.feed.tip.create({
+      agent.com.atiproto.payment.item.create({
         subject: "did:plc:recipient" as any,
         amount: 500,
         currency: "USD",
@@ -447,16 +449,16 @@ describe("workflow interpreter — integration", () => {
   it("extensibility: shape-driven interpreter handles workflow on a non-orchestrating endpoint", async () => {
     let xrpcCalls = 0;
     const { fetchHandler } = scriptedFetch({
-      "/xrpc/com.atiproto.feed.tip.list": async (req) => {
+      "/xrpc/com.atiproto.payment.item.list": async (req) => {
         xrpcCalls++;
         if (xrpcCalls === 1) {
           // feed.tip.list isn't a workflow endpoint today; the agent should
           // still handle a workflow in the response purely on shape.
-          // We include `tips: []` so the lexicon validator accepts the
+          // We include `items: []` so the lexicon validator accepts the
           // response — the point of this test is the shape-driven loop, not
           // bypassing validation.
           return jsonRes({
-            tips: [],
+            items: [],
             workflow: {
               intent: "extensibilityProbe",
               actions: [
@@ -464,15 +466,15 @@ describe("workflow interpreter — integration", () => {
                   $type: "com.atiproto.actions#create",
                   repo: USER_DID,
                   name: "thing",
-                  collection: TIP_COLLECTION,
+                  collection: ITEM_COLLECTION,
                   rkey: "extkey",
-                  record: { $type: TIP_COLLECTION },
+                  record: { $type: ITEM_COLLECTION },
                 },
               ],
             },
           });
         }
-        return jsonRes({ tips: [] });
+        return jsonRes({ items: [] });
       },
       "/xrpc/com.atproto.repo.createRecord": async (req) => {
         const body = await req.json();
@@ -484,8 +486,8 @@ describe("workflow interpreter — integration", () => {
     });
 
     const agent = buildAgent(fetchHandler);
-    const res = await agent.com.atiproto.feed.tip.list();
-    expect(res.data.tips).toEqual([]);
+    const res = await agent.com.atiproto.payment.item.list();
+    expect(res.data.items).toEqual([]);
     expect(xrpcCalls).toBe(2);
   });
 
@@ -493,7 +495,7 @@ describe("workflow interpreter — integration", () => {
     let xrpcCalls = 0;
     const proxyHeaders: string[] = [];
     const { fetchHandler } = scriptedFetch({
-      "/xrpc/com.atiproto.feed.tip.create": async (req) => {
+      "/xrpc/com.atiproto.payment.item.create": async (req) => {
         xrpcCalls++;
         const proxy = req.headers.get("atproto-proxy");
         if (proxy) proxyHeaders.push(proxy);
@@ -505,16 +507,16 @@ describe("workflow interpreter — integration", () => {
                 {
                   $type: "com.atiproto.actions#create",
                   repo: USER_DID,
-                  name: "tip",
-                  collection: TIP_COLLECTION,
+                  name: "item",
+                  collection: ITEM_COLLECTION,
                   rkey: "k",
-                  record: { $type: TIP_COLLECTION },
+                  record: { $type: ITEM_COLLECTION },
                 },
               ],
             },
           });
         }
-        return jsonRes({ tipUri: `at://${USER_DID}/${TIP_COLLECTION}/k` });
+        return jsonRes({ itemUri: `at://${USER_DID}/${ITEM_COLLECTION}/k` });
       },
       "/xrpc/com.atproto.repo.createRecord": async (req) => {
         const body = await req.json();
@@ -526,7 +528,7 @@ describe("workflow interpreter — integration", () => {
     });
 
     const agent = buildAgent(fetchHandler);
-    await agent.com.atiproto.feed.tip.create({
+    await agent.com.atiproto.payment.item.create({
       subject: "did:plc:recipient" as any,
       amount: 500,
       currency: "USD",

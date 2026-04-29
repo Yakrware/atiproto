@@ -1,0 +1,70 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.recipient.payment.cart.get",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a cart that pays the authenticated user — a cart whose items target this user. Look up by cart URI, by a contained item record URI, or by a contained subscription record URI. One of `uri`, `itemUri`, or `subscriptionUri` is required.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "uri": {
+            "type": "string",
+            "format": "at-uri",
+            "description": "AT-URI of the cart record. Takes precedence over itemUri and subscriptionUri."
+          },
+          "itemUri": {
+            "type": "string",
+            "format": "at-uri",
+            "description": "AT-URI of an item record received by the authed user. Returns the cart that contains this item. Ignored if uri is provided."
+          },
+          "subscriptionUri": {
+            "type": "string",
+            "format": "at-uri",
+            "description": "AT-URI of a subscription record received by the authed user. Returns the cart that contains this subscription. Ignored if uri or itemUri is provided."
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["uri", "cart", "items", "subscriptions"],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "Cart record URI"
+            },
+            "cid": {
+              "type": "string",
+              "format": "cid",
+              "description": "Cart record CID"
+            },
+            "cart": {
+              "type": "ref",
+              "ref": "com.atiproto.cart#view",
+              "description": "The cart record data"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "com.atiproto.item#view"
+              },
+              "description": "Resolved item records in this cart that target the authed user"
+            },
+            "subscriptions": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "com.atiproto.subscription#view"
+              },
+              "description": "Resolved subscription records in this cart that target the authed user"
+            }
+          }
+        }
+      }
+    }
+  }
+}

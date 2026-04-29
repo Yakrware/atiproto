@@ -1,0 +1,56 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.payment.item.put",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Update a pending item. Only pending items can be updated.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["uri", "record"],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "AT-URI of the item record to update"
+            },
+            "record": {
+              "type": "ref",
+              "ref": "com.atiproto.item"
+            },
+            "workflow": {
+              "type": "ref",
+              "ref": "com.atiproto.actions#inboundWorkflow",
+              "description": "Workflow callback envelope. Present on agent-driven callbacks; absent on initial calls."
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "workflow": {
+              "type": "ref",
+              "ref": "com.atiproto.actions#outboundWorkflow",
+              "description": "Workflow envelope. When present, the agent runs the actions and calls back. When absent, this is the final native result."
+            },
+            "uri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "Updated item record URI"
+            },
+            "cid": {
+              "type": "string",
+              "format": "cid",
+              "description": "New CID of the updated record"
+            }
+          }
+        }
+      }
+    }
+  }
+}
