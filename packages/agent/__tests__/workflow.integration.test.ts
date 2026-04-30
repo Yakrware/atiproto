@@ -446,37 +446,34 @@ describe("workflow interpreter — integration", () => {
     ).rejects.toThrow(/Workflow exceeded max steps \(2\)/);
   });
 
-  it("extensibility: shape-driven interpreter handles workflow on a non-orchestrating endpoint", async () => {
+  it("query workflow: side-effect workflow runs once, native result returns, no callback", async () => {
     let xrpcCalls = 0;
+    let pdsCreates = 0;
     const { fetchHandler } = scriptedFetch({
-      "/xrpc/com.atiproto.payment.item.list": async (req) => {
+      "/xrpc/com.atiproto.payment.item.list": async () => {
         xrpcCalls++;
-        if (xrpcCalls === 1) {
-          // feed.tip.list isn't a workflow endpoint today; the agent should
-          // still handle a workflow in the response purely on shape.
-          // We include `items: []` so the lexicon validator accepts the
-          // response — the point of this test is the shape-driven loop, not
-          // bypassing validation.
-          return jsonRes({
-            items: [],
-            workflow: {
-              intent: "extensibilityProbe",
-              actions: [
-                {
-                  $type: "com.atiproto.actions#create",
-                  repo: USER_DID,
-                  name: "thing",
-                  collection: ITEM_COLLECTION,
-                  rkey: "extkey",
-                  record: { $type: ITEM_COLLECTION },
-                },
-              ],
-            },
-          });
-        }
-        return jsonRes({ items: [] });
+        // Query response carries both the native result AND a side-effect
+        // workflow. The agent runs the actions and strips the envelope —
+        // there is no callback (queries have no request body).
+        return jsonRes({
+          items: [],
+          workflow: {
+            intent: "lazyMigrate",
+            actions: [
+              {
+                $type: "com.atiproto.actions#create",
+                repo: USER_DID,
+                name: "thing",
+                collection: ITEM_COLLECTION,
+                rkey: "extkey",
+                record: { $type: ITEM_COLLECTION },
+              },
+            ],
+          },
+        });
       },
       "/xrpc/com.atproto.repo.createRecord": async (req) => {
+        pdsCreates++;
         const body = await req.json();
         return jsonRes({
           uri: `at://${body.repo}/${body.collection}/${body.rkey}`,
@@ -488,7 +485,114 @@ describe("workflow interpreter — integration", () => {
     const agent = buildAgent(fetchHandler);
     const res = await agent.com.atiproto.payment.item.list();
     expect(res.data.items).toEqual([]);
-    expect(xrpcCalls).toBe(2);
+    expect((res.data as any).workflow).toBeUndefined();
+    expect(xrpcCalls).toBe(1);
+    expect(pdsCreates).toBe(1);
+  });
+
+  it("query workflow on payment.cart.get: native cart returned, side-effects executed", async () => {
+    const cartUri = `at://${USER_DID}/${CART_COLLECTION}/cartkey1`;
+    let pdsUpdates = 0;
+    const { fetchHandler, calls } = scriptedFetch({
+      "/xrpc/com.atiproto.payment.cart.get": async () =>
+        jsonRes({
+          uri: cartUri,
+          cid: FAKE_CID,
+          cart: {
+            $type: `${CART_COLLECTION}#view`,
+            uri: cartUri,
+            currency: "USD",
+            total: 0,
+            status: "open",
+            items: [],
+            createdAt: "2024-01-01T00:00:00Z",
+            expiresAt: "2024-01-08T00:00:00Z",
+          },
+          items: [],
+          subscriptions: [],
+          workflow: {
+            intent: "syncCart",
+            actions: [
+              {
+                $type: "com.atiproto.actions#update",
+                repo: USER_DID,
+                name: "syncCart",
+                collection: CART_COLLECTION,
+                rkey: "cartkey1",
+                record: {
+                  $type: CART_COLLECTION,
+                  currency: "USD",
+                  status: "open",
+                  items: [],
+                  subscriptions: [],
+                },
+              },
+            ],
+          },
+        }),
+      "/xrpc/com.atproto.repo.putRecord": async (req) => {
+        pdsUpdates++;
+        const body = await req.json();
+        return jsonRes({
+          uri: `at://${body.repo}/${body.collection}/${body.rkey}`,
+          cid: FAKE_CID_2,
+        });
+      },
+    });
+
+    const agent = buildAgent(fetchHandler);
+    const res = await agent.com.atiproto.payment.cart.get({ uri: cartUri });
+
+    expect(res.data.uri).toBe(cartUri);
+    expect((res.data as any).workflow).toBeUndefined();
+    expect(pdsUpdates).toBe(1);
+    // One initial query call + one PDS write — no callback.
+    expect(
+      calls.filter((c) => c.url.includes("payment.cart.get")),
+    ).toHaveLength(1);
+  });
+
+  it("query workflow: action failure surfaces to caller (no callback channel)", async () => {
+    const cartUri = `at://${USER_DID}/${CART_COLLECTION}/cartkey1`;
+    const { fetchHandler } = scriptedFetch({
+      "/xrpc/com.atiproto.payment.cart.get": async () =>
+        jsonRes({
+          uri: cartUri,
+          cid: FAKE_CID,
+          cart: {
+            $type: `${CART_COLLECTION}#view`,
+            uri: cartUri,
+            currency: "USD",
+            total: 0,
+            status: "open",
+            items: [],
+            createdAt: "2024-01-01T00:00:00Z",
+            expiresAt: "2024-01-08T00:00:00Z",
+          },
+          items: [],
+          subscriptions: [],
+          workflow: {
+            intent: "syncCart",
+            actions: [
+              {
+                $type: "com.atiproto.actions#update",
+                repo: USER_DID,
+                name: "syncCart",
+                collection: CART_COLLECTION,
+                rkey: "cartkey1",
+                record: { $type: CART_COLLECTION },
+              },
+            ],
+          },
+        }),
+      "/xrpc/com.atproto.repo.putRecord": async () =>
+        jsonErr("InvalidRecord", "PDS rejected", 400),
+    });
+
+    const agent = buildAgent(fetchHandler);
+    await expect(
+      agent.com.atiproto.payment.cart.get({ uri: cartUri }),
+    ).rejects.toMatchObject({ name: "WorkflowActionFailed" });
   });
 
   it("preserves the atproto-proxy header on every XRPC fetch (initial + callback)", async () => {

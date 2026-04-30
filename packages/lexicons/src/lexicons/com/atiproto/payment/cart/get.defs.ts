@@ -3,6 +3,7 @@
  */
 
 import { l } from '@atproto/lex'
+import * as AtiprotoActions from '../../actions.defs.js'
 import * as AtiprotoCart from '../../cart.defs.js'
 import * as AtiprotoItem from '../../item.defs.js'
 import * as AtiprotoSubscription from '../../subscription.defs.js'
@@ -20,6 +21,11 @@ const main = l.query(
     subscriptionUri: l.optional(l.string({ format: 'at-uri' })),
   }),
   l.jsonPayload({
+    workflow: l.optional(
+      l.ref<AtiprotoActions.OutboundWorkflow>(
+        (() => AtiprotoActions.outboundWorkflow) as any,
+      ),
+    ),
     uri: l.string({ format: 'at-uri' }),
     cid: l.optional(l.string({ format: 'cid' })),
     cart: l.ref<AtiprotoCart.View>((() => AtiprotoCart.view) as any),

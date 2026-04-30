@@ -31,6 +31,11 @@
           "type": "object",
           "required": ["uri", "cart", "items", "subscriptions"],
           "properties": {
+            "workflow": {
+              "type": "ref",
+              "ref": "com.atiproto.actions#outboundWorkflow",
+              "description": "Side-effect workflow to sync server status with PDS status."
+            },
             "uri": {
               "type": "string",
               "format": "at-uri",
