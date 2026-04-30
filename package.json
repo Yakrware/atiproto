@@ -9,7 +9,10 @@
   "scripts": {
     "build": "npm run build --workspaces",
     "test": "npm run test --workspaces",
-    "deploy": "bash scripts/deploy.sh"
+    "deploy": "bash scripts/deploy.sh",
+    "lex:status": "goat lex status packages/lexicons/src/schemas/",
+    "lex:publish": "goat lex publish --username atiproto.com -u packages/lexicons/src/schemas/",
+    "lex:lint": "goat lex lint packages/lexicons/src/schemas/"
   },
   "overrides": {
     "vite": "^7.1.7"
