@@ -161,9 +161,6 @@ export class Agent<TClient extends XrpcClient = ApiAgent> extends XrpcClient {
     data?: unknown,
     opts?: CallOptions,
   ): Promise<XRPCResponse> {
-    // Queries can't carry a body, so the workflow protocol degenerates to a
-    // single shot: server returns native result + side-effect workflow on the
-    // same response. We run the actions and strip — no callback.
     const isQuery = this.lex.getDef(nsid)?.type === "query";
 
     const baseInput =
@@ -185,7 +182,6 @@ export class Agent<TClient extends XrpcClient = ApiAgent> extends XrpcClient {
 
       try {
         const responses = await runActions(client, workflow.actions);
-        // Queries: one round, no callback. Strip and return the first response.
         if (isQuery) {
           workflow = undefined;
           break;
@@ -196,9 +192,6 @@ export class Agent<TClient extends XrpcClient = ApiAgent> extends XrpcClient {
         };
       } catch (err) {
         if (err instanceof WorkflowRaisedError) throw err;
-        // Queries: no callback channel for compensating actions. Surface the
-        // failure to the caller — the native result is still in `res.data`,
-        // but side-effects didn't fully apply.
         if (isQuery) throw err;
         if (err instanceof WorkflowActionFailed) {
           nextData = {
