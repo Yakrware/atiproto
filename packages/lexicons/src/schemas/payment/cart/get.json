@@ -31,6 +31,11 @@
           "type": "object",
           "required": ["uri", "cart", "items", "subscriptions"],
           "properties": {
+            "workflow": {
+              "type": "ref",
+              "ref": "com.atiproto.actions#outboundWorkflow",
+              "description": "Side-effect workflow for the agent to execute against the user's PDS. Independent of the query result — the native fields are always populated; the agent runs the actions and strips this envelope before returning."
+            },
             "uri": {
               "type": "string",
               "format": "at-uri",

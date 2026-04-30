@@ -85,18 +85,25 @@ export interface AgentOptions {
  *
  * `Agent.call` transparently runs the workflow protocol: when a response
  * carries a `workflow` envelope, the agent executes the actions against the
- * user's PDS and calls back until the server returns a workflow-free result.
- * The `workflow` field is stripped from the data before returning to the
- * caller, so caller-facing values match the lexicon's native output shape.
+ * user's PDS. The `workflow` field is stripped from the data before returning
+ * to the caller, so caller-facing values match the lexicon's native output.
  *
- * **Note on output types.** Orchestrating endpoints (the 9 workflow-capable
- * procedures — feed.tip.create/put, feed.subscription.*, account.cart.*,
- * account.profile.put) drop `required` from their output schemas so workflow
- * envelopes and native results both validate. As a result, generated
- * `$OutputBody` types mark all native fields optional (`tipUri?: string` etc).
- * The interpreter guarantees the native fields are populated on the value
- * callers receive, but TypeScript can't see that — callers will need a
- * runtime check or non-null assertion (`res.data.tipUri!`).
+ * Procedures and queries differ in callback shape:
+ * - **Procedures** loop: server's first response is workflow-only; the agent
+ *   runs actions and calls back with `inboundWorkflow`. Iterates until the
+ *   server returns a workflow-free result.
+ * - **Queries** are single-shot: the server returns the native result *and*
+ *   an optional workflow side-effect on the same response. The agent runs
+ *   the actions for their side effects, strips the envelope, and returns —
+ *   no callback (queries can't carry a request body).
+ *
+ * **Note on output types.** Orchestrating procedures drop `required` from
+ * their output schemas so workflow-only and native-result responses both
+ * validate. As a result, generated `$OutputBody` types mark all native fields
+ * optional (`itemUri?: string` etc). The interpreter guarantees they are
+ * populated on the value callers receive, but TypeScript can't see that —
+ * callers will need a runtime check or non-null assertion. Queries keep
+ * `required`: the native fields are always present alongside the workflow.
  */
 export class Agent<TClient extends XrpcClient = ApiAgent> extends XrpcClient {
   com: ComNS & ComOf<TClient>;
@@ -154,6 +161,11 @@ export class Agent<TClient extends XrpcClient = ApiAgent> extends XrpcClient {
     data?: unknown,
     opts?: CallOptions,
   ): Promise<XRPCResponse> {
+    // Queries can't carry a body, so the workflow protocol degenerates to a
+    // single shot: server returns native result + side-effect workflow on the
+    // same response. We run the actions and strip — no callback.
+    const isQuery = this.lex.getDef(nsid)?.type === "query";
+
     const baseInput =
       data && typeof data === "object" ? (data as Record<string, unknown>) : {};
     let nextData: unknown = data;
@@ -173,12 +185,21 @@ export class Agent<TClient extends XrpcClient = ApiAgent> extends XrpcClient {
 
       try {
         const responses = await runActions(client, workflow.actions);
+        // Queries: one round, no callback. Strip and return the first response.
+        if (isQuery) {
+          workflow = undefined;
+          break;
+        }
         nextData = {
           ...baseInput,
           [WORKFLOW_FIELD]: { intent: workflow.intent, responses },
         };
       } catch (err) {
         if (err instanceof WorkflowRaisedError) throw err;
+        // Queries: no callback channel for compensating actions. Surface the
+        // failure to the caller — the native result is still in `res.data`,
+        // but side-effects didn't fully apply.
+        if (isQuery) throw err;
         if (err instanceof WorkflowActionFailed) {
           nextData = {
             ...baseInput,
