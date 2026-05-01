@@ -78,6 +78,23 @@ const paymentAgent = new TipAgent(bskyAgent);
 // Now you can call tipping APIs
 const profile = await paymentAgent.com.atiproto.recipient.profile.get();`}
         />
+        <p className="mt-3 text-sm text-text-muted dark:text-text-muted-dark">
+          On construction the agent also pre-authorizes a Bluesky chat
+          conversation with the atiproto bot so payment receipts deliver to the
+          user's inbox instead of their Requests folder. This requires three
+          explicit RPC scopes on{" "}
+          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+            chat.bsky.convo.*
+          </code>{" "}
+          &mdash; see{" "}
+          <a
+            href="/docs/permission-sets#chat-pre-authorization-receipts"
+            className="text-primary dark:text-primary-dark hover:underline"
+          >
+            Chat Pre-Authorization
+          </a>
+          .
+        </p>
       </section>
 
       <section className="mb-10">
