@@ -4,12 +4,19 @@ import { AnchorHeading } from "~/components/AnchorHeading";
 export default function PermissionSets() {
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-2">Permission Sets</h1>
+      <h1 className="text-2xl font-bold mb-2">OAuth Scopes</h1>
       <p className="text-text-muted dark:text-text-muted-dark mb-8">
-        OAuth permission sets for scoping access to a
+        OAuth scope strings for accessing a
         <span className="text-primary dark:text-primary-dark">TIP</span>roto
-        resources. Use these when requesting authorization to control exactly
-        what your application can do.
+        resources. The recommended approach is to request explicit{" "}
+        <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+          repo:
+        </code>{" "}
+        and{" "}
+        <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+          rpc:
+        </code>{" "}
+        scopes per record collection and XRPC method.
       </p>
 
       <section className="mb-10">
@@ -17,26 +24,251 @@ export default function PermissionSets() {
           Overview
         </AnchorHeading>
         <p className="mb-3">
-          atiproto defines two permission sets that bundle granular ATProto
-          scopes into named groups. Clients reference them via{" "}
+          An OAuth scope string is a space-separated list of scope tokens. For
+          atiproto access, build it from three pieces:
+        </p>
+        <ul className="list-disc pl-6 space-y-2 mb-4">
+          <li>
+            <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+              atproto
+            </code>{" "}
+            &mdash; required base scope for any ATProto OAuth client
+          </li>
+          <li>
+            <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+              repo:&lt;collection&gt;
+            </code>{" "}
+            &mdash; one per record collection your app writes to (e.g.{" "}
+            <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+              repo:com.atiproto.cart
+            </code>
+            )
+          </li>
+          <li>
+            <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+              rpc:&lt;nsid&gt;?aud=&lt;aud&gt;
+            </code>{" "}
+            &mdash; one per XRPC method your app calls. Use{" "}
+            <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+              aud=*
+            </code>{" "}
+            for atiproto methods (the proxy provides the audience), or the
+            literal service DID (URL-encoded) for non-atiproto namespaces like{" "}
+            <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+              chat.bsky
+            </code>
+          </li>
+        </ul>
+        <p className="mb-3 text-sm text-text-muted dark:text-text-muted-dark">
+          atiproto also publishes two bundled permission sets (
+          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+            authGeneral
+          </code>{" "}
+          and{" "}
+          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+            authEnhanced
+          </code>
+          ), referenced via{" "}
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
             include:
           </code>{" "}
-          scope strings during OAuth authorization, passing the service audience
-          at invocation time.
-        </p>
-        <p className="mb-3">
-          Both permission sets use{" "}
-          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
-            inheritAud
-          </code>{" "}
-          for their RPC permissions, meaning the audience is provided by the
-          caller rather than hard-coded in the definition.
+          scope strings. They're documented below for completeness, but{" "}
+          <strong>not currently recommended</strong> &mdash; use the explicit
+          scope form instead.
         </p>
       </section>
 
       <section className="mb-10">
         <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
+          Chat Pre-Authorization (Receipts)
+        </AnchorHeading>
+        <p className="mb-4">
+          a<span className="text-primary dark:text-primary-dark">TIP</span>roto
+          delivers payment receipts to users via Bluesky DM. By default, the{" "}
+          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+            Agent
+          </code>{" "}
+          pre-authorizes a chat conversation with the atiproto bot account on
+          construction so receipts deliver to the user's inbox instead of
+          landing in the Requests folder, which most users miss.
+        </p>
+        <p className="mb-4">
+          For this to work, your OAuth scope string must grant RPC access to the
+          three{" "}
+          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+            chat.bsky.convo.*
+          </code>{" "}
+          methods the agent calls, with the audience set to the Bluesky chat
+          service. Without these scopes, the call fails silently (it's
+          fire-and-forget), but the first receipt the user receives will go to
+          Requests rather than their main inbox.
+        </p>
+
+        <AnchorHeading as="h3" className="text-lg font-medium mt-6 mb-3">
+          Required scopes
+        </AnchorHeading>
+        <p className="mb-3">
+          Add these three RPC scopes to your OAuth scope string. The audience
+          DID is URL-encoded (
+          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+            %23
+          </code>{" "}
+          for{" "}
+          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+            #
+          </code>
+          ):
+        </p>
+        <CodeBlock
+          language="text"
+          code={`rpc:chat.bsky.convo.getConvoAvailability?aud=did:web:api.bsky.chat%23bsky_chat
+rpc:chat.bsky.convo.getConvoForMembers?aud=did:web:api.bsky.chat%23bsky_chat
+rpc:chat.bsky.convo.acceptConvo?aud=did:web:api.bsky.chat%23bsky_chat`}
+        />
+        <p className="mt-3 mb-3">Each maps to one call the agent makes:</p>
+        <ul className="list-disc pl-6 space-y-1 mb-4">
+          <li>
+            <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+              getConvoAvailability
+            </code>{" "}
+            &mdash; skip if already accepted or chat disabled
+          </li>
+          <li>
+            <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+              getConvoForMembers
+            </code>{" "}
+            &mdash; resolve / create the convo
+          </li>
+          <li>
+            <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+              acceptConvo
+            </code>{" "}
+            &mdash; flip from <em>request</em> to <em>accepted</em>
+          </li>
+        </ul>
+
+        <AnchorHeading as="h3" className="text-lg font-medium mt-6 mb-3">
+          Opting out
+        </AnchorHeading>
+        <p className="mb-3">
+          If you don't want this behavior, pass{" "}
+          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+            prepChat: false
+          </code>{" "}
+          when constructing the agent and the chat scopes can be omitted from
+          your OAuth scope string:
+        </p>
+        <CodeBlock
+          code={`const paymentAgent = new TipAgent(bskyAgent, { prepChat: false });`}
+        />
+      </section>
+
+      <section className="mb-10">
+        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
+          Per-Call Scope Mapping
+        </AnchorHeading>
+        <p className="mb-3">
+          Every XRPC call requires its own{" "}
+          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+            rpc:
+          </code>{" "}
+          scope. Procedures that write to the user's PDS via the workflow
+          interpreter additionally require{" "}
+          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+            repo:
+          </code>{" "}
+          scopes for the collections they touch.
+        </p>
+
+        <AnchorHeading as="h3" className="text-lg font-medium mt-6 mb-3">
+          Example: creating a payment
+        </AnchorHeading>
+        <p className="mb-3">
+          Calling{" "}
+          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+            com.atiproto.payment.item.create
+          </code>{" "}
+          drives the agent through a workflow that creates a{" "}
+          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+            com.atiproto.item
+          </code>{" "}
+          record, then a{" "}
+          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+            com.atiproto.cart
+          </code>{" "}
+          record. The minimum scopes are:
+        </p>
+        <CodeBlock
+          language="text"
+          code={`atproto
+repo:com.atiproto.item
+repo:com.atiproto.cart
+rpc:com.atiproto.payment.item.create?aud=*`}
+        />
+        <p className="mt-3 text-sm text-text-muted dark:text-text-muted-dark">
+          Use{" "}
+          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+            aud=*
+          </code>{" "}
+          for atiproto RPC methods &mdash; the proxy header sets the actual
+          audience at request time, so a wildcard scope is sufficient and works
+          across environments.
+        </p>
+      </section>
+
+      <section className="mb-10">
+        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
+          OAuth Client Example
+        </AnchorHeading>
+        <p className="mb-3">
+          A typical client building scopes from collections-it-writes and
+          methods-it-calls:
+        </p>
+        <CodeBlock
+          code={`const REPO_COLLECTIONS = [
+  "com.atiproto.cart",
+  "com.atiproto.item",
+  "com.atiproto.subscription",
+];
+
+const RPC_METHODS = [
+  "com.atiproto.payment.cart.create",
+  "com.atiproto.payment.cart.get",
+  "com.atiproto.payment.item.create",
+  "com.atiproto.payment.subscription.create",
+  // ...add the methods your app calls
+];
+
+const CHAT_METHODS = [
+  "chat.bsky.convo.getConvoAvailability",
+  "chat.bsky.convo.getConvoForMembers",
+  "chat.bsky.convo.acceptConvo",
+];
+const CHAT_AUD = "did:web:api.bsky.chat%23bsky_chat";
+
+const scope = [
+  "atproto",
+  ...REPO_COLLECTIONS.map((c) => \`repo:\${c}\`),
+  ...RPC_METHODS.map((m) => \`rpc:\${m}?aud=*\`),
+  ...CHAT_METHODS.map((m) => \`rpc:\${m}?aud=\${CHAT_AUD}\`),
+].join(" ");
+
+const url = await oauthClient.authorize(handle, { scope });`}
+        />
+      </section>
+
+      <section className="mb-10">
+        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
+          Legacy: Permission Sets
+        </AnchorHeading>
+        <p className="mb-3 text-sm text-text-muted dark:text-text-muted-dark">
+          atiproto publishes two bundled permission sets via the lexicon. These
+          remain documented for completeness but are{" "}
+          <strong>not currently recommended</strong> &mdash; prefer the explicit
+          per-call scope form above.
+        </p>
+
+        <AnchorHeading as="h3" className="text-lg font-medium mt-6 mb-3">
           General Access
         </AnchorHeading>
         <p className="mb-1 font-mono text-sm text-text-muted dark:text-text-muted-dark">
@@ -48,10 +280,7 @@ export default function PermissionSets() {
           write access to the user's profile record or access to profile
           management endpoints.
         </p>
-
-        <AnchorHeading as="h3" className="text-lg font-medium mt-6 mb-3">
-          Repo write
-        </AnchorHeading>
+        <p className="font-medium mb-2">Repo write</p>
         <ul className="list-disc pl-6 space-y-1 mb-4">
           <li>
             <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
@@ -69,10 +298,7 @@ export default function PermissionSets() {
             </code>
           </li>
         </ul>
-
-        <AnchorHeading as="h3" className="text-lg font-medium mt-6 mb-3">
-          RPC access
-        </AnchorHeading>
+        <p className="font-medium mb-2">RPC access</p>
         <ul className="list-disc pl-6 space-y-1 mb-4">
           <li>
             <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
@@ -105,18 +331,12 @@ export default function PermissionSets() {
             &mdash; search, validate
           </li>
         </ul>
-
-        <AnchorHeading as="h3" className="text-lg font-medium mt-6 mb-3">
-          Usage
-        </AnchorHeading>
         <CodeBlock
           language="text"
           code="include:com.atiproto.authGeneral?aud=did:web:atiproto.com"
         />
-      </section>
 
-      <section className="mb-10">
-        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
+        <AnchorHeading as="h3" className="text-lg font-medium mt-8 mb-3">
           Enhanced Access
         </AnchorHeading>
         <p className="mb-1 font-mono text-sm text-text-muted dark:text-text-muted-dark">
@@ -127,10 +347,9 @@ export default function PermissionSets() {
           access to the profile record and RPC access to all profile management
           endpoints.
         </p>
-
-        <AnchorHeading as="h3" className="text-lg font-medium mt-6 mb-3">
+        <p className="font-medium mb-2">
           Additional repo write (beyond General)
-        </AnchorHeading>
+        </p>
         <ul className="list-disc pl-6 space-y-1 mb-4">
           <li>
             <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
@@ -138,10 +357,9 @@ export default function PermissionSets() {
             </code>
           </li>
         </ul>
-
-        <AnchorHeading as="h3" className="text-lg font-medium mt-6 mb-3">
+        <p className="font-medium mb-2">
           Additional RPC access (beyond General)
-        </AnchorHeading>
+        </p>
         <ul className="list-disc pl-6 space-y-1 mb-4">
           <li>
             <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
@@ -156,44 +374,10 @@ export default function PermissionSets() {
             &mdash; update profile settings
           </li>
         </ul>
-
-        <AnchorHeading as="h3" className="text-lg font-medium mt-6 mb-3">
-          Usage
-        </AnchorHeading>
         <CodeBlock
           language="text"
           code="include:com.atiproto.authEnhanced?aud=did:web:atiproto.com"
         />
-      </section>
-
-      <section className="mb-10">
-        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
-          OAuth Client Example
-        </AnchorHeading>
-        <p className="mb-3">
-          Request a permission set as part of an OAuth scope string:
-        </p>
-        <CodeBlock
-          code={`const url = await oauthClient.authorize(handle, {
-  scope: "atproto transition:generic include:com.atiproto.authGeneral?aud=did:web:atiproto.com",
-});`}
-        />
-      </section>
-
-      <section>
-        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
-          Choosing a Permission Set
-        </AnchorHeading>
-        <p className="mb-3">
-          Use <strong>General Access</strong> when your application only needs
-          to create payments, subscriptions, and carts, and look up public profiles.
-          This is the right choice for most integrations.
-        </p>
-        <p className="mb-3">
-          Use <strong>Enhanced Access</strong> when your application also needs
-          to manage the user's atiproto profile settings (e.g. toggling whether
-          they accept payments or subscriptions).
-        </p>
       </section>
     </div>
   );
