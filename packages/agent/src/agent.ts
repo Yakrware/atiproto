@@ -69,15 +69,16 @@ export interface AgentOptions {
    * in the user's Requests folder. Runs in the background on construction
    * via the user's authed agent — fire-and-forget; failures are swallowed.
    *
-   * - `true` (default): pre-authorize a convo with the atiproto bsky bot.
-   * - `false`: skip entirely.
+   * - `false` (default): skip entirely.
+   * - `true`: pre-authorize a convo with the atiproto bsky bot.
    * - `string` / `string[]`: pre-authorize with these specific bot DIDs.
    *
-   * Only runs when the underlying client is an `@atproto/api` Agent (needs
-   * `withProxy` and the `chat.bsky.convo.*` namespace). Plain XrpcClient
-   * agents — used in tests — silently skip.
+   * Requires the user's OAuth scope to grant `rpc:chat.bsky.convo.*` on the
+   * Bluesky chat audience. Only runs when the underlying client is an
+   * `@atproto/api` Agent (needs `withProxy` and the `chat.bsky.convo.*`
+   * namespace). Plain XrpcClient agents — used in tests — silently skip.
    */
-  prepChat?: PrepChatOption;
+  prepChatReceipts?: PrepChatOption;
 }
 
 /**
@@ -122,7 +123,7 @@ export class Agent<TClient extends XrpcClient = ApiAgent> extends XrpcClient {
     options: SessionManager | XrpcClient | FetchHandler | FetchHandlerOptions,
     {
       maxWorkflowSteps = DEFAULT_MAX_WORKFLOW_STEPS,
-      prepChat: prepChatOpt = true,
+      prepChatReceipts: prepChatOpt = false,
     }: AgentOptions = {},
   ) {
     const client =

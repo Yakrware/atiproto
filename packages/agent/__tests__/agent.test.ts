@@ -113,10 +113,10 @@ describe("Agent", () => {
 
       vi.spyOn(atpAgent, "withProxy").mockReturnValue(proxied);
 
-      // `prepChat: false` keeps construction from calling withProxy a second
-      // time for the bsky_chat namespace — which our mock would route back
-      // through `proxied`, double-counting the spy.
-      const agent = new Agent(atpAgent, { prepChat: false });
+      // Default `prepChatReceipts: false` keeps construction from calling
+      // withProxy a second time for the bsky_chat namespace — which our mock
+      // would route back through `proxied`, double-counting the spy.
+      const agent = new Agent(atpAgent);
 
       await agent.fetchHandler("/xrpc/test", {
         method: "GET",
