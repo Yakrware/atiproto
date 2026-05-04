@@ -84,13 +84,18 @@ export default function PermissionSets() {
         </AnchorHeading>
         <p className="mb-4">
           a<span className="text-primary dark:text-primary-dark">TIP</span>roto
-          delivers payment receipts to users via Bluesky DM. By default, the{" "}
+          delivers payment receipts to users via Bluesky DM. The{" "}
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
             Agent
           </code>{" "}
-          pre-authorizes a chat conversation with the atiproto bot account on
+          can pre-authorize a chat conversation with the atiproto bot account on
           construction so receipts deliver to the user's inbox instead of
-          landing in the Requests folder, which most users miss.
+          landing in the Requests folder, which most users miss. Opt in by
+          passing{" "}
+          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+            prepChatReceipts: true
+          </code>
+          .
         </p>
         <p className="mb-4">
           For this to work, your OAuth scope string must grant RPC access to the
@@ -148,18 +153,18 @@ rpc:chat.bsky.convo.acceptConvo?aud=did:web:api.bsky.chat%23bsky_chat`}
         </ul>
 
         <AnchorHeading as="h3" className="text-lg font-medium mt-6 mb-3">
-          Opting out
+          Opting in
         </AnchorHeading>
         <p className="mb-3">
-          If you don't want this behavior, pass{" "}
+          The behavior is off by default. Pass{" "}
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
-            prepChat: false
+            prepChatReceipts: true
           </code>{" "}
-          when constructing the agent and the chat scopes can be omitted from
-          your OAuth scope string:
+          when constructing the agent and add the chat scopes to your OAuth
+          scope string:
         </p>
         <CodeBlock
-          code={`const paymentAgent = new TipAgent(bskyAgent, { prepChat: false });`}
+          code={`const paymentAgent = new TipAgent(bskyAgent, { prepChatReceipts: true });`}
         />
       </section>
 
