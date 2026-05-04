@@ -1,4 +1,4 @@
-export { Agent, type AgentOptions } from "./agent.js";
+export { Agent, createFetchHandler, type AgentOptions } from "./agent.js";
 export * from "./namespaces/index.js";
 export { prepChatForReceipts, ATIPROTO_BSKY_DID } from "./prep-chat.js";
 export {

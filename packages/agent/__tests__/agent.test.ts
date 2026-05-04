@@ -192,7 +192,7 @@ describe("Agent", () => {
   });
 
   describe("namespace method calls", () => {
-    let agent: Agent;
+    let agent: Agent<XrpcClient>;
 
     beforeEach(() => {
       const client = createMockClient();

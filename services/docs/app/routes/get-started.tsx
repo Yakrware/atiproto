@@ -84,7 +84,7 @@ const profile = await paymentAgent.com.atiproto.recipient.profile.get();`}
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
             prepChatForReceipts
           </code>{" "}
-          helper once after login. It requires three explicit RPC scopes on{" "}
+          helper once after login. It requires four explicit RPC scopes on{" "}
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
             chat.bsky.convo.*
           </code>{" "}

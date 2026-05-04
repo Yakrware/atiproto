@@ -29,16 +29,29 @@ const SERVICE_TYPE = "payments";
 
 const DEFAULT_MAX_WORKFLOW_STEPS = 10;
 
-function createFetchHandler(client: XrpcClient): FetchHandler {
+/**
+ * Build a FetchHandler that routes requests to a given audience via the
+ * `atproto-proxy` header. When the underlying client is an `@atproto/api`
+ * Agent we use its `withProxy` clone (so labelers + auth headers compose
+ * correctly); otherwise we inject the header by hand.
+ *
+ * Exported so other packages — and `prepChatForReceipts` — can build
+ * audience-pinned handlers from any `XrpcClient`.
+ */
+export function createFetchHandler(
+  client: XrpcClient,
+  serviceType: string,
+  serviceDid: string,
+): FetchHandler {
   if (client instanceof ApiAgent) {
-    const proxied = client.withProxy(SERVICE_TYPE, SERVICE_DID);
+    const proxied = client.withProxy(serviceType, serviceDid);
     return (url, init) => proxied.fetchHandler(url, init);
   }
 
   return (url, init) => {
     const headers = new Headers(init?.headers);
     if (!headers.has("atproto-proxy")) {
-      headers.set("atproto-proxy", `${SERVICE_DID}#${SERVICE_TYPE}`);
+      headers.set("atproto-proxy", `${serviceDid}#${serviceType}`);
     }
     return client.fetchHandler(url, { ...init, headers });
   };
@@ -88,7 +101,7 @@ export interface AgentOptions {
  * callers will need a runtime check or non-null assertion. Queries keep
  * `required`: the native fields are always present alongside the workflow.
  */
-export class Agent<TClient extends XrpcClient = ApiAgent> extends XrpcClient {
+class AgentImpl<TClient extends XrpcClient = ApiAgent> extends XrpcClient {
   com: ComNS & ComOf<TClient>;
   private readonly _maxWorkflowSteps: number;
 
@@ -108,7 +121,7 @@ export class Agent<TClient extends XrpcClient = ApiAgent> extends XrpcClient {
     const client =
       options instanceof XrpcClient ? options : new ApiAgent(options);
 
-    super(createFetchHandler(client), schemas);
+    super(createFetchHandler(client, SERVICE_TYPE, SERVICE_DID), schemas);
 
     this._maxWorkflowSteps = maxWorkflowSteps;
     this.com = new ComNS(this, client) as ComNS & ComOf<TClient>;
@@ -207,3 +220,31 @@ export class Agent<TClient extends XrpcClient = ApiAgent> extends XrpcClient {
     return res;
   }
 }
+
+/**
+ * Public instance type. The constructor returns a Proxy that falls through
+ * to the underlying `TClient`, so structurally an `Agent<TClient>` *is* a
+ * `TClient` too — `agent.withProxy(...)`, `agent.chat.bsky.*`, etc. all
+ * work at runtime. The intersection here lets TypeScript accept an
+ * `Agent<ApiAgent>` wherever an `ApiAgent` is required (e.g. when calling
+ * `prepChatForReceipts`).
+ */
+export type Agent<TClient extends XrpcClient = ApiAgent> = AgentImpl<TClient> &
+  TClient;
+
+interface AgentConstructor {
+  new <TClient extends XrpcClient = ApiAgent>(
+    options: TClient,
+    agentOpts?: AgentOptions,
+  ): Agent<TClient>;
+  new (
+    options: SessionManager | FetchHandler | FetchHandlerOptions,
+    agentOpts?: AgentOptions,
+  ): Agent<ApiAgent>;
+  readonly prototype: AgentImpl;
+}
+
+// The runtime value is the implementation class, retyped so callers see
+// `Agent<TClient> & TClient` as the constructed instance type. `instanceof
+// Agent` still works since `Agent === AgentImpl` at runtime.
+export const Agent: AgentConstructor = AgentImpl as unknown as AgentConstructor;
