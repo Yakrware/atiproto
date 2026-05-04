@@ -10,7 +10,6 @@ import {
 } from "@atproto/xrpc";
 import { schemas } from "@atiproto/lexicons";
 import { ComNS } from "./namespaces/com.js";
-import { firePrepChat, type PrepChatOption } from "./prep-chat.js";
 import {
   WORKFLOW_FIELD,
   WorkflowActionFailed,
@@ -62,23 +61,6 @@ export interface AgentOptions {
    * steps (N) for <nsid>")`.
    */
   maxWorkflowSteps?: number;
-
-  /**
-   * Pre-authorize a Bluesky chat conversation with a bot account so its
-   * later DMs (payment receipts, etc.) deliver normally instead of landing
-   * in the user's Requests folder. Runs in the background on construction
-   * via the user's authed agent — fire-and-forget; failures are swallowed.
-   *
-   * - `false` (default): skip entirely.
-   * - `true`: pre-authorize a convo with the atiproto bsky bot.
-   * - `string` / `string[]`: pre-authorize with these specific bot DIDs.
-   *
-   * Requires the user's OAuth scope to grant `rpc:chat.bsky.convo.*` on the
-   * Bluesky chat audience. Only runs when the underlying client is an
-   * `@atproto/api` Agent (needs `withProxy` and the `chat.bsky.convo.*`
-   * namespace). Plain XrpcClient agents silently skip.
-   */
-  prepChatReceipts?: PrepChatOption;
 }
 
 /**
@@ -121,10 +103,7 @@ export class Agent<TClient extends XrpcClient = ApiAgent> extends XrpcClient {
   );
   constructor(
     options: SessionManager | XrpcClient | FetchHandler | FetchHandlerOptions,
-    {
-      maxWorkflowSteps = DEFAULT_MAX_WORKFLOW_STEPS,
-      prepChatReceipts: prepChatOpt = false,
-    }: AgentOptions = {},
+    { maxWorkflowSteps = DEFAULT_MAX_WORKFLOW_STEPS }: AgentOptions = {},
   ) {
     const client =
       options instanceof XrpcClient ? options : new ApiAgent(options);
@@ -138,11 +117,6 @@ export class Agent<TClient extends XrpcClient = ApiAgent> extends XrpcClient {
     // `superCall` in scope without promoting them to instance fields.
     const superCall = super.call.bind(this) as XrpcClient["call"];
     this.call = this._call.bind(this, superCall, client);
-
-    // Best-effort chat pre-authorization. Fire-and-forget — failures here
-    // (no session, network blip, chat disabled) shouldn't block construction
-    // or surface to callers.
-    firePrepChat(client, prepChatOpt);
 
     // Root proxy: our own properties take priority, everything else falls
     // through to the underlying client.

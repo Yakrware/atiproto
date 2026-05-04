@@ -1,7 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { Agent as ApiAgent } from "@atproto/api";
-import { Agent } from "../src/agent.js";
-import { prepChat } from "../src/prep-chat.js";
+import { prepChatForReceipts } from "../src/prep-chat.js";
 
 const USER_DID = "did:plc:user";
 const BOT_DID = "did:plc:4x5dcv6u4wlkjcssto7f22nu";
@@ -70,7 +69,7 @@ function authedApiAgent(
   return apiAgent;
 }
 
-describe("prepChat — direct helper", () => {
+describe("prepChatForReceipts", () => {
   it("creates+accepts when no convo exists yet", async () => {
     const { fetchHandler, calls } = scriptedFetch({
       "/xrpc/chat.bsky.convo.getConvoAvailability": async () =>
@@ -91,7 +90,7 @@ describe("prepChat — direct helper", () => {
     });
 
     const apiAgent = authedApiAgent(fetchHandler);
-    await prepChat(apiAgent, [BOT_DID]);
+    await prepChatForReceipts(apiAgent, [BOT_DID]);
 
     expect(calls.map((c) => c.path)).toEqual([
       "/xrpc/chat.bsky.convo.getConvoAvailability",
@@ -119,7 +118,7 @@ describe("prepChat — direct helper", () => {
     });
 
     const apiAgent = authedApiAgent(fetchHandler);
-    await prepChat(apiAgent, [BOT_DID]);
+    await prepChatForReceipts(apiAgent, [BOT_DID]);
 
     expect(calls.map((c) => c.path)).toEqual([
       "/xrpc/chat.bsky.convo.getConvoAvailability",
@@ -133,7 +132,7 @@ describe("prepChat — direct helper", () => {
     });
 
     const apiAgent = authedApiAgent(fetchHandler);
-    await prepChat(apiAgent, [BOT_DID]);
+    await prepChatForReceipts(apiAgent, [BOT_DID]);
 
     expect(calls).toHaveLength(1);
     expect(calls[0].path).toBe("/xrpc/chat.bsky.convo.getConvoAvailability");
@@ -142,7 +141,7 @@ describe("prepChat — direct helper", () => {
   it("no-ops on empty members list", async () => {
     const { fetchHandler, calls } = scriptedFetch({});
     const apiAgent = authedApiAgent(fetchHandler);
-    await prepChat(apiAgent, []);
+    await prepChatForReceipts(apiAgent, []);
     expect(calls).toHaveLength(0);
   });
 
@@ -174,87 +173,11 @@ describe("prepChat — direct helper", () => {
     });
 
     const apiAgent = authedApiAgent(fetchHandler);
-    await prepChat(apiAgent, [BOT_DID]);
+    await prepChatForReceipts(apiAgent, [BOT_DID]);
 
     expect(proxyHeaders).toHaveLength(3);
     expect(
       proxyHeaders.every((h) => h === "did:web:api.bsky.chat#bsky_chat"),
     ).toBe(true);
-  });
-});
-
-describe("Agent constructor — prepChatReceipts option", () => {
-  // Helper: capture whether any chat.bsky route was hit. We give construction
-  // a microtask to fire its unawaited promise.
-  async function flushMicrotasks() {
-    await new Promise((r) => setTimeout(r, 10));
-  }
-
-  it("skips by default", async () => {
-    const { fetchHandler, calls } = scriptedFetch({
-      "/xrpc/chat.bsky.convo.getConvoAvailability": async () =>
-        jsonRes({ canChat: true }),
-    });
-    const apiAgent = authedApiAgent(fetchHandler);
-    new Agent(apiAgent);
-    await flushMicrotasks();
-
-    expect(calls).toHaveLength(0);
-  });
-
-  it("fires with the atiproto bsky bot DID when prepChatReceipts: true", async () => {
-    const { fetchHandler, calls } = scriptedFetch({
-      "/xrpc/chat.bsky.convo.getConvoAvailability": async () =>
-        jsonRes({ canChat: false }),
-    });
-    const apiAgent = authedApiAgent(fetchHandler);
-    new Agent(apiAgent, { prepChatReceipts: true });
-    await flushMicrotasks();
-
-    expect(calls).toHaveLength(1);
-    expect(calls[0].path).toBe("/xrpc/chat.bsky.convo.getConvoAvailability");
-    expect(calls[0].params?.members).toBe(BOT_DID);
-  });
-
-  it("uses a custom DID when prepChatReceipts is a string", async () => {
-    const { fetchHandler, calls } = scriptedFetch({
-      "/xrpc/chat.bsky.convo.getConvoAvailability": async () =>
-        jsonRes({ canChat: false }),
-    });
-    const apiAgent = authedApiAgent(fetchHandler);
-    new Agent(apiAgent, { prepChatReceipts: "did:plc:custom-bot" });
-    await flushMicrotasks();
-
-    expect(calls).toHaveLength(1);
-    expect(calls[0].params?.members).toBe("did:plc:custom-bot");
-  });
-
-  it("accepts an array of DIDs", async () => {
-    const { fetchHandler, calls } = scriptedFetch({
-      "/xrpc/chat.bsky.convo.getConvoAvailability": async () =>
-        jsonRes({ canChat: false }),
-    });
-    const apiAgent = authedApiAgent(fetchHandler);
-    new Agent(apiAgent, {
-      prepChatReceipts: ["did:plc:bot-a", "did:plc:bot-b"],
-    });
-    await flushMicrotasks();
-
-    expect(calls[0].params?.members).toEqual([
-      "did:plc:bot-a",
-      "did:plc:bot-b",
-    ]);
-  });
-
-  it("does not throw when prep fails (e.g. network error)", async () => {
-    const fetchHandler = vi.fn(async () => {
-      throw new Error("network exploded");
-    });
-    const apiAgent = authedApiAgent(fetchHandler);
-    expect(() => new Agent(apiAgent, { prepChatReceipts: true })).not.toThrow();
-    await flushMicrotasks();
-    // No assertion on call count — fetch might or might not have been
-    // dispatched depending on internal scheduling. The assertion is just
-    // that construction doesn't surface the failure.
   });
 });
