@@ -84,18 +84,15 @@ export default function PermissionSets() {
         </AnchorHeading>
         <p className="mb-4">
           a<span className="text-primary dark:text-primary-dark">TIP</span>roto
-          delivers payment receipts to users via Bluesky DM. The{" "}
+          delivers payment receipts to users via Bluesky DM. The package exports
+          a{" "}
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
-            Agent
+            prepChatForReceipts
           </code>{" "}
-          can pre-authorize a chat conversation with the atiproto bot account on
-          construction so receipts deliver to the user's inbox instead of
-          landing in the Requests folder, which most users miss. Opt in by
-          passing{" "}
-          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
-            prepChatReceipts: true
-          </code>
-          .
+          helper that pre-authorizes a chat conversation with the atiproto bot
+          account so receipts deliver to the user's inbox instead of landing in
+          the Requests folder, which most users miss. Call it once on login (or
+          whenever you have a freshly authenticated session).
         </p>
         <p className="mb-4">
           For this to work, your OAuth scope string must grant RPC access to the
@@ -103,10 +100,9 @@ export default function PermissionSets() {
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
             chat.bsky.convo.*
           </code>{" "}
-          methods the agent calls, with the audience set to the Bluesky chat
-          service. Without these scopes, the call fails silently (it's
-          fire-and-forget), but the first receipt the user receives will go to
-          Requests rather than their main inbox.
+          methods the helper calls, with the audience set to the Bluesky chat
+          service. Without these scopes, the call fails — callers typically want
+          to fire-and-forget and swallow the rejection.
         </p>
 
         <AnchorHeading as="h3" className="text-lg font-medium mt-6 mb-3">
@@ -130,7 +126,7 @@ export default function PermissionSets() {
 rpc:chat.bsky.convo.getConvoForMembers?aud=did:web:api.bsky.chat%23bsky_chat
 rpc:chat.bsky.convo.acceptConvo?aud=did:web:api.bsky.chat%23bsky_chat`}
         />
-        <p className="mt-3 mb-3">Each maps to one call the agent makes:</p>
+        <p className="mt-3 mb-3">Each maps to one call the helper makes:</p>
         <ul className="list-disc pl-6 space-y-1 mb-4">
           <li>
             <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
@@ -153,18 +149,33 @@ rpc:chat.bsky.convo.acceptConvo?aud=did:web:api.bsky.chat%23bsky_chat`}
         </ul>
 
         <AnchorHeading as="h3" className="text-lg font-medium mt-6 mb-3">
-          Opting in
+          Usage
         </AnchorHeading>
         <p className="mb-3">
-          The behavior is off by default. Pass{" "}
+          Call{" "}
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
-            prepChatReceipts: true
+            prepChatForReceipts
           </code>{" "}
-          when constructing the agent and add the chat scopes to your OAuth
-          scope string:
+          on the user's authenticated{" "}
+          <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+            @atproto/api
+          </code>{" "}
+          Agent &mdash; typically once per session, right after OAuth completes.
+          Fire-and-forget; failures (no scope, network blip, chat disabled)
+          shouldn't block the login flow:
         </p>
         <CodeBlock
-          code={`const paymentAgent = new TipAgent(bskyAgent, { prepChatReceipts: true });`}
+          code={`import { Agent as BskyAgent } from "@atproto/api";
+import {
+  prepChatForReceipts,
+  ATIPROTO_BSKY_DID,
+} from "@atiproto/agent";
+
+const bskyAgent = new BskyAgent(oauthSession);
+
+void prepChatForReceipts(bskyAgent, [ATIPROTO_BSKY_DID]).catch(() => {
+  // best-effort — swallow
+});`}
         />
       </section>
 

@@ -52,9 +52,6 @@ function buildAgent(
 ) {
   // Build an authed ApiAgent so writes route correctly. We don't drive a real
   // OAuth login — the tests rely on the server populating `repo` per action.
-  // Default `prepChatReceipts: false` keeps the workflow tests focused on the
-  // workflow path — the chat pre-auth flow has its own coverage in
-  // prep-chat.test.ts.
   const apiAgent = new ApiAgent(fetchHandler);
   return new Agent(apiAgent, opts);
 }

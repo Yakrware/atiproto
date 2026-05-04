@@ -79,13 +79,12 @@ const paymentAgent = new TipAgent(bskyAgent);
 const profile = await paymentAgent.com.atiproto.recipient.profile.get();`}
         />
         <p className="mt-3 text-sm text-text-muted dark:text-text-muted-dark">
-          The agent can also pre-authorize a Bluesky chat conversation with the
-          atiproto bot so payment receipts deliver to the user's inbox instead
-          of their Requests folder. Opt in by passing{" "}
+          To deliver payment receipts to the user's Bluesky inbox instead of
+          their Requests folder, call the exported{" "}
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
-            prepChatReceipts: true
+            prepChatForReceipts
           </code>{" "}
-          and granting three explicit RPC scopes on{" "}
+          helper once after login. It requires three explicit RPC scopes on{" "}
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
             chat.bsky.convo.*
           </code>{" "}
