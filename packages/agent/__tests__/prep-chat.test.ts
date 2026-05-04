@@ -1,6 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
 import { Agent as ApiAgent } from "@atproto/api";
-import { prepChatForReceipts } from "../src/prep-chat.js";
+import { Lexicons } from "@atproto/lexicon";
+import { XrpcClient } from "@atproto/xrpc";
+import { Agent } from "../src/agent.js";
+import { ATIPROTO_BSKY_DID, prepChatForReceipts } from "../src/prep-chat.js";
 
 const USER_DID = "did:plc:user";
 const BOT_DID = "did:plc:4x5dcv6u4wlkjcssto7f22nu";
@@ -70,7 +73,7 @@ function authedApiAgent(
 }
 
 describe("prepChatForReceipts", () => {
-  it("creates+accepts when no convo exists yet", async () => {
+  it("creates+accepts+confirms when no convo exists yet", async () => {
     const { fetchHandler, calls } = scriptedFetch({
       "/xrpc/chat.bsky.convo.getConvoAvailability": async () =>
         jsonRes({ canChat: true }),
@@ -87,6 +90,15 @@ describe("prepChatForReceipts", () => {
           },
         }),
       "/xrpc/chat.bsky.convo.acceptConvo": async () => jsonRes({}),
+      "/xrpc/chat.bsky.convo.sendMessage": async () =>
+        jsonRes({
+          $type: "chat.bsky.convo.defs#messageView",
+          id: "msg-1",
+          rev: "rev2",
+          text: "I will receive receipts in this chat",
+          sender: { did: USER_DID },
+          sentAt: "2024-01-01T00:00:00Z",
+        }),
     });
 
     const apiAgent = authedApiAgent(fetchHandler);
@@ -96,8 +108,14 @@ describe("prepChatForReceipts", () => {
       "/xrpc/chat.bsky.convo.getConvoAvailability",
       "/xrpc/chat.bsky.convo.getConvoForMembers",
       "/xrpc/chat.bsky.convo.acceptConvo",
+      "/xrpc/chat.bsky.convo.sendMessage",
     ]);
     expect(calls[2].body).toEqual({ convoId: "convo-123" });
+    // The confirmation message makes the convo bidirectionally accepted.
+    expect(calls[3].body).toEqual({
+      convoId: "convo-123",
+      message: { text: "I will receive receipts in this chat" },
+    });
   });
 
   it("skips when convo is already accepted", async () => {
@@ -164,20 +182,61 @@ describe("prepChatForReceipts", () => {
             unreadCount: 0,
           },
         });
+      if (path.endsWith("sendMessage"))
+        return jsonRes({
+          $type: "chat.bsky.convo.defs#messageView",
+          id: "msg-1",
+          rev: "rev2",
+          text: "I will receive receipts in this chat",
+          sender: { did: USER_DID },
+          sentAt: "2024-01-01T00:00:00Z",
+        });
       return jsonRes({});
     };
     const { fetchHandler } = scriptedFetch({
       "/xrpc/chat.bsky.convo.getConvoAvailability": captureProxy,
       "/xrpc/chat.bsky.convo.getConvoForMembers": captureProxy,
       "/xrpc/chat.bsky.convo.acceptConvo": captureProxy,
+      "/xrpc/chat.bsky.convo.sendMessage": captureProxy,
     });
 
     const apiAgent = authedApiAgent(fetchHandler);
     await prepChatForReceipts(apiAgent, [BOT_DID]);
 
-    expect(proxyHeaders).toHaveLength(3);
+    expect(proxyHeaders).toHaveLength(4);
     expect(
       proxyHeaders.every((h) => h === "did:web:api.bsky.chat#bsky_chat"),
     ).toBe(true);
+  });
+
+  it("accepts an @atiproto/agent Agent<ApiAgent> as the client", async () => {
+    const { fetchHandler, calls } = scriptedFetch({
+      "/xrpc/chat.bsky.convo.getConvoAvailability": async () =>
+        jsonRes({ canChat: false }),
+    });
+    const apiAgent = authedApiAgent(fetchHandler);
+    const wrapped = new Agent(apiAgent);
+
+    await prepChatForReceipts(wrapped, [ATIPROTO_BSKY_DID]);
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0].path).toBe("/xrpc/chat.bsky.convo.getConvoAvailability");
+  });
+
+  it("accepts a raw XrpcClient as the client (header injection path)", async () => {
+    const proxyHeaders: string[] = [];
+    const { fetchHandler, calls } = scriptedFetch({
+      "/xrpc/chat.bsky.convo.getConvoAvailability": async (req) => {
+        const proxy = req.headers.get("atproto-proxy");
+        if (proxy) proxyHeaders.push(proxy);
+        return jsonRes({ canChat: false });
+      },
+    });
+    const raw = new XrpcClient(fetchHandler, new Lexicons());
+
+    await prepChatForReceipts(raw, [ATIPROTO_BSKY_DID]);
+
+    expect(calls).toHaveLength(1);
+    expect(proxyHeaders).toEqual(["did:web:api.bsky.chat#bsky_chat"]);
   });
 });

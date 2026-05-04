@@ -1,4 +1,6 @@
-import type { Agent as ApiAgent } from "@atproto/api";
+import { Agent as ApiAgent } from "@atproto/api";
+import type { XrpcClient } from "@atproto/xrpc";
+import { createFetchHandler } from "./agent.js";
 
 const BSKY_CHAT_SERVICE_DID = "did:web:api.bsky.chat";
 const BSKY_CHAT_SERVICE_TYPE = "bsky_chat";
@@ -33,12 +35,17 @@ export const ATIPROTO_BSKY_DID = "did:plc:4x5dcv6u4wlkjcssto7f22nu";
  *   void prepChatForReceipts(bskyAgent, [ATIPROTO_BSKY_DID]).catch(() => {});
  */
 export async function prepChatForReceipts(
-  client: ApiAgent,
+  client: XrpcClient,
   members: string[],
 ): Promise<void> {
   if (members.length === 0) return;
 
-  const chat = client.withProxy(BSKY_CHAT_SERVICE_TYPE, BSKY_CHAT_SERVICE_DID);
+  const fetchHandler = createFetchHandler(
+    client,
+    BSKY_CHAT_SERVICE_TYPE,
+    BSKY_CHAT_SERVICE_DID,
+  );
+  const chat = new ApiAgent(fetchHandler);
 
   const avail = await chat.chat.bsky.convo.getConvoAvailability({
     members,
@@ -55,5 +62,15 @@ export async function prepChatForReceipts(
   const got = await chat.chat.bsky.convo.getConvoForMembers({
     members,
   });
-  await chat.chat.bsky.convo.acceptConvo({ convoId: got.data.convo.id });
+  const convoId = got.data.convo.id;
+  await chat.chat.bsky.convo.acceptConvo({ convoId });
+  // acceptConvo alone moves the convo out of *this user's* Requests folder,
+  // but the convo isn't bidirectionally accepted until they actually post a
+  // message in it. Without this step the bot's later DMs can still land in
+  // Requests on the bot side or fail to deliver. Sending an explicit
+  // confirmation message closes the loop.
+  await chat.chat.bsky.convo.sendMessage({
+    convoId,
+    message: { text: "I will receive receipts in this chat" },
+  });
 }

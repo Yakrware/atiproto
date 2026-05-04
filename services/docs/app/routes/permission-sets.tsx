@@ -96,7 +96,7 @@ export default function PermissionSets() {
         </p>
         <p className="mb-4">
           For this to work, your OAuth scope string must grant RPC access to the
-          three{" "}
+          four{" "}
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
             chat.bsky.convo.*
           </code>{" "}
@@ -109,8 +109,8 @@ export default function PermissionSets() {
           Required scopes
         </AnchorHeading>
         <p className="mb-3">
-          Add these three RPC scopes to your OAuth scope string. The audience
-          DID is URL-encoded (
+          Add these four RPC scopes to your OAuth scope string. The audience DID
+          is URL-encoded (
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
             %23
           </code>{" "}
@@ -124,7 +124,8 @@ export default function PermissionSets() {
           language="text"
           code={`rpc:chat.bsky.convo.getConvoAvailability?aud=did:web:api.bsky.chat%23bsky_chat
 rpc:chat.bsky.convo.getConvoForMembers?aud=did:web:api.bsky.chat%23bsky_chat
-rpc:chat.bsky.convo.acceptConvo?aud=did:web:api.bsky.chat%23bsky_chat`}
+rpc:chat.bsky.convo.acceptConvo?aud=did:web:api.bsky.chat%23bsky_chat
+rpc:chat.bsky.convo.sendMessage?aud=did:web:api.bsky.chat%23bsky_chat`}
         />
         <p className="mt-3 mb-3">Each maps to one call the helper makes:</p>
         <ul className="list-disc pl-6 space-y-1 mb-4">
@@ -145,6 +146,13 @@ rpc:chat.bsky.convo.acceptConvo?aud=did:web:api.bsky.chat%23bsky_chat`}
               acceptConvo
             </code>{" "}
             &mdash; flip from <em>request</em> to <em>accepted</em>
+          </li>
+          <li>
+            <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+              sendMessage
+            </code>{" "}
+            &mdash; post a confirmation message so the convo is bidirectionally
+            accepted (otherwise later bot DMs may still land in Requests)
           </li>
         </ul>
 
