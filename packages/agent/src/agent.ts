@@ -76,7 +76,7 @@ export interface AgentOptions {
    * Requires the user's OAuth scope to grant `rpc:chat.bsky.convo.*` on the
    * Bluesky chat audience. Only runs when the underlying client is an
    * `@atproto/api` Agent (needs `withProxy` and the `chat.bsky.convo.*`
-   * namespace). Plain XrpcClient agents — used in tests — silently skip.
+   * namespace). Plain XrpcClient agents silently skip.
    */
   prepChatReceipts?: PrepChatOption;
 }
