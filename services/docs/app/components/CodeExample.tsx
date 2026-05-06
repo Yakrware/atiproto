@@ -36,6 +36,11 @@ function generateSampleValue(
   return '""';
 }
 
+// `workflow` is the agent's interpreter envelope. Callers never set it on
+// input nor see it on `response.data` (the agent strips it). Hide it from
+// generated examples.
+const WORKFLOW_FIELD = "workflow";
+
 function buildObjectLiteral(
   schema: Record<string, unknown>,
   indent: string,
@@ -47,10 +52,11 @@ function buildObjectLiteral(
   const required = (schema.required as string[]) ?? [];
   if (!props) return "{}";
 
-  const keys =
+  const keys = (
     onlyRequired && required.length > 0
       ? required.filter((k) => k in props)
-      : Object.keys(props);
+      : Object.keys(props)
+  ).filter((k) => k !== WORKFLOW_FIELD);
 
   if (keys.length === 0) return "{}";
 
@@ -70,10 +76,11 @@ function buildOutputPreview(
   const required = (schema.required as string[]) ?? [];
   if (!props) return "{ ... }";
 
-  const keys =
+  const keys = (
     required.length > 0
       ? required.filter((k) => k in props)
-      : Object.keys(props).slice(0, 4);
+      : Object.keys(props).slice(0, 4)
+  ).filter((k) => k !== WORKFLOW_FIELD);
 
   if (keys.length === 0) return "{ ... }";
 

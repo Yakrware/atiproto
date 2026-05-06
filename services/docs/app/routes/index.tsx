@@ -9,6 +9,9 @@ import {
 import { Sidebar } from "~/components/Sidebar";
 import { SearchBar } from "~/components/SearchBar";
 import { ThemeToggle } from "~/components/ThemeToggle";
+import { GitHubIcon } from "~/components/icons/GitHubIcon";
+
+const GITHUB_REPO_URL = "https://github.com/Yakrware/atiproto";
 
 export function loader() {
   return {
@@ -68,7 +71,16 @@ export default function DocsLayout({ loaderData }: Route.ComponentProps) {
             <SearchBar searchIndex={searchIndex} version={version} />
           </div>
 
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-1">
+            <a
+              href={GITHUB_REPO_URL}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="p-2 rounded-lg hover:bg-surface-alt dark:hover:bg-surface-alt-dark transition-colors"
+              aria-label="View source on GitHub"
+            >
+              <GitHubIcon className="w-5 h-5" />
+            </a>
             <ThemeToggle />
           </div>
         </div>
