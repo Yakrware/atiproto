@@ -9,6 +9,37 @@ interface LexiconDetailProps {
   };
 }
 
+const WORKFLOW_FIELD = "workflow";
+const AGENT_NOTE_INPUT =
+  "@atiproto/agent fills this in transparently on callbacks — callers don't construct it. Documented for direct-API and non-JS implementers.";
+const AGENT_NOTE_OUTPUT =
+  "@atiproto/agent runs the actions and strips this envelope before returning, so callers only see the native fields. Documented for direct-API and non-JS implementers.";
+
+// Inputs/outputs of orchestrating endpoints carry a `workflow` envelope used
+// by the agent's interpreter. We keep the field visible (it's part of the
+// wire protocol — non-JS implementers need it), but amend its description
+// to flag that the @atiproto/agent abstracts it away.
+function annotateWorkflow(
+  schema: Record<string, unknown> | undefined,
+  note: string,
+): Record<string, unknown> | undefined {
+  if (!schema) return schema;
+  const props = schema.properties as
+    | Record<string, Record<string, unknown>>
+    | undefined;
+  if (!props || !(WORKFLOW_FIELD in props)) return schema;
+  const wf = props[WORKFLOW_FIELD];
+  const existing = (wf.description as string | undefined)?.trim();
+  const description = existing ? `${existing} ${note}` : note;
+  return {
+    ...schema,
+    properties: {
+      ...props,
+      [WORKFLOW_FIELD]: { ...wf, description },
+    },
+  };
+}
+
 function TypeBadge({ type }: { type: string }) {
   const colors: Record<string, string> = {
     query: "bg-badge-query text-white",
@@ -32,12 +63,13 @@ export function LexiconDetail({ lexicon }: LexiconDetailProps) {
   const type = mainDef.type as string;
   const description = mainDef.description as string | undefined;
 
-  const inputSchema = (mainDef.input as Record<string, unknown>)?.schema as
+  const rawInputSchema = (mainDef.input as Record<string, unknown>)?.schema as
     | Record<string, unknown>
     | undefined;
-  const outputSchema = (mainDef.output as Record<string, unknown>)?.schema as
-    | Record<string, unknown>
-    | undefined;
+  const rawOutputSchema = (mainDef.output as Record<string, unknown>)
+    ?.schema as Record<string, unknown> | undefined;
+  const inputSchema = annotateWorkflow(rawInputSchema, AGENT_NOTE_INPUT);
+  const outputSchema = annotateWorkflow(rawOutputSchema, AGENT_NOTE_OUTPUT);
   const paramsSchema = mainDef.parameters as
     | Record<string, unknown>
     | undefined;
