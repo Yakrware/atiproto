@@ -4,32 +4,47 @@
   "defs": {
     "main": {
       "type": "query",
-      "description": "List carts created by the authenticated user.",
+      "description": "List carts created by the authenticated user. Supports filtering by recipient subject, a specific record (an item / subscription line, or the subject the line points at), and cart status (cart and broker payment statuses are unified on the cart's `status` field).",
       "parameters": {
         "type": "params",
         "properties": {
           "subject": {
             "type": "string",
             "format": "did",
-            "description": "Optional: only return carts whose items pay this recipient DID"
+            "description": "Optional: only return carts whose items pay this recipient DID."
+          },
+          "record": {
+            "type": "string",
+            "format": "at-uri",
+            "description": "Optional. Pass an at-uri to a specific record (an item / subscription line, a post, a feed, etc.) or `at://did:plc:...` (a repo-level at-uri) to match by user DID. Matches when the cart has a line item with this strongRef in `items[*]`, or when the at-uri equals the `subject` of any line item."
           },
           "status": {
             "type": "string",
             "maxLength": 64,
-            "enum": ["open", "completed", "expired", "abandoned"],
-            "description": "Filter by cart status"
+            "knownValues": [
+              "open",
+              "expired",
+              "abandoned",
+              "pending",
+              "completed",
+              "failed",
+              "refunded",
+              "cancelled",
+              "fulfilled"
+            ],
+            "description": "Filter by cart status. Accepts cart-lifecycle values (open / expired / abandoned / fulfilled) or broker-payment-snapshot values (pending / completed / failed / refunded / cancelled)."
           },
           "cursor": {
             "type": "string",
             "maxLength": 512,
-            "description": "Pagination cursor"
+            "description": "Pagination cursor."
           },
           "limit": {
             "type": "integer",
             "default": 20,
             "minimum": 1,
             "maximum": 100,
-            "description": "Results per page (1-100, default: 20)"
+            "description": "Results per page (1-100, default: 20)."
           }
         }
       },
@@ -37,41 +52,21 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
+          "required": ["carts"],
           "properties": {
             "carts": {
               "type": "array",
               "items": {
                 "type": "ref",
-                "ref": "#cartResponse"
+                "ref": "com.atiproto.cart#view"
               }
             },
             "cursor": {
               "type": "string",
               "maxLength": 512,
-              "description": "Pagination cursor for next page"
+              "description": "Pagination cursor for next page."
             }
-          },
-          "required": ["carts"]
-        }
-      }
-    },
-    "cartResponse": {
-      "type": "object",
-      "required": ["uri", "cid", "record"],
-      "properties": {
-        "uri": {
-          "type": "string",
-          "format": "at-uri",
-          "description": "AT-URI of the cart record"
-        },
-        "cid": {
-          "type": "string",
-          "format": "cid",
-          "description": "CID of the cart record"
-        },
-        "record": {
-          "type": "ref",
-          "ref": "com.atiproto.cart#view"
+          }
         }
       }
     }

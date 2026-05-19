@@ -4,37 +4,58 @@
   "defs": {
     "main": {
       "type": "query",
-      "description": "Get the authenticated user's profile settings. Returns defaults if no profile exists.",
+      "description": "Get the authenticated user's payment profile. Returns defaults when no profile is configured. `acceptingPayments` on the profile view reflects server-derived readiness from the user's broker list. When called against a broker, the response also includes a `broker` block with the broker DID, this user's account status with that broker, and a fresh onboarding link.",
       "output": {
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": ["profile", "hasProfile", "readyForPayment"],
+          "required": ["profile", "hasProfile"],
           "properties": {
-            "uri": {
-              "type": "string",
-              "format": "at-uri",
-              "description": "Profile record URI (absent if no profile configured)"
-            },
-            "cid": {
-              "type": "string",
-              "format": "cid",
-              "description": "Profile record CID (absent if no profile configured)"
-            },
             "profile": {
               "type": "ref",
               "ref": "com.atiproto.profile#view",
-              "description": "The profile record data (defaults if not configured)"
+              "description": "The profile view (defaults applied when no profile record exists)."
             },
             "hasProfile": {
               "type": "boolean",
-              "description": "Whether the user has saved a profile record"
+              "description": "Whether the user has saved a profile record."
             },
-            "readyForPayment": {
-              "type": "boolean",
-              "description": "Whether the user's payment account is set up and enabled"
+            "broker": {
+              "type": "ref",
+              "ref": "#brokerView",
+              "description": "Present only when the responder is a broker. Carries the broker DID, the authed user's account status with this broker, and an onboarding link the client can redirect to."
             }
           }
+        }
+      }
+    },
+    "brokerView": {
+      "type": "object",
+      "description": "Broker-side view of the authed user's account. Returned only when `recipient.profile.get` is called on a broker (rather than a PoS).",
+      "required": ["did", "status"],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did",
+          "description": "DID of the broker answering the request."
+        },
+        "status": {
+          "type": "string",
+          "maxLength": 64,
+          "knownValues": [
+            "none",
+            "pending",
+            "needs_info",
+            "ready",
+            "restricted",
+            "disabled"
+          ],
+          "description": "Broker-defined onboarding state for the authed user. `ready` means the user can receive payouts; the other values indicate where onboarding is and whether action is needed."
+        },
+        "onboardingUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "Optional. Fresh broker-hosted onboarding link. Clients should redirect the user here to complete (or update) their account."
         }
       }
     }

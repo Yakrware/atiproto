@@ -1,0 +1,37 @@
+{
+  "lexicon": 1,
+  "id": "network.attested.proof",
+  "description": "Remote attestation proof record per the badge.blue scheme. Stored independently in the issuer's repository. Source records reference a proof by appending a `com.atproto.repo.strongRef` (pointing at this record) to their `signatures` array. The signature is implicit: the issuer's PDS commit covering this record is the attestation.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": ["cid"],
+        "properties": {
+          "cid": {
+            "type": "string",
+            "format": "cid",
+            "description": "CID of the canonical signing payload of the source record being attested (same computation as `network.attested.signature.cid`)."
+          },
+          "status": {
+            "type": "string",
+            "description": "Optional status indicator for the attestation (implementation-defined)."
+          },
+          "issuer": {
+            "type": "string",
+            "format": "did",
+            "description": "Optional. DID of the issuing party. Usually redundant with the repository owner; useful when the record was written by a delegate or when the issuer wants to be explicit."
+          },
+          "role": {
+            "type": "string",
+            "maxLength": 64,
+            "knownValues": ["broker", "pos", "appview", "co-signer"],
+            "description": "Optional. Role under which the issuer attested. Lets verifiers reason about completeness (e.g. require both PoS and AppView attestations on a cart)."
+          }
+        }
+      }
+    }
+  }
+}

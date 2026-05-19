@@ -4,4 +4,3 @@
 
 export * as 'get' from './subscription/get.js'
 export * as list from './subscription/list.js'
-export * as validate from './subscription/validate.js'

@@ -1,133 +1,152 @@
 {
   "lexicon": 1,
   "id": "com.atiproto.cart",
+  "description": "A shopping cart of one-time items and/or subscriptions, payable in one checkout. Signed by the recipient AppView per the network.attested signature scheme. The AppView writes its own cart records directly (no PoS helper required) and signs them so the PoS knows the cart has been validated. When marked as private, `subject` and the line item refs in `items` are absent from the record so a public reader cannot tell who pays whom or what was bought; the issuing PoS retains the hydrated record until shared spaces are available.",
   "defs": {
     "main": {
       "type": "record",
-      "description": "A record representing a shopping cart for items/subscriptions",
       "key": "any",
       "record": {
         "type": "object",
-        "required": [
-          "items",
-          "currency",
-          "total",
-          "status",
-          "createdAt",
-          "expiresAt"
-        ],
+        "required": ["items", "currency", "status"],
         "properties": {
+          "subject": {
+            "type": "string",
+            "format": "did",
+            "description": "DID of the recipient. Absent (null) when marked as private."
+          },
           "items": {
             "type": "array",
             "items": {
               "type": "ref",
-              "ref": "#cartItem"
-            }
+              "ref": "com.atproto.repo.strongRef"
+            },
+            "description": "Cart line items. Each is a strongRef to a `com.atiproto.item` or `com.atiproto.subscription` record (the at-uri's collection segment identifies which). Empty (or absent) when marked as private."
           },
           "currency": {
             "type": "string",
             "maxLength": 3,
-            "description": "ISO 4217 currency code"
+            "description": "ISO 4217 currency code."
           },
           "total": {
             "type": "integer",
-            "description": "Total amount in cents"
+            "description": "Total amount in the smallest unit of `currency`."
           },
           "status": {
             "type": "string",
             "maxLength": 64,
-            "enum": ["open", "completed", "expired", "abandoned"],
-            "description": "Cart status"
+            "knownValues": [
+              "open",
+              "expired",
+              "abandoned",
+              "pending",
+              "completed",
+              "failed",
+              "refunded",
+              "cancelled",
+              "fulfilled"
+            ],
+            "description": "Lifecycle state of the cart. When `payment` is present, the AppView snapshots the broker payment's status here (pending / completed / failed / refunded / cancelled). Before a payment is attached the cart's own lifecycle states apply (open / expired / abandoned). After fulfillment, the AppView (or merchant integration) advances to `fulfilled` to mark delivery. Open to extension via `knownValues` rather than a hard enum."
           },
           "createdAt": {
             "type": "string",
-            "format": "datetime",
-            "description": "Creation timestamp"
+            "format": "datetime"
           },
           "expiresAt": {
             "type": "string",
-            "format": "datetime",
-            "description": "Expiration timestamp"
+            "format": "datetime"
           },
           "completedAt": {
             "type": "string",
-            "format": "datetime",
-            "description": "Completion timestamp"
+            "format": "datetime"
+          },
+          "payment": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef",
+            "description": "StrongRef to the `network.attested.payment` record settling this cart. Set during checkout (or attached after the fact via `payment.cart.put`). Only the PoS can validate this field, so it is not writable via `com.atproto.repo.putRecord`."
+          },
+          "signatures": {
+            "type": "array",
+            "items": {
+              "type": "union",
+              "refs": [
+                "network.attested.signature",
+                "com.atproto.repo.strongRef"
+              ]
+            },
+            "description": "Recipient AppView attestation(s). The AppView writes and updates its own cart records directly and signs them so the PoS can trust the validated state. Each entry is either an inline `network.attested.signature` or a `com.atproto.repo.strongRef` pointing at a remote `network.attested.proof` record. The canonical signing payload covers `items`, `currency`, `status`, plus `subject`, `total`, `createdAt`, `expiresAt`, `completedAt`, and `payment` when present. Mutating any of those fields invalidates every signature in this array."
           }
         }
       }
     },
     "view": {
       "type": "object",
-      "description": "View of a cart record for use in API responses",
-      "required": [
-        "uri",
-        "items",
-        "currency",
-        "total",
-        "status",
-        "createdAt",
-        "expiresAt"
-      ],
+      "description": "Hydrated cart view returned by PoS get endpoints.",
+      "required": ["uri", "items", "currency", "status"],
       "properties": {
         "uri": {
           "type": "string",
-          "format": "at-uri",
-          "description": "AT-URI of the cart record"
+          "format": "at-uri"
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "subject": {
+          "type": "string",
+          "format": "did"
         },
         "items": {
           "type": "array",
           "items": {
             "type": "ref",
-            "ref": "#cartItem"
+            "ref": "com.atproto.repo.strongRef"
           }
         },
         "currency": {
           "type": "string",
-          "maxLength": 3,
-          "description": "ISO 4217 currency code"
+          "maxLength": 3
         },
         "total": {
-          "type": "integer",
-          "description": "Total amount in cents"
+          "type": "integer"
         },
         "status": {
           "type": "string",
           "maxLength": 64,
-          "enum": ["open", "completed", "expired", "abandoned"],
-          "description": "Cart status"
+          "knownValues": [
+            "open",
+            "expired",
+            "abandoned",
+            "pending",
+            "completed",
+            "failed",
+            "refunded",
+            "cancelled",
+            "fulfilled"
+          ]
         },
         "createdAt": {
           "type": "string",
-          "format": "datetime",
-          "description": "Creation timestamp"
+          "format": "datetime"
         },
         "expiresAt": {
           "type": "string",
-          "format": "datetime",
-          "description": "Expiration timestamp"
+          "format": "datetime"
         },
         "completedAt": {
           "type": "string",
-          "format": "datetime",
-          "description": "Completion timestamp"
-        }
-      }
-    },
-    "cartItem": {
-      "type": "object",
-      "required": ["type", "recordUri"],
-      "properties": {
-        "type": {
-          "type": "string",
-          "maxLength": 128,
-          "description": "Type of cart item: item or subscription",
-          "enum": ["com.atiproto.item", "com.atiproto.subscription"]
+          "format": "datetime"
         },
-        "recordUri": {
-          "type": "string",
-          "format": "at-uri",
-          "description": "AT-URI for item on record"
+        "payment": {
+          "type": "ref",
+          "ref": "com.atproto.repo.strongRef"
+        },
+        "signatures": {
+          "type": "array",
+          "items": {
+            "type": "union",
+            "refs": ["network.attested.signature", "com.atproto.repo.strongRef"]
+          }
         }
       }
     }

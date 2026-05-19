@@ -10,7 +10,7 @@ const $nsid = 'com.atiproto.payment.subscription.put'
 
 export { $nsid }
 
-/** Update a pending subscription. Only pending subscriptions can be updated. */
+/** Update a subscription. */
 const main = l.procedure(
   $nsid,
   l.params(),

@@ -4,22 +4,27 @@
   "defs": {
     "main": {
       "type": "procedure",
-      "description": "Create a new empty cart",
+      "description": "Create a new, empty cart on the PoS. The PoS signs the cart record and returns it via the standard workflow envelope so the agent can write the stripped form to the payer's PDS. Distinct from `payment.cart.checkout`: this only builds the cart, no broker is contacted and no `checkoutUrl` is issued.",
       "input": {
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": ["currency"],
+          "required": ["subject", "currency"],
           "properties": {
+            "subject": {
+              "type": "string",
+              "format": "did",
+              "description": "DID of the recipient. Required on create so the PoS knows whom the cart targets. Stripped from the PDS record when private (the default)."
+            },
             "currency": {
               "type": "string",
               "maxLength": 3,
-              "description": "ISO 4217 currency code"
+              "description": "ISO 4217 currency code."
             },
-            "redirectUrl": {
-              "type": "string",
-              "format": "uri",
-              "description": "URI to redirect to after checkout is complete/cancelled"
+            "private": {
+              "type": "boolean",
+              "default": true,
+              "description": "If true (the default), the issued cart record omits `subject` and `items` line item refs so a public reader cannot tell who pays whom or what was bought."
             },
             "workflow": {
               "type": "ref",
@@ -33,26 +38,17 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
+          "required": ["cart"],
           "properties": {
             "workflow": {
               "type": "ref",
               "ref": "com.atiproto.actions#outboundWorkflow",
-              "description": "Workflow envelope. When present, the agent runs the actions and calls back. When absent, this is the final native result."
+              "description": "Workflow envelope. When present, the agent runs the actions (typically a single PDS write of the stripped cart) and calls back. When absent, this is the final native result."
             },
             "cart": {
               "type": "ref",
               "ref": "com.atiproto.cart#view",
-              "description": "The created cart record"
-            },
-            "cartUri": {
-              "type": "string",
-              "format": "at-uri",
-              "description": "URI of the cart record"
-            },
-            "checkoutUrl": {
-              "type": "string",
-              "format": "uri",
-              "description": "Checkout URL hosted by atiproto"
+              "description": "The signed cart view (status: open)."
             }
           }
         }

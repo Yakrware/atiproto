@@ -4,10 +4,15 @@
   "defs": {
     "main": {
       "type": "query",
-      "description": "List subscriptions for the authenticated user",
+      "description": "List subscriptions sent by the authenticated user.",
       "parameters": {
         "type": "params",
         "properties": {
+          "subject": {
+            "type": "string",
+            "format": "at-uri",
+            "description": "Optional. Mirror of the subscription's `subject` union: pass an at-uri to a specific record (e.g. a paid feed) or `at://did:plc:...` (a repo-level at-uri) to match subscriptions whose `subject` is a `#userRef` carrying that DID."
+          },
           "cursor": {
             "type": "string",
             "maxLength": 512,

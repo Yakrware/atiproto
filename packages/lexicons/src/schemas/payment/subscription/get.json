@@ -1,21 +1,20 @@
 {
+  "lexicon": 1,
+  "id": "com.atiproto.payment.subscription.get",
   "defs": {
     "main": {
-      "description": "Get a specific subscription sent by the authenticated user. Looks up by subscription record uri or subject (recipient) DID. These are mutually exclusive; uri takes precedence.",
+      "type": "query",
+      "description": "Hydrate a subscription record by uri. The authenticated user must be the sender. Search filters that were previously on this endpoint live on `payment.subscription.list`.",
       "parameters": {
+        "type": "params",
+        "required": ["uri"],
         "properties": {
           "uri": {
-            "description": "AT-URI of the subscription record. Takes precedence over subject.",
+            "type": "string",
             "format": "at-uri",
-            "type": "string"
-          },
-          "subject": {
-            "description": "DID of the user being subscribed to. Ignored if uri is provided.",
-            "format": "did",
-            "type": "string"
+            "description": "URI of the subscription record."
           }
-        },
-        "type": "params"
+        }
       },
       "output": {
         "encoding": "application/json",
@@ -25,15 +24,11 @@
           "properties": {
             "subscription": {
               "type": "ref",
-              "ref": "com.atiproto.subscription#view",
-              "description": "The subscription record data"
+              "ref": "com.atiproto.subscription#view"
             }
           }
         }
-      },
-      "type": "query"
+      }
     }
-  },
-  "id": "com.atiproto.payment.subscription.get",
-  "lexicon": 1
+  }
 }

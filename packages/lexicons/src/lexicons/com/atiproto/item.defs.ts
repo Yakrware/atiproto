@@ -3,77 +3,88 @@
  */
 
 import { l } from '@atproto/lex'
+import * as RepoStrongRef from '../atproto/repo/strongRef.defs.js'
+import * as AttestedSignature from '../../network/attested/signature.defs.js'
 
 const $nsid = 'com.atiproto.item'
 
 export { $nsid }
 
-/** A record representing a item given by one user to another */
 type Main = {
   $type: 'com.atiproto.item'
 
   /**
-   * DID of the user receiving the item
+   * Reference to the entity being paid for. Either a `com.atproto.repo.strongRef` (a specific record, e.g. a post) or a `#userRef` (a thin wrapper carrying a did string for the user being paid). Absent when marked as private.
    */
-  subject?: l.DidString
+  subject?:
+    | l.$Typed<RepoStrongRef.Main>
+    | l.$Typed<UserRef>
+    | l.Unknown$TypedObject
 
   /**
-   * AT-URI of specific record being tipped
-   */
-  recordUri?: l.AtUriString
-
-  /**
-   * Tip amount in cents (0 when recipient allows zero items)
+   * Per-unit amount in the smallest unit of the cart's `currency` (0 when the recipient permits zero-value items). Multiply by `quantity` for the line total.
    */
   amount: number
 
   /**
-   * ISO 4217 currency code
+   * Number of units of this item. Defaults to 1.
    */
-  currency: string
+  quantity: number
 
   /**
-   * Tip status
+   * Implementation-defined status string. PoS does not enforce or interpret this value; payment / cart state lives on the cart's `status` field.
    */
-  status: 'pending' | 'authorized' | 'completed' | 'failed' | 'refunded'
+  status: string
 
   /**
-   * Optional message (max 500 chars)
+   * Optional message attached to the item.
    */
   message?: string
-
-  /**
-   * Creation timestamp
-   */
   createdAt: l.DatetimeString
+  completedAt?: l.DatetimeString
 
   /**
-   * Completion timestamp
+   * PoS + recipient AppView attestations. Each entry is either an inline `network.attested.signature` or a `com.atproto.repo.strongRef` pointing at a remote `network.attested.proof` record. The canonical signing payload covers `amount`, `quantity`, `status`, `createdAt`, plus `subject`, `message`, and `completedAt` when present. Mutating any of those fields invalidates every signature in this array.
    */
-  completedAt?: l.DatetimeString
+  signatures: (
+    | l.$Typed<AttestedSignature.Main>
+    | l.$Typed<RepoStrongRef.Main>
+    | l.Unknown$TypedObject
+  )[]
 }
 
 export type { Main }
 
-/** A record representing a item given by one user to another */
 const main = l.record<'any', Main>(
   'any',
   $nsid,
   l.object({
-    subject: l.optional(l.string({ format: 'did' })),
-    recordUri: l.optional(l.string({ format: 'at-uri' })),
+    subject: l.optional(
+      l.typedUnion(
+        [
+          l.typedRef<RepoStrongRef.Main>((() => RepoStrongRef.main) as any),
+          l.typedRef<UserRef>((() => userRef) as any),
+        ],
+        false,
+      ),
+    ),
     amount: l.integer({ minimum: 0 }),
-    currency: l.string({ maxLength: 3 }),
-    status: l.enum([
-      'pending',
-      'authorized',
-      'completed',
-      'failed',
-      'refunded',
-    ]),
+    quantity: l.withDefault(l.integer({ minimum: 1 }), 1),
+    status: l.string({ maxLength: 64 }),
     message: l.optional(l.string({ maxGraphemes: 500, maxLength: 5000 })),
     createdAt: l.string({ format: 'datetime' }),
     completedAt: l.optional(l.string({ format: 'datetime' })),
+    signatures: l.array(
+      l.typedUnion(
+        [
+          l.typedRef<AttestedSignature.Main>(
+            (() => AttestedSignature.main) as any,
+          ),
+          l.typedRef<RepoStrongRef.Main>((() => RepoStrongRef.main) as any),
+        ],
+        false,
+      ),
+    ),
   }),
 )
 
@@ -92,79 +103,78 @@ export const $assert = /*#__PURE__*/ main.assert.bind(main),
   $validate = /*#__PURE__*/ main.validate.bind(main),
   $safeValidate = /*#__PURE__*/ main.safeValidate.bind(main)
 
-/** View of a item record for use in API responses */
 type View = {
   $type?: 'com.atiproto.item#view'
-
-  /**
-   * AT-URI of the item record
-   */
   uri: l.AtUriString
-
-  /**
-   * DID of the user receiving the item
-   */
-  subject?: l.DidString
-
-  /**
-   * AT-URI of specific record being tipped
-   */
-  recordUri?: l.AtUriString
-
-  /**
-   * Tip amount in cents (0 when recipient allows zero items)
-   */
+  cid?: l.CidString
+  subject?:
+    | l.$Typed<RepoStrongRef.Main>
+    | l.$Typed<UserRef>
+    | l.Unknown$TypedObject
   amount: number
-
-  /**
-   * ISO 4217 currency code
-   */
-  currency: string
-
-  /**
-   * Tip status
-   */
-  status: 'pending' | 'authorized' | 'completed' | 'failed' | 'refunded'
-
-  /**
-   * Optional message (max 500 chars)
-   */
+  quantity: number
+  status: string
   message?: string
-
-  /**
-   * Creation timestamp
-   */
   createdAt: l.DatetimeString
-
-  /**
-   * Completion timestamp
-   */
   completedAt?: l.DatetimeString
+  signatures?: (
+    | l.$Typed<AttestedSignature.Main>
+    | l.$Typed<RepoStrongRef.Main>
+    | l.Unknown$TypedObject
+  )[]
 }
 
 export type { View }
 
-/** View of a item record for use in API responses */
 const view = l.typedObject<View>(
   $nsid,
   'view',
   l.object({
     uri: l.string({ format: 'at-uri' }),
-    subject: l.optional(l.string({ format: 'did' })),
-    recordUri: l.optional(l.string({ format: 'at-uri' })),
+    cid: l.optional(l.string({ format: 'cid' })),
+    subject: l.optional(
+      l.typedUnion(
+        [
+          l.typedRef<RepoStrongRef.Main>((() => RepoStrongRef.main) as any),
+          l.typedRef<UserRef>((() => userRef) as any),
+        ],
+        false,
+      ),
+    ),
     amount: l.integer({ minimum: 0 }),
-    currency: l.string({ maxLength: 3 }),
-    status: l.enum([
-      'pending',
-      'authorized',
-      'completed',
-      'failed',
-      'refunded',
-    ]),
+    quantity: l.withDefault(l.integer({ minimum: 1 }), 1),
+    status: l.string({ maxLength: 64 }),
     message: l.optional(l.string({ maxGraphemes: 500, maxLength: 5000 })),
     createdAt: l.string({ format: 'datetime' }),
     completedAt: l.optional(l.string({ format: 'datetime' })),
+    signatures: l.optional(
+      l.array(
+        l.typedUnion(
+          [
+            l.typedRef<AttestedSignature.Main>(
+              (() => AttestedSignature.main) as any,
+            ),
+            l.typedRef<RepoStrongRef.Main>((() => RepoStrongRef.main) as any),
+          ],
+          false,
+        ),
+      ),
+    ),
   }),
 )
 
 export { view }
+
+/** Thin wrapper that carries a bare did string for the user being paid. The wire shape is `{ "$type": "com.atiproto.item#userRef", "did": "did:plc:..." }`; pair with `com.atproto.repo.strongRef` in a `subject` union to express either-or. */
+type UserRef = { $type?: 'com.atiproto.item#userRef'; did: l.DidString }
+
+export type { UserRef }
+
+/** Thin wrapper that carries a bare did string for the user being paid. The wire shape is `{ "$type": "com.atiproto.item#userRef", "did": "did:plc:..." }`; pair with `com.atproto.repo.strongRef` in a `subject` union to express either-or. */
+const userRef = l.typedObject<UserRef>(
+  $nsid,
+  'userRef',
+  l.object({ did: l.string({ format: 'did' }) }),
+)
+
+export { userRef }

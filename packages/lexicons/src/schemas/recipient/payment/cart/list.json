@@ -4,32 +4,52 @@
   "defs": {
     "main": {
       "type": "query",
-      "description": "List carts whose items pay the authenticated user — i.e. carts targeting this user as a payment recipient. Read-only, no PDS writes.",
+      "description": "List carts whose items pay the authenticated user (carts targeting this user as a payment recipient). Read-only, no PDS writes.",
       "parameters": {
         "type": "params",
         "properties": {
           "sender": {
             "type": "string",
             "format": "did",
-            "description": "Optional: only return carts created by this sender DID"
+            "description": "Optional: only return carts created by this sender DID."
           },
           "status": {
             "type": "string",
             "maxLength": 64,
-            "enum": ["open", "completed", "expired", "abandoned"],
-            "description": "Filter by cart status"
+            "knownValues": [
+              "open",
+              "expired",
+              "abandoned",
+              "pending",
+              "completed",
+              "failed",
+              "refunded",
+              "cancelled",
+              "fulfilled"
+            ],
+            "description": "Filter by cart status. Accepts cart-lifecycle values (open / expired / abandoned / fulfilled) or broker-payment-snapshot values (pending / completed / failed / refunded / cancelled)."
+          },
+          "startDate": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Optional: only return carts whose `createdAt` is on or after this timestamp."
+          },
+          "endDate": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Optional: only return carts whose `createdAt` is on or before this timestamp."
           },
           "cursor": {
             "type": "string",
             "maxLength": 512,
-            "description": "Pagination cursor"
+            "description": "Pagination cursor."
           },
           "limit": {
             "type": "integer",
             "default": 20,
             "minimum": 1,
             "maximum": 100,
-            "description": "Results per page (1-100, default: 20)"
+            "description": "Results per page (1-100, default: 20)."
           }
         }
       },
@@ -43,35 +63,15 @@
               "type": "array",
               "items": {
                 "type": "ref",
-                "ref": "#cartResponse"
+                "ref": "com.atiproto.cart#view"
               }
             },
             "cursor": {
               "type": "string",
               "maxLength": 512,
-              "description": "Pagination cursor for next page"
+              "description": "Pagination cursor for next page."
             }
           }
-        }
-      }
-    },
-    "cartResponse": {
-      "type": "object",
-      "required": ["uri", "cid", "record"],
-      "properties": {
-        "uri": {
-          "type": "string",
-          "format": "at-uri",
-          "description": "AT-URI of the cart record"
-        },
-        "cid": {
-          "type": "string",
-          "format": "cid",
-          "description": "CID of the cart record"
-        },
-        "record": {
-          "type": "ref",
-          "ref": "com.atiproto.cart#view"
         }
       }
     }

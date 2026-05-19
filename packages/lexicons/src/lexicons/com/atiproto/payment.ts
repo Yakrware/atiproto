@@ -4,5 +4,4 @@
 
 export * as cart from './payment/cart.js'
 export * as item from './payment/item.js'
-export * as list from './payment/list.js'
 export * as subscription from './payment/subscription.js'

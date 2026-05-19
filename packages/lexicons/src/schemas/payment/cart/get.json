@@ -4,24 +4,15 @@
   "defs": {
     "main": {
       "type": "query",
-      "description": "Get a specific cart sent by the authenticated user, including resolved item and subscription records. One of `uri`, `itemUri`, or `subscriptionUri` is required.",
+      "description": "Hydrate a cart by uri. Includes the resolved item and subscription records that the cart references. Broker payment state is reflected on the cart's own `status` field (snapshot maintained by the recipient AppView), so no separate payment lookup is needed.",
       "parameters": {
         "type": "params",
+        "required": ["uri"],
         "properties": {
           "uri": {
             "type": "string",
             "format": "at-uri",
-            "description": "AT-URI of the cart record. Takes precedence over itemUri and subscriptionUri."
-          },
-          "itemUri": {
-            "type": "string",
-            "format": "at-uri",
-            "description": "AT-URI of an item record. Returns the cart that contains this item. Ignored if uri is provided."
-          },
-          "subscriptionUri": {
-            "type": "string",
-            "format": "at-uri",
-            "description": "AT-URI of a subscription record. Returns the cart that contains this subscription. Ignored if uri or itemUri is provided."
+            "description": "URI of the cart record."
           }
         }
       },
@@ -29,48 +20,22 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": ["uri", "cart", "items", "subscriptions"],
+          "required": ["cart", "items"],
           "properties": {
-            "workflow": {
-              "type": "ref",
-              "ref": "com.atiproto.actions#outboundWorkflow",
-              "description": "Side-effect workflow to sync server status with PDS status."
-            },
-            "uri": {
-              "type": "string",
-              "format": "at-uri",
-              "description": "Cart record URI"
-            },
-            "cid": {
-              "type": "string",
-              "format": "cid",
-              "description": "Cart record CID"
-            },
             "cart": {
               "type": "ref",
-              "ref": "com.atiproto.cart#view",
-              "description": "The cart record data"
-            },
-            "checkoutUrl": {
-              "type": "string",
-              "format": "uri",
-              "description": "Checkout URL, only present when cart status is open"
+              "ref": "com.atiproto.cart#view"
             },
             "items": {
               "type": "array",
               "items": {
-                "type": "ref",
-                "ref": "com.atiproto.item#view"
+                "type": "union",
+                "refs": [
+                  "com.atiproto.item#view",
+                  "com.atiproto.subscription#view"
+                ]
               },
-              "description": "Resolved item records referenced by this cart"
-            },
-            "subscriptions": {
-              "type": "array",
-              "items": {
-                "type": "ref",
-                "ref": "com.atiproto.subscription#view"
-              },
-              "description": "Resolved subscription records referenced by this cart"
+              "description": "Resolved item and subscription records referenced by this cart. Discriminated by `$type`."
             }
           }
         }

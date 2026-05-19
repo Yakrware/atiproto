@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.authCreateCart",
+  "defs": {
+    "main": {
+      "type": "permission-set",
+      "title": "Create Cart",
+      "detail": "Create and update carts, items, and subscriptions on the PoS. Grants the PoS-side write endpoints plus the repo collections the corresponding records live in.",
+      "permissions": [
+        {
+          "type": "permission",
+          "resource": "repo",
+          "collection": [
+            "com.atiproto.cart",
+            "com.atiproto.item",
+            "com.atiproto.subscription"
+          ]
+        },
+        {
+          "type": "permission",
+          "resource": "rpc",
+          "aud": "*",
+          "lxm": [
+            "com.atiproto.payment.cart.create",
+            "com.atiproto.payment.cart.put",
+            "com.atiproto.payment.item.create",
+            "com.atiproto.payment.item.put",
+            "com.atiproto.payment.subscription.create",
+            "com.atiproto.payment.subscription.put",
+            "com.atiproto.payment.subscription.cancel"
+          ]
+        }
+      ]
+    }
+  }
+}

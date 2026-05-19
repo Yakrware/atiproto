@@ -1,0 +1,105 @@
+{
+  "lexicon": 1,
+  "id": "network.attested.payment.status",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Look up a `network.attested.payment` record by uri. Returns a `#view`: status, broker, timestamps, and signatures are always present; private fields (`subject`, `items`, `total`, `currency`) are auto-filled by the broker only when the caller is one of the signing parties.",
+      "parameters": {
+        "type": "params",
+        "required": ["uri"],
+        "properties": {
+          "uri": {
+            "type": "string",
+            "format": "at-uri",
+            "description": "URI of the network.attested.payment record."
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["payment"],
+          "properties": {
+            "payment": {
+              "type": "ref",
+              "ref": "#view"
+            }
+          }
+        }
+      }
+    },
+    "view": {
+      "type": "object",
+      "description": "Hydrated view of a `network.attested.payment` record. Shape mirrors the `network.attested.payment.initiate` input plus `total`, the record's uri/cid, and signatures. Private fields (`subject`, `items`, `total`, `currency`) are auto-filled by the broker only when the caller is one of the signing parties; for other callers, the view degrades to the record's public surface.",
+      "required": ["uri", "status", "broker", "createdAt", "signatures"],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "subject": {
+          "type": "string",
+          "format": "did",
+          "description": "DID of the payment recipient. Auto-filled when the caller is authorized; absent otherwise."
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "union",
+            "refs": [
+              "network.attested.payment.initiate#oneTime",
+              "network.attested.payment.initiate#recurring"
+            ]
+          },
+          "description": "Line items as supplied to `initiate`. Auto-filled when the caller is authorized; absent otherwise."
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Sum of line item amounts in the smallest currency unit. Auto-filled when the caller is authorized; absent otherwise."
+        },
+        "currency": {
+          "type": "string",
+          "maxLength": 3,
+          "description": "ISO 4217 currency code of `total`. Auto-filled when the caller is authorized; absent otherwise."
+        },
+        "status": {
+          "type": "string",
+          "maxLength": 64,
+          "knownValues": [
+            "pending",
+            "completed",
+            "failed",
+            "refunded",
+            "cancelled"
+          ]
+        },
+        "broker": {
+          "type": "string",
+          "format": "did"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "signatures": {
+          "type": "array",
+          "items": {
+            "type": "union",
+            "refs": ["network.attested.signature", "com.atproto.repo.strongRef"]
+          }
+        }
+      }
+    }
+  }
+}
