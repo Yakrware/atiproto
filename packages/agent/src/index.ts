@@ -11,3 +11,8 @@ export {
   type WorkflowAction,
   type WorkflowError,
 } from "./workflow.js";
+export {
+  signature_scope_collections,
+  hasSignatureScope,
+  type SignatureScopes,
+} from "./signature-scopes.js";

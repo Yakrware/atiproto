@@ -1,7 +1,7 @@
 {
-  "name": "@atiproto/agent",
-  "version": "1.4.0",
-  "description": "ATProto agent",
+  "name": "@atiproto/atproto-attestation",
+  "version": "0.0.1",
+  "description": "ATProto record attestation: sign and verify records using did:key signatures over a DAG-CBOR CID",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -24,19 +24,18 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Yakrware/atiproto.git",
-    "directory": "packages/agent"
+    "directory": "packages/atproto-attestation"
   },
-  "homepage": "https://atiproto.com/docs/get-started",
+  "homepage": "https://atiproto.com/docs/lexicon/network.attested.signature",
   "bugs": "https://github.com/Yakrware/atiproto/issues",
   "license": "MIT",
   "dependencies": {
-    "@atiproto/atproto-attestation": "^0.0.1",
-    "@atiproto/lexicons": "^1.1.0",
-    "@atproto/api": "^0.19.6",
-    "@atproto/xrpc": "^0.7.7"
+    "@ipld/dag-cbor": "^9.2.1",
+    "@noble/curves": "^1.6.0",
+    "@noble/hashes": "^1.5.0",
+    "multiformats": "^13.3.1"
   },
   "devDependencies": {
-    "@atproto/lex": "^0.0.23",
     "@vitest/coverage-v8": "^4.1.4",
     "tsup": "^8.5.1",
     "typescript": "^6.0.2",

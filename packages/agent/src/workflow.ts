@@ -1,5 +1,10 @@
 import type { XrpcClient } from "@atproto/xrpc";
 import type { com } from "@atiproto/lexicons";
+import type { Attestation } from "@atiproto/atproto-attestation";
+import {
+  signature_scope_collections,
+  hasSignatureScope,
+} from "./signature-scopes.js";
 
 export type WorkflowError = {
   action: string;
@@ -103,9 +108,35 @@ function xrpcErrorCode(err: unknown): string | undefined {
   return typeof candidate === "string" ? candidate : undefined;
 }
 
+/**
+ * Apply an attestation signature to a record bound for a collection we
+ * know carries `signatures[]`. The canonical signing payload is restricted
+ * to the fields listed in `signature_scope_collections`. Records on
+ * unrecognized collections pass through unchanged.
+ */
+async function maybeSign(
+  attestation: Attestation | undefined,
+  repo: string,
+  collection: string,
+  record: unknown,
+): Promise<unknown> {
+  if (!attestation) return record;
+  if (!hasSignatureScope(collection)) return record;
+  const map = asRecord(record);
+  if (!map) return record;
+  const withType: Record<string, unknown> = { $type: collection, ...map };
+  const fields = signature_scope_collections[collection];
+  return attestation.signAndAppend({
+    record: withType,
+    repository: repo,
+    fields,
+  });
+}
+
 export async function runActions(
   pds: XrpcClient,
   actions: readonly WorkflowAction[],
+  attestation?: Attestation,
 ): Promise<com.atiproto.actions.Response[]> {
   const responses: com.atiproto.actions.Response[] = [];
   for (const action of actions) {
@@ -113,6 +144,12 @@ export async function runActions(
       switch (action.$type) {
         case "com.atiproto.actions#create": {
           const a = action as CreateAction;
+          const record = await maybeSign(
+            attestation,
+            a.repo,
+            a.collection,
+            a.record,
+          );
           const res = await pds.call(
             "com.atproto.repo.createRecord",
             undefined,
@@ -120,7 +157,7 @@ export async function runActions(
               repo: a.repo,
               collection: a.collection,
               rkey: a.rkey,
-              record: a.record,
+              record,
             },
           );
           responses.push({
@@ -132,11 +169,17 @@ export async function runActions(
         }
         case "com.atiproto.actions#update": {
           const a = action as UpdateAction;
+          const record = await maybeSign(
+            attestation,
+            a.repo,
+            a.collection,
+            a.record,
+          );
           const res = await pds.call("com.atproto.repo.putRecord", undefined, {
             repo: a.repo,
             collection: a.collection,
             rkey: a.rkey,
-            record: a.record,
+            record,
             swapCommit: a.swapCommit,
           });
           responses.push({
