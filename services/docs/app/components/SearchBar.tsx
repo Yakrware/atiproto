@@ -17,6 +17,7 @@ function TypeBadge({ type }: { type: string }) {
     procedure: "text-badge-procedure",
     record: "text-badge-record",
     "permission-set": "text-badge-permission",
+    object: "text-text-muted dark:text-text-muted-dark",
   };
   return (
     <span className={`text-[10px] font-medium ${colors[type] ?? ""}`}>
@@ -24,7 +25,9 @@ function TypeBadge({ type }: { type: string }) {
         ? "proc"
         : type === "permission-set"
           ? "perm"
-          : type}
+          : type === "object"
+            ? "type"
+            : type}
     </span>
   );
 }
@@ -122,9 +125,14 @@ export function SearchBar({ searchIndex, version }: SearchBarProps) {
                   : "hover:bg-surface-alt dark:hover:bg-surface-alt-dark"
               }`}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-mono text-xs">{entry.nsid}</span>
                 <TypeBadge type={entry.type} />
+                {entry.authority === "network.attested" && (
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-mono border border-primary/40 bg-primary/10 text-primary">
+                    network.attested
+                  </span>
+                )}
               </div>
               {entry.description && (
                 <p className="text-xs text-text-muted dark:text-text-muted-dark mt-0.5 truncate">

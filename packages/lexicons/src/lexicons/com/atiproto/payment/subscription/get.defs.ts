@@ -9,13 +9,10 @@ const $nsid = 'com.atiproto.payment.subscription.get'
 
 export { $nsid }
 
-/** Get a specific subscription sent by the authenticated user. Looks up by subscription record uri or subject (recipient) DID. These are mutually exclusive; uri takes precedence. */
+/** Hydrate a subscription record by uri. The authenticated user must be the sender. Search filters that were previously on this endpoint live on `payment.subscription.list`. */
 const main = l.query(
   $nsid,
-  l.params({
-    uri: l.optional(l.string({ format: 'at-uri' })),
-    subject: l.optional(l.string({ format: 'did' })),
-  }),
+  l.params({ uri: l.string({ format: 'at-uri' }) }),
   l.jsonPayload({
     subscription: l.ref<AtiprotoSubscription.View>(
       (() => AtiprotoSubscription.view) as any,

@@ -9,16 +9,14 @@ const $nsid = 'com.atiproto.recipient.profile.get'
 
 export { $nsid }
 
-/** Get the authenticated user's profile settings. Returns defaults if no profile exists. */
+/** Get the authenticated user's payment profile. Returns defaults when no profile is configured. `acceptingPayments` on the profile view reflects server-derived readiness from the user's broker list. When called against a broker, the response also includes a `broker` block with the broker DID, this user's account status with that broker, and a fresh onboarding link. */
 const main = l.query(
   $nsid,
   l.params(),
   l.jsonPayload({
-    uri: l.optional(l.string({ format: 'at-uri' })),
-    cid: l.optional(l.string({ format: 'cid' })),
     profile: l.ref<AtiprotoProfile.View>((() => AtiprotoProfile.view) as any),
     hasProfile: l.boolean(),
-    readyForPayment: l.boolean(),
+    broker: l.optional(l.ref<BrokerView>((() => brokerView) as any)),
   }),
 )
 export { main }
@@ -33,3 +31,55 @@ export type $OutputBody<B = l.BinaryData> = l.InferMethodOutputBody<
 export const $lxm = main.nsid,
   $params = main.parameters,
   $output = main.output
+
+/** Broker-side view of the authed user's account. Returned only when `recipient.profile.get` is called on a broker (rather than a PoS). */
+type BrokerView = {
+  $type?: 'com.atiproto.recipient.profile.get#brokerView'
+
+  /**
+   * DID of the broker answering the request.
+   */
+  did: l.DidString
+
+  /**
+   * Broker-defined onboarding state for the authed user. `ready` means the user can receive payouts; the other values indicate where onboarding is and whether action is needed.
+   */
+  status:
+    | 'none'
+    | 'pending'
+    | 'needs_info'
+    | 'ready'
+    | 'restricted'
+    | 'disabled'
+    | l.UnknownString
+
+  /**
+   * Optional. Fresh broker-hosted onboarding link. Clients should redirect the user here to complete (or update) their account.
+   */
+  onboardingUrl?: l.UriString
+}
+
+export type { BrokerView }
+
+/** Broker-side view of the authed user's account. Returned only when `recipient.profile.get` is called on a broker (rather than a PoS). */
+const brokerView = l.typedObject<BrokerView>(
+  $nsid,
+  'brokerView',
+  l.object({
+    did: l.string({ format: 'did' }),
+    status: l.string<{
+      maxLength: 64
+      knownValues: [
+        'none',
+        'pending',
+        'needs_info',
+        'ready',
+        'restricted',
+        'disabled',
+      ]
+    }>({ maxLength: 64 }),
+    onboardingUrl: l.optional(l.string({ format: 'uri' })),
+  }),
+)
+
+export { brokerView }

@@ -1,0 +1,91 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.payment.cart.checkout",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Check out an existing cart. The cart record already carries subject, items, currency, and total; this procedure only needs the cart uri. When a `broker` is pre-seeded, the PoS runs the broker's `network.attested.payment.initiate` (today via outbound workflow, in the future direct) and the response carries `checkoutUrl` plus a strongRef `payment`. When no broker is pre-seeded, `payment` carries an `#initiateRequest` shape the caller can use to invoke a broker themselves. Callers inspect `$type` on `payment` to discriminate the two cases.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["cart"],
+          "properties": {
+            "cart": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "URI of the existing cart to check out."
+            },
+            "broker": {
+              "type": "string",
+              "format": "did",
+              "description": "Optional. did:web of a single broker to route initiate through. When omitted, the response's `payment` carries the unfilled initiate request instead of a strongRef."
+            },
+            "redirectUrl": {
+              "type": "string",
+              "format": "uri",
+              "description": "URI the processor should redirect to after checkout completion or cancellation. Used when a broker is provided."
+            },
+            "workflow": {
+              "type": "ref",
+              "ref": "com.atiproto.actions#inboundWorkflow",
+              "description": "Workflow callback envelope carrying the broker's `network.attested.payment.initiate` response. Present only on agent-driven callbacks."
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["payment"],
+          "properties": {
+            "workflow": {
+              "type": "ref",
+              "ref": "com.atiproto.actions#outboundWorkflow",
+              "description": "Workflow envelope. When present, the agent runs the actions (typically a single call to `network.attested.payment.initiate`) and calls back. When absent, this is the final native result."
+            },
+            "checkoutUrl": {
+              "type": "string",
+              "format": "uri",
+              "description": "Processor-hosted checkout URL. Present only when a `broker` was provided and initiate succeeded."
+            },
+            "payment": {
+              "type": "union",
+              "refs": ["com.atproto.repo.strongRef", "#initiateRequest"],
+              "description": "Either a `com.atproto.repo.strongRef` to the newly created `network.attested.payment` record (when a broker was provided and initiate completed) or an `#initiateRequest` shape mirroring `network.attested.payment.initiate` input (when no broker was provided; the caller routes to a broker themselves). Callers discriminate by `$type`."
+            }
+          }
+        }
+      }
+    },
+    "initiateRequest": {
+      "type": "object",
+      "description": "Unfilled `network.attested.payment.initiate` input. Returned in the `payment` field when the caller did not pre-seed a broker; the caller fills in their chosen broker and invokes initiate, then uses `payment.cart.put` to attach the resulting payment ref.",
+      "required": ["subject", "items"],
+      "properties": {
+        "subject": {
+          "type": "string",
+          "format": "did",
+          "description": "DID of the payment recipient (mirrors the cart's subject)."
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "union",
+            "refs": [
+              "network.attested.payment.initiate#oneTime",
+              "network.attested.payment.initiate#recurring"
+            ]
+          },
+          "description": "Line items derived from the cart, ready to forward to a broker's `network.attested.payment.initiate`."
+        },
+        "redirectUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "URI the processor should redirect to after checkout completion or cancellation, when the caller is ready to provide one."
+        }
+      }
+    }
+  }
+}

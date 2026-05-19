@@ -1,0 +1,19 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.authReadEntitlements",
+  "defs": {
+    "main": {
+      "type": "permission-set",
+      "title": "Read Entitlements",
+      "detail": "Verify signed entitlements (and any other `network.attested.*` record) via `network.attested.verify`. Read-only.",
+      "permissions": [
+        {
+          "type": "permission",
+          "resource": "rpc",
+          "aud": "*",
+          "lxm": ["network.attested.verify"]
+        }
+      ]
+    }
+  }
+}

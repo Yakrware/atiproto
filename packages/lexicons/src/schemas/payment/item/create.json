@@ -4,51 +4,51 @@
   "defs": {
     "main": {
       "type": "procedure",
-      "description": "Create a item on a DID or specific record. Creates or adds to a cart and returns a checkout URL.",
+      "description": "Create an item.",
       "input": {
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": ["subject", "amount", "currency"],
+          "required": ["subject", "amount"],
           "properties": {
             "subject": {
-              "type": "string",
-              "format": "did",
-              "description": "DID of the user being tipped"
-            },
-            "recordUri": {
-              "type": "string",
-              "format": "at-uri",
-              "description": "AT-URI of specific record being tipped"
+              "type": "union",
+              "refs": [
+                "com.atproto.repo.strongRef",
+                "com.atiproto.item#userRef"
+              ],
+              "description": "Reference to the entity being paid for. Either a `com.atproto.repo.strongRef` (a specific record, e.g. a post) or a `com.atiproto.item#userRef` (a thin wrapper carrying a did string)."
             },
             "amount": {
               "type": "integer",
-              "description": "Tip amount in cents"
+              "minimum": 0,
+              "description": "Per-unit amount in the smallest unit of `currency`."
+            },
+            "quantity": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "description": "Number of units. Defaults to 1."
             },
             "currency": {
               "type": "string",
               "maxLength": 3,
-              "description": "ISO 4217 currency code"
+              "description": "ISO 4217 currency code. Required when `cartUri` is blank; otherwise ignored (the cart's currency is used)."
+            },
+            "message": {
+              "type": "string",
+              "maxGraphemes": 500,
+              "maxLength": 5000,
+              "description": "Optional message attached to the item."
+            },
+            "private": {
+              "type": "boolean",
+              "description": "Optional. When `cartUri` is blank, defaults to true (the issued cart's items are private). Ignored when `cartUri` is supplied (the existing cart's privacy mode applies)."
             },
             "cartUri": {
               "type": "string",
               "format": "at-uri",
-              "description": "AT-URI of an existing cart to add this item to. If omitted, a new cart is created."
-            },
-            "redirectUrl": {
-              "type": "string",
-              "format": "uri",
-              "description": "URL to redirect to after checkout completes"
-            },
-            "message": {
-              "type": "string",
-              "description": "Optional message (max 500 chars)",
-              "maxGraphemes": 500,
-              "maxLength": 5000
-            },
-            "isPrivate": {
-              "type": "boolean",
-              "description": "If true, the recipient (subject) and recordUri are stored only in atiproto's private database and are omitted from the PDS item record."
+              "description": "Optional URI of an existing open cart to add this item to. The cart record is re-signed if updated."
             },
             "workflow": {
               "type": "ref",
@@ -62,36 +62,17 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
+          "required": ["item"],
           "properties": {
             "workflow": {
               "type": "ref",
               "ref": "com.atiproto.actions#outboundWorkflow",
               "description": "Workflow envelope. When present, the agent runs the actions and calls back. When absent, this is the final native result."
             },
-            "itemUri": {
-              "type": "string",
-              "format": "at-uri",
-              "description": "URI of the item record in PDS"
-            },
             "item": {
               "type": "ref",
               "ref": "com.atiproto.item#view",
-              "description": "The created item record (status: pending)"
-            },
-            "cartUri": {
-              "type": "string",
-              "format": "at-uri",
-              "description": "URI of the cart record in PDS"
-            },
-            "cart": {
-              "type": "ref",
-              "ref": "com.atiproto.cart#view",
-              "description": "The cart record (new or updated)"
-            },
-            "checkoutUrl": {
-              "type": "string",
-              "format": "uri",
-              "description": "Checkout URL hosted by atiproto"
+              "description": "The signed item view (status: pending)."
             }
           }
         }

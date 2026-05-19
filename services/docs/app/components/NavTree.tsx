@@ -8,6 +8,8 @@ function TypeBadge({ type }: { type: string }) {
     procedure: "bg-badge-procedure/15 text-badge-procedure",
     record: "bg-badge-record/15 text-badge-record",
     "permission-set": "bg-badge-permission/15 text-badge-permission",
+    object:
+      "bg-surface-alt dark:bg-surface-alt-dark text-text-muted dark:text-text-muted-dark border border-border dark:border-border-dark",
   };
   return (
     <span
@@ -17,7 +19,9 @@ function TypeBadge({ type }: { type: string }) {
         ? "proc"
         : type === "permission-set"
           ? "perm"
-          : type}
+          : type === "object"
+            ? "type"
+            : type}
     </span>
   );
 }

@@ -10,13 +10,14 @@ const $nsid = 'com.atiproto.payment.cart.create'
 
 export { $nsid }
 
-/** Create a new empty cart */
+/** Create a new, empty cart on the PoS. The PoS signs the cart record and returns it via the standard workflow envelope so the agent can write the stripped form to the payer's PDS. Distinct from `payment.cart.checkout`: this only builds the cart, no broker is contacted and no `checkoutUrl` is issued. */
 const main = l.procedure(
   $nsid,
   l.params(),
   l.jsonPayload({
+    subject: l.string({ format: 'did' }),
     currency: l.string({ maxLength: 3 }),
-    redirectUrl: l.optional(l.string({ format: 'uri' })),
+    private: l.optional(l.withDefault(l.boolean(), true)),
     workflow: l.optional(
       l.ref<AtiprotoActions.InboundWorkflow>(
         (() => AtiprotoActions.inboundWorkflow) as any,
@@ -29,11 +30,7 @@ const main = l.procedure(
         (() => AtiprotoActions.outboundWorkflow) as any,
       ),
     ),
-    cart: l.optional(
-      l.ref<AtiprotoCart.View>((() => AtiprotoCart.view) as any),
-    ),
-    cartUri: l.optional(l.string({ format: 'at-uri' })),
-    checkoutUrl: l.optional(l.string({ format: 'uri' })),
+    cart: l.ref<AtiprotoCart.View>((() => AtiprotoCart.view) as any),
   }),
 )
 export { main }

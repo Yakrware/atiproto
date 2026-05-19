@@ -1,0 +1,19 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.authReadPayments",
+  "defs": {
+    "main": {
+      "type": "permission-set",
+      "title": "Read Payments",
+      "detail": "Look up broker payment records, attestation proofs, and verify signed records via `network.attested.*`. Read-only.",
+      "permissions": [
+        {
+          "type": "permission",
+          "resource": "rpc",
+          "aud": "*",
+          "lxm": ["network.attested.payment.status", "network.attested.verify"]
+        }
+      ]
+    }
+  }
+}

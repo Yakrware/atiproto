@@ -3,3 +3,4 @@
  */
 
 export * as com from './com.js'
+export * as network from './network.js'

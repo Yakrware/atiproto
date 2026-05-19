@@ -9,19 +9,35 @@ const $nsid = 'com.atiproto.payment.cart.list'
 
 export { $nsid }
 
-/** List carts created by the authenticated user. */
+/** List carts created by the authenticated user. Supports filtering by recipient subject, a specific record (an item / subscription line, or the subject the line points at), and cart status (cart and broker payment statuses are unified on the cart's `status` field). */
 const main = l.query(
   $nsid,
   l.params({
     subject: l.optional(l.string({ format: 'did' })),
-    status: l.optional(l.enum(['open', 'completed', 'expired', 'abandoned'])),
+    record: l.optional(l.string({ format: 'at-uri' })),
+    status: l.optional(
+      l.string<{
+        maxLength: 64
+        knownValues: [
+          'open',
+          'expired',
+          'abandoned',
+          'pending',
+          'completed',
+          'failed',
+          'refunded',
+          'cancelled',
+          'fulfilled',
+        ]
+      }>({ maxLength: 64 }),
+    ),
     cursor: l.optional(l.string({ maxLength: 512 })),
     limit: l.optional(
       l.withDefault(l.integer({ minimum: 1, maximum: 100 }), 20),
     ),
   }),
   l.jsonPayload({
-    carts: l.array(l.ref<CartResponse>((() => cartResponse) as any)),
+    carts: l.array(l.ref<AtiprotoCart.View>((() => AtiprotoCart.view) as any)),
     cursor: l.optional(l.string({ maxLength: 512 })),
   }),
 )
@@ -37,32 +53,3 @@ export type $OutputBody<B = l.BinaryData> = l.InferMethodOutputBody<
 export const $lxm = main.nsid,
   $params = main.parameters,
   $output = main.output
-
-type CartResponse = {
-  $type?: 'com.atiproto.payment.cart.list#cartResponse'
-
-  /**
-   * AT-URI of the cart record
-   */
-  uri: l.AtUriString
-
-  /**
-   * CID of the cart record
-   */
-  cid: l.CidString
-  record: AtiprotoCart.View
-}
-
-export type { CartResponse }
-
-const cartResponse = l.typedObject<CartResponse>(
-  $nsid,
-  'cartResponse',
-  l.object({
-    uri: l.string({ format: 'at-uri' }),
-    cid: l.string({ format: 'cid' }),
-    record: l.ref<AtiprotoCart.View>((() => AtiprotoCart.view) as any),
-  }),
-)
-
-export { cartResponse }

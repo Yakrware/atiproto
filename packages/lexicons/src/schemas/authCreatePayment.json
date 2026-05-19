@@ -1,0 +1,34 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.authCreatePayment",
+  "defs": {
+    "main": {
+      "type": "permission-set",
+      "title": "Create Payment",
+      "detail": "Initiate broker payments and run the PoS checkout flow. Grants `network.attested.payment.initiate` / `status`, plus the PoS endpoints that drive checkout (cart.checkout / cart.put), and repo write on the records the checkout flow lands on the payer's PDS (cart, item, subscription, stripped entitlement).",
+      "permissions": [
+        {
+          "type": "permission",
+          "resource": "repo",
+          "collection": [
+            "com.atiproto.cart",
+            "com.atiproto.item",
+            "com.atiproto.subscription",
+            "network.attested.entitlement"
+          ]
+        },
+        {
+          "type": "permission",
+          "resource": "rpc",
+          "aud": "*",
+          "lxm": [
+            "network.attested.payment.initiate",
+            "network.attested.payment.status",
+            "com.atiproto.payment.cart.checkout",
+            "com.atiproto.payment.cart.put"
+          ]
+        }
+      ]
+    }
+  }
+}

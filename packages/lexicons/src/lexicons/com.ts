@@ -3,3 +3,4 @@
  */
 
 export * as atiproto from './com/atiproto.js'
+export * as atproto from './com/atproto.js'

@@ -3,61 +3,114 @@
  */
 
 import { l } from '@atproto/lex'
+import * as RepoStrongRef from '../atproto/repo/strongRef.defs.js'
+import * as AttestedSignature from '../../network/attested/signature.defs.js'
 
 const $nsid = 'com.atiproto.cart'
 
 export { $nsid }
 
-/** A record representing a shopping cart for items/subscriptions */
 type Main = {
   $type: 'com.atiproto.cart'
-  items: CartItem[]
 
   /**
-   * ISO 4217 currency code
+   * DID of the recipient. Absent (null) when marked as private.
+   */
+  subject?: l.DidString
+
+  /**
+   * Cart line items. Each is a strongRef to a `com.atiproto.item` or `com.atiproto.subscription` record (the at-uri's collection segment identifies which). Empty (or absent) when marked as private.
+   */
+  items: RepoStrongRef.Main[]
+
+  /**
+   * ISO 4217 currency code.
    */
   currency: string
 
   /**
-   * Total amount in cents
+   * Total amount in the smallest unit of `currency`.
    */
-  total: number
+  total?: number
 
   /**
-   * Cart status
+   * Lifecycle state of the cart. When `payment` is present, the AppView snapshots the broker payment's status here (pending / completed / failed / refunded / cancelled). Before a payment is attached the cart's own lifecycle states apply (open / expired / abandoned). After fulfillment, the AppView (or merchant integration) advances to `fulfilled` to mark delivery. Open to extension via `knownValues` rather than a hard enum.
    */
-  status: 'open' | 'completed' | 'expired' | 'abandoned'
-
-  /**
-   * Creation timestamp
-   */
-  createdAt: l.DatetimeString
-
-  /**
-   * Expiration timestamp
-   */
-  expiresAt: l.DatetimeString
-
-  /**
-   * Completion timestamp
-   */
+  status:
+    | 'open'
+    | 'expired'
+    | 'abandoned'
+    | 'pending'
+    | 'completed'
+    | 'failed'
+    | 'refunded'
+    | 'cancelled'
+    | 'fulfilled'
+    | l.UnknownString
+  createdAt?: l.DatetimeString
+  expiresAt?: l.DatetimeString
   completedAt?: l.DatetimeString
+
+  /**
+   * StrongRef to the `network.attested.payment` record settling this cart. Set during checkout (or attached after the fact via `payment.cart.put`). Only the PoS can validate this field, so it is not writable via `com.atproto.repo.putRecord`.
+   */
+  payment?: RepoStrongRef.Main
+
+  /**
+   * Recipient AppView attestation(s). The AppView writes and updates its own cart records directly and signs them so the PoS can trust the validated state. Each entry is either an inline `network.attested.signature` or a `com.atproto.repo.strongRef` pointing at a remote `network.attested.proof` record. The canonical signing payload covers `items`, `currency`, `status`, plus `subject`, `total`, `createdAt`, `expiresAt`, `completedAt`, and `payment` when present. Mutating any of those fields invalidates every signature in this array.
+   */
+  signatures?: (
+    | l.$Typed<AttestedSignature.Main>
+    | l.$Typed<RepoStrongRef.Main>
+    | l.Unknown$TypedObject
+  )[]
 }
 
 export type { Main }
 
-/** A record representing a shopping cart for items/subscriptions */
 const main = l.record<'any', Main>(
   'any',
   $nsid,
   l.object({
-    items: l.array(l.ref<CartItem>((() => cartItem) as any)),
+    subject: l.optional(l.string({ format: 'did' })),
+    items: l.array(
+      l.ref<RepoStrongRef.Main>((() => RepoStrongRef.main) as any),
+    ),
     currency: l.string({ maxLength: 3 }),
-    total: l.integer(),
-    status: l.enum(['open', 'completed', 'expired', 'abandoned']),
-    createdAt: l.string({ format: 'datetime' }),
-    expiresAt: l.string({ format: 'datetime' }),
+    total: l.optional(l.integer()),
+    status: l.string<{
+      maxLength: 64
+      knownValues: [
+        'open',
+        'expired',
+        'abandoned',
+        'pending',
+        'completed',
+        'failed',
+        'refunded',
+        'cancelled',
+        'fulfilled',
+      ]
+    }>({ maxLength: 64 }),
+    createdAt: l.optional(l.string({ format: 'datetime' })),
+    expiresAt: l.optional(l.string({ format: 'datetime' })),
     completedAt: l.optional(l.string({ format: 'datetime' })),
+    payment: l.optional(
+      l.ref<RepoStrongRef.Main>((() => RepoStrongRef.main) as any),
+    ),
+    signatures: l.optional(
+      l.array(
+        l.typedUnion(
+          [
+            l.typedRef<AttestedSignature.Main>(
+              (() => AttestedSignature.main) as any,
+            ),
+            l.typedRef<RepoStrongRef.Main>((() => RepoStrongRef.main) as any),
+          ],
+          false,
+        ),
+      ),
+    ),
   }),
 )
 
@@ -76,90 +129,86 @@ export const $assert = /*#__PURE__*/ main.assert.bind(main),
   $validate = /*#__PURE__*/ main.validate.bind(main),
   $safeValidate = /*#__PURE__*/ main.safeValidate.bind(main)
 
-/** View of a cart record for use in API responses */
+/** Hydrated cart view returned by PoS get endpoints. */
 type View = {
   $type?: 'com.atiproto.cart#view'
-
-  /**
-   * AT-URI of the cart record
-   */
   uri: l.AtUriString
-  items: CartItem[]
-
-  /**
-   * ISO 4217 currency code
-   */
+  cid?: l.CidString
+  subject?: l.DidString
+  items: RepoStrongRef.Main[]
   currency: string
-
-  /**
-   * Total amount in cents
-   */
-  total: number
-
-  /**
-   * Cart status
-   */
-  status: 'open' | 'completed' | 'expired' | 'abandoned'
-
-  /**
-   * Creation timestamp
-   */
-  createdAt: l.DatetimeString
-
-  /**
-   * Expiration timestamp
-   */
-  expiresAt: l.DatetimeString
-
-  /**
-   * Completion timestamp
-   */
+  total?: number
+  status:
+    | 'open'
+    | 'expired'
+    | 'abandoned'
+    | 'pending'
+    | 'completed'
+    | 'failed'
+    | 'refunded'
+    | 'cancelled'
+    | 'fulfilled'
+    | l.UnknownString
+  createdAt?: l.DatetimeString
+  expiresAt?: l.DatetimeString
   completedAt?: l.DatetimeString
+  payment?: RepoStrongRef.Main
+  signatures?: (
+    | l.$Typed<AttestedSignature.Main>
+    | l.$Typed<RepoStrongRef.Main>
+    | l.Unknown$TypedObject
+  )[]
 }
 
 export type { View }
 
-/** View of a cart record for use in API responses */
+/** Hydrated cart view returned by PoS get endpoints. */
 const view = l.typedObject<View>(
   $nsid,
   'view',
   l.object({
     uri: l.string({ format: 'at-uri' }),
-    items: l.array(l.ref<CartItem>((() => cartItem) as any)),
+    cid: l.optional(l.string({ format: 'cid' })),
+    subject: l.optional(l.string({ format: 'did' })),
+    items: l.array(
+      l.ref<RepoStrongRef.Main>((() => RepoStrongRef.main) as any),
+    ),
     currency: l.string({ maxLength: 3 }),
-    total: l.integer(),
-    status: l.enum(['open', 'completed', 'expired', 'abandoned']),
-    createdAt: l.string({ format: 'datetime' }),
-    expiresAt: l.string({ format: 'datetime' }),
+    total: l.optional(l.integer()),
+    status: l.string<{
+      maxLength: 64
+      knownValues: [
+        'open',
+        'expired',
+        'abandoned',
+        'pending',
+        'completed',
+        'failed',
+        'refunded',
+        'cancelled',
+        'fulfilled',
+      ]
+    }>({ maxLength: 64 }),
+    createdAt: l.optional(l.string({ format: 'datetime' })),
+    expiresAt: l.optional(l.string({ format: 'datetime' })),
     completedAt: l.optional(l.string({ format: 'datetime' })),
+    payment: l.optional(
+      l.ref<RepoStrongRef.Main>((() => RepoStrongRef.main) as any),
+    ),
+    signatures: l.optional(
+      l.array(
+        l.typedUnion(
+          [
+            l.typedRef<AttestedSignature.Main>(
+              (() => AttestedSignature.main) as any,
+            ),
+            l.typedRef<RepoStrongRef.Main>((() => RepoStrongRef.main) as any),
+          ],
+          false,
+        ),
+      ),
+    ),
   }),
 )
 
 export { view }
-
-type CartItem = {
-  $type?: 'com.atiproto.cart#cartItem'
-
-  /**
-   * Type of cart item: item or subscription
-   */
-  type: 'com.atiproto.item' | 'com.atiproto.subscription'
-
-  /**
-   * AT-URI for item on record
-   */
-  recordUri: l.AtUriString
-}
-
-export type { CartItem }
-
-const cartItem = l.typedObject<CartItem>(
-  $nsid,
-  'cartItem',
-  l.object({
-    type: l.enum(['com.atiproto.item', 'com.atiproto.subscription']),
-    recordUri: l.string({ format: 'at-uri' }),
-  }),
-)
-
-export { cartItem }

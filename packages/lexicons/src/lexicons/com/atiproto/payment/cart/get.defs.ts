@@ -3,7 +3,6 @@
  */
 
 import { l } from '@atproto/lex'
-import * as AtiprotoActions from '../../actions.defs.js'
 import * as AtiprotoCart from '../../cart.defs.js'
 import * as AtiprotoItem from '../../item.defs.js'
 import * as AtiprotoSubscription from '../../subscription.defs.js'
@@ -12,28 +11,21 @@ const $nsid = 'com.atiproto.payment.cart.get'
 
 export { $nsid }
 
-/** Get a specific cart sent by the authenticated user, including resolved item and subscription records. One of `uri`, `itemUri`, or `subscriptionUri` is required. */
+/** Hydrate a cart by uri. Includes the resolved item and subscription records that the cart references. Broker payment state is reflected on the cart's own `status` field (snapshot maintained by the recipient AppView), so no separate payment lookup is needed. */
 const main = l.query(
   $nsid,
-  l.params({
-    uri: l.optional(l.string({ format: 'at-uri' })),
-    itemUri: l.optional(l.string({ format: 'at-uri' })),
-    subscriptionUri: l.optional(l.string({ format: 'at-uri' })),
-  }),
+  l.params({ uri: l.string({ format: 'at-uri' }) }),
   l.jsonPayload({
-    workflow: l.optional(
-      l.ref<AtiprotoActions.OutboundWorkflow>(
-        (() => AtiprotoActions.outboundWorkflow) as any,
-      ),
-    ),
-    uri: l.string({ format: 'at-uri' }),
-    cid: l.optional(l.string({ format: 'cid' })),
     cart: l.ref<AtiprotoCart.View>((() => AtiprotoCart.view) as any),
-    checkoutUrl: l.optional(l.string({ format: 'uri' })),
-    items: l.array(l.ref<AtiprotoItem.View>((() => AtiprotoItem.view) as any)),
-    subscriptions: l.array(
-      l.ref<AtiprotoSubscription.View>(
-        (() => AtiprotoSubscription.view) as any,
+    items: l.array(
+      l.typedUnion(
+        [
+          l.typedRef<AtiprotoItem.View>((() => AtiprotoItem.view) as any),
+          l.typedRef<AtiprotoSubscription.View>(
+            (() => AtiprotoSubscription.view) as any,
+          ),
+        ],
+        false,
       ),
     ),
   }),

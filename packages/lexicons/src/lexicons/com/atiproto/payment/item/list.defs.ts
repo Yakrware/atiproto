@@ -9,12 +9,11 @@ const $nsid = 'com.atiproto.payment.item.list'
 
 export { $nsid }
 
-/** List items sent by the authenticated user */
+/** List items sent by the authenticated user. */
 const main = l.query(
   $nsid,
   l.params({
-    subject: l.optional(l.string({ format: 'did' })),
-    recordUri: l.optional(l.string({ format: 'at-uri' })),
+    subject: l.optional(l.string({ format: 'at-uri' })),
     cursor: l.optional(l.string({ maxLength: 512 })),
     limit: l.optional(
       l.withDefault(l.integer({ minimum: 1, maximum: 100 }), 50),

@@ -1,0 +1,35 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.authReadCart",
+  "defs": {
+    "main": {
+      "type": "permission-set",
+      "title": "Read Cart",
+      "detail": "Read access to the authenticated user's carts and their line items (one-time items and subscriptions). Grants the PoS hydration endpoints plus the repo collections the records live in so callers can read the source records directly.",
+      "permissions": [
+        {
+          "type": "permission",
+          "resource": "repo",
+          "collection": [
+            "com.atiproto.cart",
+            "com.atiproto.item",
+            "com.atiproto.subscription"
+          ]
+        },
+        {
+          "type": "permission",
+          "resource": "rpc",
+          "aud": "*",
+          "lxm": [
+            "com.atiproto.payment.cart.get",
+            "com.atiproto.payment.cart.list",
+            "com.atiproto.payment.item.get",
+            "com.atiproto.payment.item.list",
+            "com.atiproto.payment.subscription.get",
+            "com.atiproto.payment.subscription.list"
+          ]
+        }
+      ]
+    }
+  }
+}

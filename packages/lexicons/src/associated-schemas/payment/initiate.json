@@ -1,0 +1,132 @@
+{
+  "lexicon": 1,
+  "id": "network.attested.payment.initiate",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Broker-side checkout procedure. Creates a pending `network.attested.payment` record signed by the broker and returns a checkout URL plus a strongRef to the payment. Line item details are retained internally by the broker; they do not appear on the resulting record.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["subject", "items"],
+          "properties": {
+            "subject": {
+              "type": "string",
+              "format": "did",
+              "description": "DID of the payment recipient. Required by the broker so it knows whom to pay; the resulting `network.attested.payment` record only carries `subject` if the issuer opts in to publishing it."
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "union",
+                "refs": ["#oneTime", "#recurring"]
+              },
+              "description": "Line items being paid for. Each entry is discriminated by `$type` as `#oneTime` or `#recurring`."
+            },
+            "redirectUrl": {
+              "type": "string",
+              "format": "uri",
+              "description": "URI the processor should redirect to after checkout completion or cancellation."
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["payment", "checkoutUrl"],
+          "properties": {
+            "payment": {
+              "type": "ref",
+              "ref": "com.atproto.repo.strongRef",
+              "description": "StrongRef to the newly created `network.attested.payment` record."
+            },
+            "checkoutUrl": {
+              "type": "string",
+              "format": "uri",
+              "description": "Processor-hosted checkout URL the payer should be redirected to."
+            }
+          }
+        }
+      }
+    },
+    "oneTime": {
+      "type": "object",
+      "description": "A one-time line item.",
+      "required": ["description", "amount", "currency"],
+      "properties": {
+        "description": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "amount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Line total in the smallest unit of `currency` (PoS-side quantity is already multiplied in)."
+        },
+        "currency": {
+          "type": "string",
+          "maxLength": 3,
+          "description": "ISO 4217 currency code."
+        }
+      }
+    },
+    "recurring": {
+      "type": "object",
+      "description": "A recurring line item billed at a fixed interval.",
+      "required": ["description", "amount", "currency", "interval"],
+      "properties": {
+        "description": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "amount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Per-period amount in the smallest unit of `currency`."
+        },
+        "currency": {
+          "type": "string",
+          "maxLength": 3,
+          "description": "ISO 4217 currency code."
+        },
+        "interval": {
+          "type": "union",
+          "refs": ["#namedInterval", "#customInterval"],
+          "description": "Billing cadence. Discriminated by `$type`: `#namedInterval` for the common cases (weekly / monthly / yearly), `#customInterval` for a custom number of days."
+        },
+        "billingStartDate": {
+          "type": "string",
+          "format": "datetime",
+          "description": "First billing period."
+        }
+      }
+    },
+    "namedInterval": {
+      "type": "object",
+      "description": "One of the well-known billing cadences.",
+      "required": ["value"],
+      "properties": {
+        "value": {
+          "type": "string",
+          "maxLength": 16,
+          "enum": ["weekly", "monthly", "yearly"]
+        }
+      }
+    },
+    "customInterval": {
+      "type": "object",
+      "description": "An arbitrary number-of-days interval. Lets callers set non-standard cadences (every 14 days, every 90 days, etc.).",
+      "required": ["days"],
+      "properties": {
+        "days": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Length of one billing period in days."
+        }
+      }
+    }
+  }
+}

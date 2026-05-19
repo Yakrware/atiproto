@@ -10,7 +10,7 @@ const $nsid = 'com.atiproto.payment.cart.put'
 
 export { $nsid }
 
-/** Update a cart. Only open carts can be updated. */
+/** Update a cart. */
 const main = l.procedure(
   $nsid,
   l.params(),
@@ -29,8 +29,9 @@ const main = l.procedure(
         (() => AtiprotoActions.outboundWorkflow) as any,
       ),
     ),
-    uri: l.optional(l.string({ format: 'at-uri' })),
-    cid: l.optional(l.string({ format: 'cid' })),
+    cart: l.optional(
+      l.ref<AtiprotoCart.View>((() => AtiprotoCart.view) as any),
+    ),
   }),
 )
 export { main }

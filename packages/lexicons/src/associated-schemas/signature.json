@@ -1,0 +1,44 @@
+{
+  "lexicon": 1,
+  "id": "network.attested.signature",
+  "description": "Inline attestation entry per the badge.blue scheme. Embedded directly in a record's `signatures` array. Required fields are `key`, `cid`, and `signature` itself; identity / role metadata (`issuer`, `issuedAt`, `purpose`) is optional. For remote attestations, use `com.atproto.repo.strongRef` in the signatures array instead (typically pointing at a `network.attested.proof` record).",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": ["key", "cid", "signature"],
+      "properties": {
+        "key": {
+          "type": "string",
+          "maxLength": 256,
+          "description": "did:key public-key reference used to verify this signature."
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid",
+          "description": "CID of the canonical signing payload (the record with `signatures` stripped, `$sig` metadata inserted including the repository DID, DAG-CBOR encoded, SHA-256 wrapped as CIDv1)."
+        },
+        "signature": {
+          "type": "bytes",
+          "maxLength": 256,
+          "description": "Normalized ECDSA signature bytes over the CID. Curve is inferred from `key` (P-256, P-384, or K-256). Serialized as `{ \"$bytes\": \"<base64>\" }` per lex bytes encoding."
+        },
+        "issuer": {
+          "type": "string",
+          "format": "did",
+          "description": "Optional. DID of the issuing party. Useful when `key` does not directly identify the issuer."
+        },
+        "issuedAt": {
+          "type": "string",
+          "format": "datetime",
+          "description": "Optional. When the signature was produced."
+        },
+        "role": {
+          "type": "string",
+          "maxLength": 64,
+          "knownValues": ["broker", "pos", "appview", "co-signer"],
+          "description": "Optional. Role under which the issuer signed. Lets verifiers reason about completeness (e.g. require both PoS and AppView attestations on a cart)."
+        }
+      }
+    }
+  }
+}

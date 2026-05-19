@@ -3,77 +3,117 @@
  */
 
 import { l } from '@atproto/lex'
+import * as RepoStrongRef from '../atproto/repo/strongRef.defs.js'
+import * as PaymentInitiate from '../../network/attested/payment/initiate.defs.js'
+import * as AttestedSignature from '../../network/attested/signature.defs.js'
 
 const $nsid = 'com.atiproto.subscription'
 
 export { $nsid }
 
-/** A record representing a subscription from one user to another */
 type Main = {
   $type: 'com.atiproto.subscription'
 
   /**
-   * DID of the user being subscribed to
+   * Reference to the entity being subscribed to. Either a `com.atproto.repo.strongRef` (a specific record, e.g. a paid feed) or a `#userRef` (a thin wrapper carrying a did string for the user being subscribed to). Absent when marked as private.
    */
-  subject: l.DidString
+  subject?:
+    | l.$Typed<RepoStrongRef.Main>
+    | l.$Typed<UserRef>
+    | l.Unknown$TypedObject
 
   /**
-   * Subscription amount in cents (0 for free subscriptions)
+   * Per-period subscription amount in the smallest unit of the cart's `currency` (0 for free).
    */
   amount: number
 
   /**
-   * ISO 4217 currency code
+   * Billing cadence. Mirrors `network.attested.payment.initiate#interval`: either `network.attested.payment.initiate#namedInterval` (weekly / monthly / yearly) or `network.attested.payment.initiate#customInterval` (`{ days: integer >= 1 }`).
    */
-  currency: string
+  interval:
+    | l.$Typed<PaymentInitiate.NamedInterval>
+    | l.$Typed<PaymentInitiate.CustomInterval>
+    | l.Unknown$TypedObject
 
   /**
-   * Billing interval
+   * Subscription lifecycle state. Open to extension via `knownValues`; PoS continues to interpret these values for subscription-specific flows (renewal, dunning, etc.).
    */
-  interval: 'monthly' | 'yearly'
+  status:
+    | 'pending'
+    | 'active'
+    | 'past_due'
+    | 'cancelled'
+    | 'expired'
+    | l.UnknownString
 
   /**
-   * Subscription status
-   */
-  status: 'pending' | 'active' | 'past_due' | 'cancelled' | 'expired'
-
-  /**
-   * First billing period, can be used to determine recurrence
+   * First billing period; can be used to derive recurrence.
    */
   billingStartDate: l.DatetimeString
-
-  /**
-   * Cancellation timestamp
-   */
   cancelledAt?: l.DatetimeString
 
   /**
-   * Date until which the subscriber retains access after cancellation
+   * Date until which the subscriber retains access after cancellation.
    */
   accessUntil?: l.DatetimeString
+  createdAt: l.DatetimeString
 
   /**
-   * Creation timestamp
+   * PoS + recipient AppView attestations. Each entry is either an inline `network.attested.signature` or a `com.atproto.repo.strongRef` pointing at a remote `network.attested.proof` record. The canonical signing payload covers `amount`, `interval`, `status`, `billingStartDate`, `createdAt`, plus `subject`, `cancelledAt`, and `accessUntil` when present. Mutating any of those fields invalidates every signature in this array.
    */
-  createdAt: l.DatetimeString
+  signatures: (
+    | l.$Typed<AttestedSignature.Main>
+    | l.$Typed<RepoStrongRef.Main>
+    | l.Unknown$TypedObject
+  )[]
 }
 
 export type { Main }
 
-/** A record representing a subscription from one user to another */
 const main = l.record<'any', Main>(
   'any',
   $nsid,
   l.object({
-    subject: l.string({ format: 'did' }),
+    subject: l.optional(
+      l.typedUnion(
+        [
+          l.typedRef<RepoStrongRef.Main>((() => RepoStrongRef.main) as any),
+          l.typedRef<UserRef>((() => userRef) as any),
+        ],
+        false,
+      ),
+    ),
     amount: l.integer({ minimum: 0 }),
-    currency: l.string({ maxLength: 3 }),
-    interval: l.enum(['monthly', 'yearly']),
-    status: l.enum(['pending', 'active', 'past_due', 'cancelled', 'expired']),
+    interval: l.typedUnion(
+      [
+        l.typedRef<PaymentInitiate.NamedInterval>(
+          (() => PaymentInitiate.namedInterval) as any,
+        ),
+        l.typedRef<PaymentInitiate.CustomInterval>(
+          (() => PaymentInitiate.customInterval) as any,
+        ),
+      ],
+      false,
+    ),
+    status: l.string<{
+      maxLength: 64
+      knownValues: ['pending', 'active', 'past_due', 'cancelled', 'expired']
+    }>({ maxLength: 64 }),
     billingStartDate: l.string({ format: 'datetime' }),
     cancelledAt: l.optional(l.string({ format: 'datetime' })),
     accessUntil: l.optional(l.string({ format: 'datetime' })),
     createdAt: l.string({ format: 'datetime' }),
+    signatures: l.array(
+      l.typedUnion(
+        [
+          l.typedRef<AttestedSignature.Main>(
+            (() => AttestedSignature.main) as any,
+          ),
+          l.typedRef<RepoStrongRef.Main>((() => RepoStrongRef.main) as any),
+        ],
+        false,
+      ),
+    ),
   }),
 )
 
@@ -92,85 +132,108 @@ export const $assert = /*#__PURE__*/ main.assert.bind(main),
   $validate = /*#__PURE__*/ main.validate.bind(main),
   $safeValidate = /*#__PURE__*/ main.safeValidate.bind(main)
 
-/** View of a subscription record for use in API responses */
 type View = {
   $type?: 'com.atiproto.subscription#view'
-
-  /**
-   * AT-URI of the subscription record
-   */
   uri: l.AtUriString
-
-  /**
-   * DID of the user being subscribed to
-   */
-  subject?: l.DidString
-
-  /**
-   * Subscription amount in cents (0 for free subscriptions)
-   */
+  cid?: l.CidString
+  subject?:
+    | l.$Typed<RepoStrongRef.Main>
+    | l.$Typed<UserRef>
+    | l.Unknown$TypedObject
   amount: number
-
-  /**
-   * ISO 4217 currency code
-   */
-  currency: string
-
-  /**
-   * Billing interval
-   */
-  interval: 'monthly' | 'yearly'
-
-  /**
-   * Subscription status
-   */
-  status: 'pending' | 'active' | 'past_due' | 'cancelled' | 'expired'
-
-  /**
-   * First billing period, can be used to determine recurrence
-   */
+  interval:
+    | l.$Typed<PaymentInitiate.NamedInterval>
+    | l.$Typed<PaymentInitiate.CustomInterval>
+    | l.Unknown$TypedObject
+  status:
+    | 'pending'
+    | 'active'
+    | 'past_due'
+    | 'cancelled'
+    | 'expired'
+    | l.UnknownString
   billingStartDate: l.DatetimeString
 
   /**
-   * Next scheduled renewal/billing date. Server-derived from the billing schedule; not stored in PDS. Omitted when not applicable (e.g. cancelled or unauthenticated views).
+   * Next scheduled renewal/billing date. Server-derived from the billing schedule; not stored on the record.
    */
   renewalDate?: l.DatetimeString
-
-  /**
-   * Cancellation timestamp
-   */
   cancelledAt?: l.DatetimeString
-
-  /**
-   * Date until which the subscriber retains access after cancellation
-   */
   accessUntil?: l.DatetimeString
-
-  /**
-   * Creation timestamp
-   */
   createdAt: l.DatetimeString
+  signatures?: (
+    | l.$Typed<AttestedSignature.Main>
+    | l.$Typed<RepoStrongRef.Main>
+    | l.Unknown$TypedObject
+  )[]
 }
 
 export type { View }
 
-/** View of a subscription record for use in API responses */
 const view = l.typedObject<View>(
   $nsid,
   'view',
   l.object({
     uri: l.string({ format: 'at-uri' }),
-    subject: l.optional(l.string({ format: 'did' })),
+    cid: l.optional(l.string({ format: 'cid' })),
+    subject: l.optional(
+      l.typedUnion(
+        [
+          l.typedRef<RepoStrongRef.Main>((() => RepoStrongRef.main) as any),
+          l.typedRef<UserRef>((() => userRef) as any),
+        ],
+        false,
+      ),
+    ),
     amount: l.integer({ minimum: 0 }),
-    currency: l.string({ maxLength: 3 }),
-    interval: l.enum(['monthly', 'yearly']),
-    status: l.enum(['pending', 'active', 'past_due', 'cancelled', 'expired']),
+    interval: l.typedUnion(
+      [
+        l.typedRef<PaymentInitiate.NamedInterval>(
+          (() => PaymentInitiate.namedInterval) as any,
+        ),
+        l.typedRef<PaymentInitiate.CustomInterval>(
+          (() => PaymentInitiate.customInterval) as any,
+        ),
+      ],
+      false,
+    ),
+    status: l.string<{
+      maxLength: 64
+      knownValues: ['pending', 'active', 'past_due', 'cancelled', 'expired']
+    }>({ maxLength: 64 }),
     billingStartDate: l.string({ format: 'datetime' }),
     renewalDate: l.optional(l.string({ format: 'datetime' })),
     cancelledAt: l.optional(l.string({ format: 'datetime' })),
     accessUntil: l.optional(l.string({ format: 'datetime' })),
     createdAt: l.string({ format: 'datetime' }),
+    signatures: l.optional(
+      l.array(
+        l.typedUnion(
+          [
+            l.typedRef<AttestedSignature.Main>(
+              (() => AttestedSignature.main) as any,
+            ),
+            l.typedRef<RepoStrongRef.Main>((() => RepoStrongRef.main) as any),
+          ],
+          false,
+        ),
+      ),
+    ),
   }),
 )
 
 export { view }
+
+/** Thin wrapper that carries a bare did string for the user being subscribed to. The wire shape is `{ "$type": "com.atiproto.subscription#userRef", "did": "did:plc:..." }`; pair with `com.atproto.repo.strongRef` in a `subject` union to express either-or. */
+type UserRef = { $type?: 'com.atiproto.subscription#userRef'; did: l.DidString }
+
+export type { UserRef }
+
+/** Thin wrapper that carries a bare did string for the user being subscribed to. The wire shape is `{ "$type": "com.atiproto.subscription#userRef", "did": "did:plc:..." }`; pair with `com.atproto.repo.strongRef` in a `subject` union to express either-or. */
+const userRef = l.typedObject<UserRef>(
+  $nsid,
+  'userRef',
+  l.object({ did: l.string({ format: 'did' }) }),
+)
+
+export { userRef }

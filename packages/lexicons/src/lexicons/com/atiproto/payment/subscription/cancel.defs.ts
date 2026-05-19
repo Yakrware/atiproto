@@ -10,7 +10,7 @@ const $nsid = 'com.atiproto.payment.subscription.cancel'
 
 export { $nsid }
 
-/** Cancel an active subscription */
+/** Cancel an active subscription. Should be implemented by broker. May be implemented by PoS to orchestrate with broker. */
 const main = l.procedure(
   $nsid,
   l.params(),
@@ -28,7 +28,6 @@ const main = l.procedure(
         (() => AtiprotoActions.outboundWorkflow) as any,
       ),
     ),
-    subscriptionUri: l.optional(l.string({ format: 'at-uri' })),
     subscription: l.optional(
       l.ref<AtiprotoSubscription.View>(
         (() => AtiprotoSubscription.view) as any,

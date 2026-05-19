@@ -1,0 +1,50 @@
+{
+  "lexicon": 1,
+  "id": "network.attested.entitlement",
+  "description": "A standalone, lexicon-agnostic entitlement record issued by the PoS as a post-checkout completion step. Carries the entitled subject and a strongRef array of records the subject is entitled to as a result of the linked payment. Signed by the PoS. `subject` and `entitlements` are absent when the record is marked as private; only the existence of an entitlement (with `payment` and signatures) remains.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": ["payment", "createdAt", "signatures"],
+        "properties": {
+          "subject": {
+            "type": "string",
+            "format": "did",
+            "description": "DID of the entitled party. Absent (null) when marked as private."
+          },
+          "entitlements": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "com.atproto.repo.strongRef"
+            },
+            "description": "Strong references to the records the subject is entitled to. Lexicon-agnostic: refs may point at any record type. Empty (or absent) when marked as private."
+          },
+          "payment": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef",
+            "description": "StrongRef to the `network.attested.payment` record that justified this entitlement. Entitlements reference payments; payments do not reference carts or entitlements back."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "signatures": {
+            "type": "array",
+            "items": {
+              "type": "union",
+              "refs": [
+                "network.attested.signature",
+                "com.atproto.repo.strongRef"
+              ]
+            },
+            "description": "PoS attestation(s). Each entry is either an inline `network.attested.signature` or a `com.atproto.repo.strongRef` pointing at a remote `network.attested.proof` record. The canonical signing payload covers `payment`, `createdAt`, plus `subject` and `entitlements` when present. Mutating any of those fields invalidates every signature in this array."
+          }
+        }
+      }
+    }
+  }
+}

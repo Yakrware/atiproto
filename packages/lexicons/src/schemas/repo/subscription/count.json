@@ -4,24 +4,24 @@
   "defs": {
     "main": {
       "type": "query",
-      "description": "Count active subscriptions. If subject is provided, counts subscriptions received by that DID. If omitted, counts subscriptions the authenticated user has active (as the subscriber). Optionally filtered by a start/end datetime window (matching billingStartDate). When the authenticated user is the subject/owner of the target, the response also includes the sum of amounts.",
+      "description": "Count active subscriptions. When `record` is provided, counts subscriptions targeting that at-uri (either a specific record or, when the at-uri is repo-level like `at://did:plc:...`, all subscriptions the named user receives). When omitted, counts subscriptions the authenticated user has active as the subscriber. Optionally filtered by a start/end datetime window (matching `billingStartDate`). When the authenticated caller is the subject/owner of the target (or counting their own active subscriptions), the response also includes the sum of amounts.",
       "parameters": {
         "type": "params",
         "properties": {
-          "subject": {
+          "record": {
             "type": "string",
-            "format": "did",
-            "description": "DID of the user being subscribed to. If omitted, the query counts subscriptions the authenticated user has active as the subscriber."
+            "format": "at-uri",
+            "description": "Optional. Pass an at-uri to a specific record (the subscription's `subject` strongRef), or `at://did:plc:...` (a repo-level at-uri) to match subscriptions whose `subject` is a `#userRef` carrying that DID. Omit to count subscriptions the authenticated caller is the subscriber on."
           },
           "startDate": {
             "type": "string",
             "format": "datetime",
-            "description": "Only count subscriptions whose billingStartDate is at or after this timestamp"
+            "description": "Only count subscriptions whose `billingStartDate` is at or after this timestamp."
           },
           "endDate": {
             "type": "string",
             "format": "datetime",
-            "description": "Only count subscriptions whose billingStartDate is at or before this timestamp"
+            "description": "Only count subscriptions whose `billingStartDate` is at or before this timestamp."
           }
         }
       },
@@ -33,16 +33,16 @@
           "properties": {
             "count": {
               "type": "integer",
-              "description": "Number of active subscriptions matching the filter"
+              "description": "Number of active subscriptions matching the filter."
             },
             "amount": {
               "type": "integer",
-              "description": "Sum of all subscription amounts in cents. Only returned when the authenticated user is the subject/owner of the target (or when counting their own active subscriptions)."
+              "description": "Sum of all subscription amounts in the smallest unit of `currency`. Only returned when the authenticated caller is the subject/owner of the target (or when counting their own active subscriptions)."
             },
             "currency": {
               "type": "string",
               "maxLength": 3,
-              "description": "Currency of the summed amount. Only returned when the authenticated user is the subject/owner of the target (or when counting their own active subscriptions)."
+              "description": "Currency of the summed amount. Only returned when the authenticated caller is the subject/owner of the target (or when counting their own active subscriptions)."
             }
           }
         }

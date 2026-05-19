@@ -1,0 +1,24 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.authWriteProfile",
+  "defs": {
+    "main": {
+      "type": "permission-set",
+      "title": "Write Profile",
+      "detail": "Update the authenticated user's payment profile. Grants the PoS-side `recipient.profile.put` endpoint plus repo write on the `com.atiproto.profile` collection.",
+      "permissions": [
+        {
+          "type": "permission",
+          "resource": "repo",
+          "collection": ["com.atiproto.profile"]
+        },
+        {
+          "type": "permission",
+          "resource": "rpc",
+          "aud": "*",
+          "lxm": ["com.atiproto.recipient.profile.put"]
+        }
+      ]
+    }
+  }
+}

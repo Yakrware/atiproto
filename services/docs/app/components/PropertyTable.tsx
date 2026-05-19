@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 
-const LEXICON_PREFIX = "com.atiproto.";
+const LEXICON_PREFIXES = ["com.atiproto.", "network.attested."] as const;
 
 interface Property {
   name: string;
@@ -20,7 +20,8 @@ interface PropertyTableProps {
 }
 
 function isLinkableRef(ref: string): boolean {
-  return ref.startsWith(LEXICON_PREFIX) && !ref.startsWith("#");
+  if (ref.startsWith("#")) return false;
+  return LEXICON_PREFIXES.some((p) => ref.startsWith(p));
 }
 
 function RefLink({ ref: refId }: { ref: string }) {

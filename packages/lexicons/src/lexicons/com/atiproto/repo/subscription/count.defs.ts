@@ -8,11 +8,11 @@ const $nsid = 'com.atiproto.repo.subscription.count'
 
 export { $nsid }
 
-/** Count active subscriptions. If subject is provided, counts subscriptions received by that DID. If omitted, counts subscriptions the authenticated user has active (as the subscriber). Optionally filtered by a start/end datetime window (matching billingStartDate). When the authenticated user is the subject/owner of the target, the response also includes the sum of amounts. */
+/** Count active subscriptions. When `record` is provided, counts subscriptions targeting that at-uri (either a specific record or, when the at-uri is repo-level like `at://did:plc:...`, all subscriptions the named user receives). When omitted, counts subscriptions the authenticated user has active as the subscriber. Optionally filtered by a start/end datetime window (matching `billingStartDate`). When the authenticated caller is the subject/owner of the target (or counting their own active subscriptions), the response also includes the sum of amounts. */
 const main = l.query(
   $nsid,
   l.params({
-    subject: l.optional(l.string({ format: 'did' })),
+    record: l.optional(l.string({ format: 'at-uri' })),
     startDate: l.optional(l.string({ format: 'datetime' })),
     endDate: l.optional(l.string({ format: 'datetime' })),
   }),

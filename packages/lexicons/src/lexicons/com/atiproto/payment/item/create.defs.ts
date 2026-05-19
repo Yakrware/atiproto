@@ -3,27 +3,32 @@
  */
 
 import { l } from '@atproto/lex'
-import * as AtiprotoActions from '../../actions.defs.js'
+import * as RepoStrongRef from '../../../atproto/repo/strongRef.defs.js'
 import * as AtiprotoItem from '../../item.defs.js'
-import * as AtiprotoCart from '../../cart.defs.js'
+import * as AtiprotoActions from '../../actions.defs.js'
 
 const $nsid = 'com.atiproto.payment.item.create'
 
 export { $nsid }
 
-/** Create a item on a DID or specific record. Creates or adds to a cart and returns a checkout URL. */
+/** Create an item. */
 const main = l.procedure(
   $nsid,
   l.params(),
   l.jsonPayload({
-    subject: l.string({ format: 'did' }),
-    recordUri: l.optional(l.string({ format: 'at-uri' })),
-    amount: l.integer(),
-    currency: l.string({ maxLength: 3 }),
-    cartUri: l.optional(l.string({ format: 'at-uri' })),
-    redirectUrl: l.optional(l.string({ format: 'uri' })),
+    subject: l.typedUnion(
+      [
+        l.typedRef<RepoStrongRef.Main>((() => RepoStrongRef.main) as any),
+        l.typedRef<AtiprotoItem.UserRef>((() => AtiprotoItem.userRef) as any),
+      ],
+      false,
+    ),
+    amount: l.integer({ minimum: 0 }),
+    quantity: l.optional(l.withDefault(l.integer({ minimum: 1 }), 1)),
+    currency: l.optional(l.string({ maxLength: 3 })),
     message: l.optional(l.string({ maxGraphemes: 500, maxLength: 5000 })),
-    isPrivate: l.optional(l.boolean()),
+    private: l.optional(l.boolean()),
+    cartUri: l.optional(l.string({ format: 'at-uri' })),
     workflow: l.optional(
       l.ref<AtiprotoActions.InboundWorkflow>(
         (() => AtiprotoActions.inboundWorkflow) as any,
@@ -36,15 +41,7 @@ const main = l.procedure(
         (() => AtiprotoActions.outboundWorkflow) as any,
       ),
     ),
-    itemUri: l.optional(l.string({ format: 'at-uri' })),
-    item: l.optional(
-      l.ref<AtiprotoItem.View>((() => AtiprotoItem.view) as any),
-    ),
-    cartUri: l.optional(l.string({ format: 'at-uri' })),
-    cart: l.optional(
-      l.ref<AtiprotoCart.View>((() => AtiprotoCart.view) as any),
-    ),
-    checkoutUrl: l.optional(l.string({ format: 'uri' })),
+    item: l.ref<AtiprotoItem.View>((() => AtiprotoItem.view) as any),
   }),
 )
 export { main }
