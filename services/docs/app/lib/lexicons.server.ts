@@ -58,6 +58,28 @@ export function buildNavTree(): NavItem[] {
     { label: "Edge OAuth Client", href: "/docs/edge-oauth" },
   ];
 
+  const packages: NavItem[] = [
+    {
+      label: "atproto-attestation",
+      children: [
+        { label: "Get Started", href: "/docs/atproto-attestation" },
+        {
+          label: "Attestation",
+          href: "/docs/atproto-attestation/Attestation",
+        },
+        { label: "verify", href: "/docs/atproto-attestation/verify" },
+        {
+          label: "KeyResolver & RecordResolver",
+          href: "/docs/atproto-attestation/resolvers",
+        },
+        {
+          label: "did:key utilities",
+          href: "/docs/atproto-attestation/keys",
+        },
+      ],
+    },
+  ];
+
   const edgePackages: NavItem[] = [
     {
       label: "edge-oauth-client",
@@ -255,6 +277,7 @@ export function buildNavTree(): NavItem[] {
 
   const tree: NavItem[] = [
     { label: "Guides", children: guides },
+    { label: "Packages", children: packages },
     { label: "Edge OAuth Packages", children: edgePackages },
     {
       label: "Record Types",

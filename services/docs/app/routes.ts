@@ -8,6 +8,22 @@ export default [
     route("stripe-connect", "routes/stripe-connect.tsx"),
     route("edge-oauth", "routes/edge-oauth.tsx"),
 
+    // atproto-attestation
+    route("atproto-attestation", "routes/atproto-attestation/_index.tsx"),
+    route(
+      "atproto-attestation/Attestation",
+      "routes/atproto-attestation/Attestation.tsx",
+    ),
+    route(
+      "atproto-attestation/verify",
+      "routes/atproto-attestation/verify.tsx",
+    ),
+    route(
+      "atproto-attestation/resolvers",
+      "routes/atproto-attestation/resolvers.tsx",
+    ),
+    route("atproto-attestation/keys", "routes/atproto-attestation/keys.tsx"),
+
     // edge-oauth-client
     route("edge-oauth-client", "routes/edge-oauth-client/_index.tsx"),
     route(
