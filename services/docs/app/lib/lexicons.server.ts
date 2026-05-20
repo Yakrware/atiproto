@@ -78,9 +78,6 @@ export function buildNavTree(): NavItem[] {
         },
       ],
     },
-  ];
-
-  const edgePackages: NavItem[] = [
     {
       label: "edge-oauth-client",
       children: [
@@ -278,7 +275,6 @@ export function buildNavTree(): NavItem[] {
   const tree: NavItem[] = [
     { label: "Guides", children: guides },
     { label: "Packages", children: packages },
-    { label: "Edge OAuth Packages", children: edgePackages },
     {
       label: "Record Types",
       children: records.sort((a, b) => a.label.localeCompare(b.label)),
