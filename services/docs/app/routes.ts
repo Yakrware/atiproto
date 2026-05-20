@@ -24,6 +24,36 @@ export default [
     ),
     route("atproto-attestation/keys", "routes/atproto-attestation/keys.tsx"),
 
+    // key-resolver
+    route("key-resolver", "routes/key-resolver/_index.tsx"),
+    route(
+      "key-resolver/DidKeyResolver",
+      "routes/key-resolver/DidKeyResolver.tsx",
+    ),
+    route(
+      "key-resolver/FetchKeyResolver",
+      "routes/key-resolver/FetchKeyResolver.tsx",
+    ),
+    route(
+      "key-resolver/EdgeKeyResolver",
+      "routes/key-resolver/EdgeKeyResolver.tsx",
+    ),
+
+    // record-resolver
+    route("record-resolver", "routes/record-resolver/_index.tsx"),
+    route(
+      "record-resolver/FetchRecordResolver",
+      "routes/record-resolver/FetchRecordResolver.tsx",
+    ),
+    route(
+      "record-resolver/AgentRecordResolver",
+      "routes/record-resolver/AgentRecordResolver.tsx",
+    ),
+    route(
+      "record-resolver/EdgeRecordResolver",
+      "routes/record-resolver/EdgeRecordResolver.tsx",
+    ),
+
     // edge-oauth-client
     route("edge-oauth-client", "routes/edge-oauth-client/_index.tsx"),
     route(

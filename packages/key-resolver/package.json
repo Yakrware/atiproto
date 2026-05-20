@@ -1,0 +1,42 @@
+{
+  "name": "@atiproto/key-resolver",
+  "version": "0.0.1",
+  "description": "KeyResolver implementations for @atiproto/atproto-attestation: did:key, fetch-backed DID document resolution, and edge-cached variants",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup && tsc --emitDeclarationOnly --declaration",
+    "prepack": "npm run build",
+    "test": "vitest run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Yakrware/atiproto.git",
+    "directory": "packages/key-resolver"
+  },
+  "homepage": "https://atiproto.com/docs/key-resolver",
+  "bugs": "https://github.com/Yakrware/atiproto/issues",
+  "license": "MIT",
+  "dependencies": {
+    "@atiproto/atproto-attestation": "^0.0.1",
+    "@atproto-labs/simple-store": "^0.3.0",
+    "@atproto-labs/simple-store-memory": "^0.1.4"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.2",
+    "vitest": "^4.1.4"
+  }
+}

@@ -79,6 +79,42 @@ export function buildNavTree(): NavItem[] {
       ],
     },
     {
+      label: "key-resolver",
+      children: [
+        { label: "Get Started", href: "/docs/key-resolver" },
+        {
+          label: "DidKeyResolver",
+          href: "/docs/key-resolver/DidKeyResolver",
+        },
+        {
+          label: "FetchKeyResolver",
+          href: "/docs/key-resolver/FetchKeyResolver",
+        },
+        {
+          label: "EdgeKeyResolver",
+          href: "/docs/key-resolver/EdgeKeyResolver",
+        },
+      ],
+    },
+    {
+      label: "record-resolver",
+      children: [
+        { label: "Get Started", href: "/docs/record-resolver" },
+        {
+          label: "FetchRecordResolver",
+          href: "/docs/record-resolver/FetchRecordResolver",
+        },
+        {
+          label: "AgentRecordResolver",
+          href: "/docs/record-resolver/AgentRecordResolver",
+        },
+        {
+          label: "EdgeRecordResolver",
+          href: "/docs/record-resolver/EdgeRecordResolver",
+        },
+      ],
+    },
+    {
       label: "edge-oauth-client",
       children: [
         { label: "Get Started", href: "/docs/edge-oauth-client" },
