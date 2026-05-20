@@ -6,7 +6,7 @@ export default function KeyResolverIndex() {
     <div>
       <h1 className="text-2xl font-bold mb-2">key-resolver</h1>
       <p className="text-text-muted dark:text-text-muted-dark mb-8">
-        Ready-made{" "}
+        Factory functions that return{" "}
         <a
           href="/docs/atproto-attestation/resolvers"
           className="text-primary dark:text-primary-dark hover:underline font-mono text-sm"
@@ -17,8 +17,12 @@ export default function KeyResolverIndex() {
         <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
           @atiproto/atproto-attestation
         </code>
-        . Pick the one that matches your runtime: bare did:key parsing, live
-        DID-document fetch, or a cached fetch suitable for the edge.
+        . Each factory returns a function with the canonical KeyResolver
+        signature, ready to drop into{" "}
+        <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+          verify
+        </code>
+        .
       </p>
 
       <section className="mb-10">
@@ -35,36 +39,36 @@ export default function KeyResolverIndex() {
         <ul className="space-y-3 text-sm">
           <li>
             <a
-              href="/docs/key-resolver/DidKeyResolver"
+              href="/docs/key-resolver/createDidKeyResolver"
               className="text-primary dark:text-primary-dark hover:underline font-mono"
             >
-              DidKeyResolver
-            </a>{" "}
-            — local-only parser for <code className="font-mono">did:key:</code>{" "}
+              createDidKeyResolver
+            </a>
+            : local-only parser for <code className="font-mono">did:key:</code>{" "}
             references. Same behavior as the verifier's built-in default,
-            exposed as a class so you can compose it explicitly.
+            exposed as an explicit factory.
           </li>
           <li>
             <a
-              href="/docs/key-resolver/FetchKeyResolver"
+              href="/docs/key-resolver/createFetchKeyResolver"
               className="text-primary dark:text-primary-dark hover:underline font-mono"
             >
-              FetchKeyResolver
-            </a>{" "}
-            — fetches DID documents from the PLC directory or did:web hosts
+              createFetchKeyResolver
+            </a>
+            : fetches DID documents from the PLC directory or did:web hosts
             using <code className="font-mono">fetch</code>, then extracts the
             key from the named verification method. Pure network, no cache.
           </li>
           <li>
             <a
-              href="/docs/key-resolver/EdgeKeyResolver"
+              href="/docs/key-resolver/createCachedKeyResolver"
               className="text-primary dark:text-primary-dark hover:underline font-mono"
             >
-              EdgeKeyResolver
-            </a>{" "}
-            — same as <code className="font-mono">FetchKeyResolver</code> with a{" "}
-            <code className="font-mono">SimpleStore</code> cache in front of the
-            DID document fetch. Defaults to in-memory; pair with{" "}
+              createCachedKeyResolver
+            </a>
+            : same as <code className="font-mono">createFetchKeyResolver</code>{" "}
+            with a <code className="font-mono">SimpleStore</code> cache in front
+            of the DID document fetch. Defaults to in-memory. Pair with{" "}
             <a
               href="/docs/edge-resolver-cache"
               className="text-primary dark:text-primary-dark hover:underline font-mono"
@@ -82,10 +86,10 @@ export default function KeyResolverIndex() {
         </AnchorHeading>
         <CodeBlock
           code={`import { verify } from "@atiproto/atproto-attestation";
-import { EdgeKeyResolver } from "@atiproto/key-resolver";
+import { createCachedKeyResolver } from "@atiproto/key-resolver";
 import { createDidCache } from "@atiproto/edge-resolver-cache";
 
-const keys = new EdgeKeyResolver({
+const keyResolver = createCachedKeyResolver({
   plcUrl: "https://plc.directory",
   cache: createDidCache(),
 });
@@ -94,7 +98,7 @@ const result = await verify({
   record,
   repository: "did:plc:recipient",
   fields: ["items", "currency", "status"],
-  keyResolver: keys.resolve,
+  keyResolver,
 });`}
         />
       </section>
@@ -110,8 +114,8 @@ const result = await verify({
               className="text-primary dark:text-primary-dark hover:underline font-mono"
             >
               KeyResolver &amp; RecordResolver
-            </a>{" "}
-            — the underlying resolver interfaces.
+            </a>
+            : the underlying resolver interfaces.
           </li>
           <li>
             <a
@@ -119,8 +123,8 @@ const result = await verify({
               className="text-primary dark:text-primary-dark hover:underline font-mono"
             >
               record-resolver
-            </a>{" "}
-            — companion package for remote (proof-record) attestations.
+            </a>
+            : companion package for remote (proof-record) attestations.
           </li>
         </ul>
       </section>

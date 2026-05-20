@@ -1,9 +1,9 @@
-import { parseAtUri, type RecordMap } from "./types.js";
+import { parseAtUri, type RecordMap, type RecordResolver } from "./types.js";
 
 export interface FetchRecordResolverOptions {
   /**
-   * Base URL of the relay (or PDS) used to fetch records. Calls land on
-   * `${relay}/xrpc/com.atproto.repo.getRecord`. Default:
+   * Base URL of the relay (or PDS) used to fetch records. Calls land
+   * on `${relay}/xrpc/com.atproto.repo.getRecord`. Default:
    * `https://bsky.network`.
    */
   relay?: string;
@@ -17,35 +17,28 @@ const DEFAULT_RELAY = "https://bsky.network";
 const DEFAULT_TIMEOUT = 3000;
 
 /**
- * Resolves `at://` URIs to record values by calling
- * `com.atproto.repo.getRecord` on a configurable relay.
- *
- * Suitable for verifying remote attestations from anywhere with HTTPS —
- * no auth required since proof records are public.
+ * Builds a RecordResolver that calls `com.atproto.repo.getRecord` on a
+ * configurable relay (or PDS) over plain `fetch`. No auth.
  */
-export class FetchRecordResolver {
-  private readonly relay: string;
-  private readonly timeout: number;
-  private readonly fetchImpl: typeof fetch;
+export function createFetchRecordResolver(
+  options: FetchRecordResolverOptions = {},
+): RecordResolver {
+  const relay = options.relay ?? DEFAULT_RELAY;
+  const timeout = options.timeout ?? DEFAULT_TIMEOUT;
+  const fetchImpl = options.fetch ?? fetch;
 
-  constructor(options: FetchRecordResolverOptions = {}) {
-    this.relay = options.relay ?? DEFAULT_RELAY;
-    this.timeout = options.timeout ?? DEFAULT_TIMEOUT;
-    this.fetchImpl = options.fetch ?? fetch;
-  }
-
-  resolve = async (uri: string): Promise<RecordMap> => {
+  return async (uri) => {
     const { repo, collection, rkey } = parseAtUri(uri);
 
-    const url = new URL("/xrpc/com.atproto.repo.getRecord", this.relay);
+    const url = new URL("/xrpc/com.atproto.repo.getRecord", relay);
     url.searchParams.set("repo", repo);
     url.searchParams.set("collection", collection);
     url.searchParams.set("rkey", rkey);
 
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), this.timeout);
+    const timer = setTimeout(() => controller.abort(), timeout);
     try {
-      const res = await this.fetchImpl(url, {
+      const res = await fetchImpl(url, {
         signal: controller.signal,
         headers: { accept: "application/json" },
       });

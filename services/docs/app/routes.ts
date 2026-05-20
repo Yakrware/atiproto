@@ -27,31 +27,31 @@ export default [
     // key-resolver
     route("key-resolver", "routes/key-resolver/_index.tsx"),
     route(
-      "key-resolver/DidKeyResolver",
-      "routes/key-resolver/DidKeyResolver.tsx",
+      "key-resolver/createDidKeyResolver",
+      "routes/key-resolver/createDidKeyResolver.tsx",
     ),
     route(
-      "key-resolver/FetchKeyResolver",
-      "routes/key-resolver/FetchKeyResolver.tsx",
+      "key-resolver/createFetchKeyResolver",
+      "routes/key-resolver/createFetchKeyResolver.tsx",
     ),
     route(
-      "key-resolver/EdgeKeyResolver",
-      "routes/key-resolver/EdgeKeyResolver.tsx",
+      "key-resolver/createCachedKeyResolver",
+      "routes/key-resolver/createCachedKeyResolver.tsx",
     ),
 
     // record-resolver
     route("record-resolver", "routes/record-resolver/_index.tsx"),
     route(
-      "record-resolver/FetchRecordResolver",
-      "routes/record-resolver/FetchRecordResolver.tsx",
+      "record-resolver/createFetchRecordResolver",
+      "routes/record-resolver/createFetchRecordResolver.tsx",
     ),
     route(
-      "record-resolver/AgentRecordResolver",
-      "routes/record-resolver/AgentRecordResolver.tsx",
+      "record-resolver/createAgentRecordResolver",
+      "routes/record-resolver/createAgentRecordResolver.tsx",
     ),
     route(
-      "record-resolver/EdgeRecordResolver",
-      "routes/record-resolver/EdgeRecordResolver.tsx",
+      "record-resolver/createCachedRecordResolver",
+      "routes/record-resolver/createCachedRecordResolver.tsx",
     ),
 
     // edge-oauth-client

@@ -1,28 +1,29 @@
 import { CodeBlock } from "~/components/CodeBlock";
 import { AnchorHeading } from "~/components/AnchorHeading";
 
-export default function FetchKeyResolverPage() {
+export default function CreateFetchRecordResolverPage() {
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-1">FetchKeyResolver</h1>
+      <h1 className="text-2xl font-bold mb-1">createFetchRecordResolver</h1>
       <p className="text-text-muted dark:text-text-muted-dark mb-1 text-sm font-mono">
-        @atiproto/key-resolver
+        @atiproto/record-resolver
       </p>
       <p className="text-text-muted dark:text-text-muted-dark mb-8">
-        Fetches the signer's DID document over HTTPS, then extracts the public
-        key from the named verification method. Supports{" "}
-        <code className="font-mono">did:key:</code> (no fetch — parsed locally),{" "}
-        <code className="font-mono">did:plc:</code> (via the PLC directory), and{" "}
-        <code className="font-mono">did:web:</code> (via{" "}
-        <code className="font-mono">/.well-known/did.json</code>).
+        Returns a RecordResolver that calls{" "}
+        <code className="font-mono">com.atproto.repo.getRecord</code> on a
+        configurable relay (or any PDS that mirrors the record). Plain{" "}
+        <code className="font-mono">fetch</code> only. No auth or XRPC client
+        dependency.
       </p>
 
       <section className="mb-10">
         <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
-          Constructor
+          Signature
         </AnchorHeading>
         <CodeBlock
-          code={`new FetchKeyResolver(options?: FetchKeyResolverOptions)`}
+          code={`function createFetchRecordResolver(
+  options?: FetchRecordResolverOptions,
+): RecordResolver`}
         />
 
         <div className="overflow-x-auto mt-4">
@@ -45,12 +46,18 @@ export default function FetchKeyResolverPage() {
             </thead>
             <tbody className="text-text-muted dark:text-text-muted-dark">
               <tr className="border-b border-border dark:border-border-dark">
-                <td className="px-3 py-2 font-mono text-xs">plcUrl</td>
+                <td className="px-3 py-2 font-mono text-xs">relay</td>
                 <td className="px-3 py-2 font-mono text-xs">string</td>
                 <td className="px-3 py-2 font-mono text-xs">
-                  "https://plc.directory"
+                  "https://bsky.network"
                 </td>
-                <td className="px-3 py-2 text-xs">PLC directory base URL.</td>
+                <td className="px-3 py-2 text-xs">
+                  Base URL hosting{" "}
+                  <code className="font-mono">
+                    /xrpc/com.atproto.repo.getRecord
+                  </code>
+                  . Use any relay or the issuer's PDS directly.
+                </td>
               </tr>
               <tr className="border-b border-border dark:border-border-dark">
                 <td className="px-3 py-2 font-mono text-xs">timeout</td>
@@ -77,40 +84,15 @@ export default function FetchKeyResolverPage() {
 
       <section className="mb-10">
         <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
-          Resolve
+          Behavior
         </AnchorHeading>
-        <CodeBlock code={`resolve(ref: string): Promise<KeyData>`} />
-        <p className="mt-3 text-sm">
-          <code className="font-mono">ref</code> is the string stored at{" "}
-          <code className="font-mono">signature.key</code>. Bare{" "}
-          <code className="font-mono">did:key:</code> references skip the fetch
-          entirely; everything else is parsed as{" "}
-          <code className="font-mono">{`<did>#<fragment>`}</code> and resolved
-          against the appropriate DID document.
+        <p className="text-sm">
+          Parses{" "}
+          <code className="font-mono">at://{`{repo}/{collection}/{rkey}`}</code>
+          , issues a single <code className="font-mono">getRecord</code> call,
+          and returns the <code className="font-mono">value</code> field of the
+          response. Throws on non-2xx or missing value.
         </p>
-      </section>
-
-      <section className="mb-10">
-        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
-          Supported key formats
-        </AnchorHeading>
-        <p className="mb-3 text-sm">
-          The resolver reads both flavors of public-key material that
-          atproto-flavored DID documents emit:
-        </p>
-        <ul className="list-disc list-inside text-sm space-y-1 text-text-muted dark:text-text-muted-dark">
-          <li>
-            <code className="font-mono">publicKeyMultibase</code> — parsed as
-            the multibase portion of a{" "}
-            <code className="font-mono">did:key:</code> string.
-          </li>
-          <li>
-            <code className="font-mono">publicKeyJwk</code> — OKP keys (Ed25519)
-            and EC keys (P-256, P-384, secp256k1) are recognized via{" "}
-            <code className="font-mono">crv</code> /{" "}
-            <code className="font-mono">alg</code>.
-          </li>
-        </ul>
       </section>
 
       <section className="mb-10">
@@ -119,30 +101,29 @@ export default function FetchKeyResolverPage() {
         </AnchorHeading>
         <CodeBlock
           code={`import { verify } from "@atiproto/atproto-attestation";
-import { FetchKeyResolver } from "@atiproto/key-resolver";
+import { createFetchRecordResolver } from "@atiproto/record-resolver";
 
-const keys = new FetchKeyResolver({
-  plcUrl: "https://plc.directory",
-  timeout: 5000,
+const recordResolver = createFetchRecordResolver({
+  relay: "https://bsky.network",
 });
 
 const result = await verify({
   record,
   repository: "did:plc:recipient",
   fields: ["items", "currency", "status"],
-  keyResolver: keys.resolve,
+  recordResolver,
 });`}
         />
         <p className="mt-3 text-sm text-text-muted dark:text-text-muted-dark">
-          For repeated verifications against the same signers, prefer{" "}
+          For repeated verifications, prefer{" "}
           <a
-            href="/docs/key-resolver/EdgeKeyResolver"
+            href="/docs/record-resolver/createCachedRecordResolver"
             className="text-primary dark:text-primary-dark hover:underline font-mono"
           >
-            EdgeKeyResolver
-          </a>{" "}
-          so each DID document is fetched once per cache TTL rather than once
-          per record.
+            createCachedRecordResolver
+          </a>
+          . Proof records are content-addressed: once resolved, they never
+          change.
         </p>
       </section>
 
@@ -153,18 +134,18 @@ const result = await verify({
         <ul className="space-y-1 text-sm">
           <li>
             <a
-              href="/docs/key-resolver/DidKeyResolver"
+              href="/docs/record-resolver/createAgentRecordResolver"
               className="text-primary dark:text-primary-dark hover:underline font-mono"
             >
-              DidKeyResolver
+              createAgentRecordResolver
             </a>
           </li>
           <li>
             <a
-              href="/docs/key-resolver/EdgeKeyResolver"
+              href="/docs/record-resolver/createCachedRecordResolver"
               className="text-primary dark:text-primary-dark hover:underline font-mono"
             >
-              EdgeKeyResolver
+              createCachedRecordResolver
             </a>
           </li>
         </ul>

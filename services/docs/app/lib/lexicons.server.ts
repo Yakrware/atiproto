@@ -83,16 +83,16 @@ export function buildNavTree(): NavItem[] {
       children: [
         { label: "Get Started", href: "/docs/key-resolver" },
         {
-          label: "DidKeyResolver",
-          href: "/docs/key-resolver/DidKeyResolver",
+          label: "createDidKeyResolver",
+          href: "/docs/key-resolver/createDidKeyResolver",
         },
         {
-          label: "FetchKeyResolver",
-          href: "/docs/key-resolver/FetchKeyResolver",
+          label: "createFetchKeyResolver",
+          href: "/docs/key-resolver/createFetchKeyResolver",
         },
         {
-          label: "EdgeKeyResolver",
-          href: "/docs/key-resolver/EdgeKeyResolver",
+          label: "createCachedKeyResolver",
+          href: "/docs/key-resolver/createCachedKeyResolver",
         },
       ],
     },
@@ -101,16 +101,16 @@ export function buildNavTree(): NavItem[] {
       children: [
         { label: "Get Started", href: "/docs/record-resolver" },
         {
-          label: "FetchRecordResolver",
-          href: "/docs/record-resolver/FetchRecordResolver",
+          label: "createFetchRecordResolver",
+          href: "/docs/record-resolver/createFetchRecordResolver",
         },
         {
-          label: "AgentRecordResolver",
-          href: "/docs/record-resolver/AgentRecordResolver",
+          label: "createAgentRecordResolver",
+          href: "/docs/record-resolver/createAgentRecordResolver",
         },
         {
-          label: "EdgeRecordResolver",
-          href: "/docs/record-resolver/EdgeRecordResolver",
+          label: "createCachedRecordResolver",
+          href: "/docs/record-resolver/createCachedRecordResolver",
         },
       ],
     },

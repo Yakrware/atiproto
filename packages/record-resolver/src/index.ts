@@ -1,14 +1,14 @@
 export {
-  FetchRecordResolver,
+  createFetchRecordResolver,
   type FetchRecordResolverOptions,
-} from "./FetchRecordResolver.js";
+} from "./createFetchRecordResolver.js";
 export {
-  AgentRecordResolver,
+  createAgentRecordResolver,
   type RecordResolverAgent,
-} from "./AgentRecordResolver.js";
+} from "./createAgentRecordResolver.js";
 export {
-  EdgeRecordResolver,
-  type EdgeRecordResolverOptions,
-} from "./EdgeRecordResolver.js";
+  createCachedRecordResolver,
+  type CachedRecordResolverOptions,
+} from "./createCachedRecordResolver.js";
 export { parseAtUri, type ParsedAtUri } from "./types.js";
 export type { RecordMap, RecordResolver } from "./types.js";

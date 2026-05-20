@@ -1,12 +1,14 @@
-export { DidKeyResolver } from "./DidKeyResolver.js";
+export { createDidKeyResolver } from "./createDidKeyResolver.js";
 export {
-  FetchKeyResolver,
+  createFetchKeyResolver,
+  createDidDocumentFetcher,
+  type DidDocumentFetcher,
   type FetchKeyResolverOptions,
-} from "./FetchKeyResolver.js";
+} from "./createFetchKeyResolver.js";
 export {
-  EdgeKeyResolver,
-  type EdgeKeyResolverOptions,
-} from "./EdgeKeyResolver.js";
+  createCachedKeyResolver,
+  type CachedKeyResolverOptions,
+} from "./createCachedKeyResolver.js";
 export { extractKeyFromDidDoc } from "./extractKey.js";
 export type {
   DidDocument,

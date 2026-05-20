@@ -1,4 +1,4 @@
-import { parseAtUri, type RecordMap } from "./types.js";
+import { parseAtUri, type RecordMap, type RecordResolver } from "./types.js";
 
 /**
  * Minimal XRPC-shaped agent. Matches `@atiproto/agent.Agent`,
@@ -13,16 +13,15 @@ export interface RecordResolverAgent {
 }
 
 /**
- * Resolves `at://` URIs to record values via an existing XRPC client.
- * Auth, retries, and proxying live on the client — this resolver just
- * routes the `com.atproto.repo.getRecord` call through it.
+ * Builds a RecordResolver that routes `getRecord` through an existing
+ * XRPC client. Auth, retries, and proxying live on the client.
  */
-export class AgentRecordResolver {
-  constructor(private readonly agent: RecordResolverAgent) {}
-
-  resolve = async (uri: string): Promise<RecordMap> => {
+export function createAgentRecordResolver(
+  agent: RecordResolverAgent,
+): RecordResolver {
+  return async (uri) => {
     const { repo, collection, rkey } = parseAtUri(uri);
-    const res = await this.agent.call("com.atproto.repo.getRecord", {
+    const res = await agent.call("com.atproto.repo.getRecord", {
       repo,
       collection,
       rkey,

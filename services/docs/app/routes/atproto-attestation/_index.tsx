@@ -45,8 +45,8 @@ export default function AtprotoAttestationIndex() {
             @atiproto/agent
           </code>
           . Install it directly when you need to sign or verify records outside
-          of an agent context — e.g. in a worker that produces AppView
-          attestations.
+          of an agent context (e.g. in a worker that produces AppView
+          attestations).
         </p>
       </section>
 
@@ -115,7 +115,7 @@ if (!result.valid) {
             network.attested.proof
           </a>{" "}
           record. To produce a remote attestation, pass an agent to the
-          constructor — the agent is used to{" "}
+          constructor. The agent is used to{" "}
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-xs font-mono">
             createRecord
           </code>{" "}
@@ -146,8 +146,8 @@ if (!result.valid) {
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-xs font-mono">
             fields
           </code>{" "}
-          to restrict the payload to a specific set of record keys — this is
-          what the agent does on a record-write so that ancillary fields (e.g.
+          to restrict the payload to a specific set of record keys. This is what
+          the agent does on a record-write so that ancillary fields (e.g.
           server-side annotations) can change without breaking the signature.
           The verifier must use the same field list.
         </p>
@@ -177,7 +177,7 @@ if (!result.valid) {
               Attestation
             </a>{" "}
             <span className="text-text-muted dark:text-text-muted-dark">
-              — Sign records inline or via an agent-backed proof record.
+              Sign records inline or via an agent-backed proof record.
             </span>
           </li>
           <li>
@@ -188,7 +188,7 @@ if (!result.valid) {
               verify
             </a>{" "}
             <span className="text-text-muted dark:text-text-muted-dark">
-              — Standalone verifier. No keys required at module init.
+              Standalone verifier. No keys required at module init.
             </span>
           </li>
           <li>
@@ -199,7 +199,7 @@ if (!result.valid) {
               KeyResolver &amp; RecordResolver
             </a>{" "}
             <span className="text-text-muted dark:text-text-muted-dark">
-              — Plug in DID-doc keys and PDS-hosted proof records.
+              Plug in DID-doc keys and PDS-hosted proof records.
             </span>
           </li>
           <li>
@@ -210,7 +210,7 @@ if (!result.valid) {
               did:key utilities
             </a>{" "}
             <span className="text-text-muted dark:text-text-muted-dark">
-              — Parse and format did:key and private-key multibase strings.
+              Parse and format did:key and private-key multibase strings.
             </span>
           </li>
         </ul>

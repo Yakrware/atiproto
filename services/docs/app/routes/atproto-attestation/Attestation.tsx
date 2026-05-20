@@ -148,7 +148,7 @@ interface SignInput {
           </code>{" "}
           (a strongRef) is returned instead. The signed CID is{" "}
           <em>identical</em> between the two paths only when the metadata's{" "}
-          <code className="font-mono">$type</code> matches — by design, inline
+          <code className="font-mono">$type</code> matches. By design, inline
           and remote attestations are domain-separated.
         </p>
       </section>

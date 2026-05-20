@@ -3,9 +3,9 @@ import { p256 } from "@noble/curves/nist";
 import { ed25519 } from "@noble/curves/ed25519";
 import { formatDidKey } from "@atiproto/atproto-attestation";
 import {
-  DidKeyResolver,
-  FetchKeyResolver,
-  EdgeKeyResolver,
+  createDidKeyResolver,
+  createFetchKeyResolver,
+  createCachedKeyResolver,
   extractKeyFromDidDoc,
 } from "../src/index.js";
 
@@ -33,27 +33,27 @@ function fakeFetch(docs: Record<string, unknown>): typeof fetch {
   }) as unknown as typeof fetch;
 }
 
-describe("DidKeyResolver", () => {
+describe("createDidKeyResolver", () => {
   it("parses did:key references locally", () => {
     const { did, pub } = makeP256Did();
-    const resolver = new DidKeyResolver();
-    const key = resolver.resolve(did);
+    const resolve = createDidKeyResolver();
+    const key = resolve(did) as { type: string; bytes: Uint8Array };
     expect(key.type).toBe("p256");
     expect(key.bytes).toEqual(pub);
   });
 
   it("rejects non-did:key references", () => {
-    const resolver = new DidKeyResolver();
-    expect(() => resolver.resolve("did:plc:abc#x")).toThrow(/did:key/);
+    const resolve = createDidKeyResolver();
+    expect(() => resolve("did:plc:abc#x")).toThrow(/did:key/);
   });
 });
 
-describe("FetchKeyResolver", () => {
+describe("createFetchKeyResolver", () => {
   it("parses bare did:key without a fetch", async () => {
     const { did, pub } = makeP256Did();
     const fetchImpl = vi.fn() as unknown as typeof fetch;
-    const resolver = new FetchKeyResolver({ fetch: fetchImpl });
-    const key = await resolver.resolve(did);
+    const resolve = createFetchKeyResolver({ fetch: fetchImpl });
+    const key = await resolve(did);
     expect(key.bytes).toEqual(pub);
     expect(fetchImpl).not.toHaveBeenCalled();
   });
@@ -70,10 +70,10 @@ describe("FetchKeyResolver", () => {
         },
       ],
     };
-    const resolver = new FetchKeyResolver({
+    const resolve = createFetchKeyResolver({
       fetch: fakeFetch({ [`https://plc.directory/${PLC_DID}`]: doc }),
     });
-    const key = await resolver.resolve(`${PLC_DID}#${FRAG}`);
+    const key = await resolve(`${PLC_DID}#${FRAG}`);
     expect(key.type).toBe("p256");
     expect(key.bytes).toEqual(pub);
   });
@@ -89,24 +89,24 @@ describe("FetchKeyResolver", () => {
         },
       ],
     };
-    const resolver = new FetchKeyResolver({
+    const resolve = createFetchKeyResolver({
       fetch: fakeFetch({
         "https://appview.example/.well-known/did.json": doc,
       }),
     });
-    const key = await resolver.resolve(`${webDid}#${FRAG}`);
+    const key = await resolve(`${webDid}#${FRAG}`);
     expect(key.bytes).toEqual(pub);
   });
 
   it("rejects unsupported DID methods", async () => {
-    const resolver = new FetchKeyResolver();
-    await expect(resolver.resolve("did:example:abc#x")).rejects.toThrow(
+    const resolve = createFetchKeyResolver();
+    await expect(resolve("did:example:abc#x")).rejects.toThrow(
       /Unsupported DID method/,
     );
   });
 });
 
-describe("EdgeKeyResolver", () => {
+describe("createCachedKeyResolver", () => {
   it("caches the DID document across resolves of the same DID", async () => {
     const { multibase } = makeP256Did();
     const doc = {
@@ -120,11 +120,11 @@ describe("EdgeKeyResolver", () => {
         ...args: Parameters<typeof fetch>
       ) => ReturnType<typeof fetch>,
     ) as unknown as typeof fetch;
-    const resolver = new EdgeKeyResolver({ fetch: fetchImpl });
+    const resolve = createCachedKeyResolver({ fetch: fetchImpl });
 
-    await resolver.resolve(`${PLC_DID}#${FRAG}`);
-    await resolver.resolve(`${PLC_DID}#second`);
-    // Same DID — only one fetch even though we asked for two fragments.
+    await resolve(`${PLC_DID}#${FRAG}`);
+    await resolve(`${PLC_DID}#second`);
+    // Same DID, only one fetch even though we asked for two fragments.
     expect(
       (fetchImpl as unknown as ReturnType<typeof vi.fn>).mock.calls,
     ).toHaveLength(1);

@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 import {
-  FetchRecordResolver,
-  AgentRecordResolver,
-  EdgeRecordResolver,
+  createFetchRecordResolver,
+  createAgentRecordResolver,
+  createCachedRecordResolver,
   parseAtUri,
 } from "../src/index.js";
 
@@ -28,7 +28,7 @@ describe("parseAtUri", () => {
   });
 });
 
-describe("FetchRecordResolver", () => {
+describe("createFetchRecordResolver", () => {
   it("calls com.atproto.repo.getRecord on the configured relay", async () => {
     const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
       const url = typeof input === "string" ? input : input.toString();
@@ -40,11 +40,11 @@ describe("FetchRecordResolver", () => {
         status: 200,
       });
     }) as unknown as typeof fetch;
-    const resolver = new FetchRecordResolver({
+    const resolve = createFetchRecordResolver({
       relay: "https://my-relay.example",
       fetch: fetchImpl,
     });
-    const record = await resolver.resolve(URI);
+    const record = await resolve(URI);
     expect(record).toEqual(PROOF_RECORD);
   });
 
@@ -52,12 +52,12 @@ describe("FetchRecordResolver", () => {
     const fetchImpl = vi.fn(
       async () => new Response("not found", { status: 404 }),
     ) as unknown as typeof fetch;
-    const resolver = new FetchRecordResolver({ fetch: fetchImpl });
-    await expect(resolver.resolve(URI)).rejects.toThrow(/404/);
+    const resolve = createFetchRecordResolver({ fetch: fetchImpl });
+    await expect(resolve(URI)).rejects.toThrow(/404/);
   });
 });
 
-describe("AgentRecordResolver", () => {
+describe("createAgentRecordResolver", () => {
   it("routes the call through the agent", async () => {
     const calls: Array<{ nsid: string; params: unknown }> = [];
     const agent = {
@@ -66,8 +66,8 @@ describe("AgentRecordResolver", () => {
         return { data: { value: PROOF_RECORD } };
       }),
     };
-    const resolver = new AgentRecordResolver(agent);
-    const record = await resolver.resolve(URI);
+    const resolve = createAgentRecordResolver(agent);
+    const record = await resolve(URI);
     expect(record).toEqual(PROOF_RECORD);
     expect(calls[0].nsid).toBe("com.atproto.repo.getRecord");
     expect(calls[0].params).toEqual({
@@ -78,15 +78,15 @@ describe("AgentRecordResolver", () => {
   });
 });
 
-describe("EdgeRecordResolver", () => {
+describe("createCachedRecordResolver", () => {
   it("caches resolved records by URI", async () => {
     const fetchImpl = vi.fn(
       async () =>
         new Response(JSON.stringify({ value: PROOF_RECORD }), { status: 200 }),
     ) as unknown as typeof fetch;
-    const resolver = new EdgeRecordResolver({ fetch: fetchImpl });
-    await resolver.resolve(URI);
-    await resolver.resolve(URI);
+    const resolve = createCachedRecordResolver({ fetch: fetchImpl });
+    await resolve(URI);
+    await resolve(URI);
     expect(
       (fetchImpl as unknown as ReturnType<typeof vi.fn>).mock.calls,
     ).toHaveLength(1);

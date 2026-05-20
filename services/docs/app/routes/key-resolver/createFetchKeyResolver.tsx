@@ -1,33 +1,30 @@
 import { CodeBlock } from "~/components/CodeBlock";
 import { AnchorHeading } from "~/components/AnchorHeading";
 
-export default function EdgeKeyResolverPage() {
+export default function CreateFetchKeyResolverPage() {
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-1">EdgeKeyResolver</h1>
+      <h1 className="text-2xl font-bold mb-1">createFetchKeyResolver</h1>
       <p className="text-text-muted dark:text-text-muted-dark mb-1 text-sm font-mono">
         @atiproto/key-resolver
       </p>
       <p className="text-text-muted dark:text-text-muted-dark mb-8">
-        Wraps{" "}
-        <a
-          href="/docs/key-resolver/FetchKeyResolver"
-          className="text-primary dark:text-primary-dark hover:underline font-mono text-sm"
-        >
-          FetchKeyResolver
-        </a>{" "}
-        with a <code className="font-mono">SimpleStore</code> cache in front of
-        the DID document fetch. Multiple fragments on the same DID share a
-        single network request; multiple records that share the same signer
-        share the cached document.
+        Returns a KeyResolver that fetches the signer's DID document over HTTPS,
+        then extracts the public key from the named verification method.
+        Supports <code className="font-mono">did:key:</code> (no fetch, parsed
+        locally), <code className="font-mono">did:plc:</code> (via the PLC
+        directory), and <code className="font-mono">did:web:</code> (via{" "}
+        <code className="font-mono">/.well-known/did.json</code>).
       </p>
 
       <section className="mb-10">
         <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
-          Constructor
+          Signature
         </AnchorHeading>
         <CodeBlock
-          code={`new EdgeKeyResolver(options?: EdgeKeyResolverOptions)`}
+          code={`function createFetchKeyResolver(
+  options?: FetchKeyResolverOptions,
+): KeyResolver`}
         />
 
         <div className="overflow-x-auto mt-4">
@@ -65,26 +62,14 @@ export default function EdgeKeyResolverPage() {
                   Milliseconds before the fetch is aborted.
                 </td>
               </tr>
-              <tr className="border-b border-border dark:border-border-dark">
+              <tr>
                 <td className="px-3 py-2 font-mono text-xs">fetch</td>
                 <td className="px-3 py-2 font-mono text-xs">typeof fetch</td>
                 <td className="px-3 py-2 font-mono text-xs">
                   globalThis.fetch
                 </td>
                 <td className="px-3 py-2 text-xs">
-                  Override the global fetch.
-                </td>
-              </tr>
-              <tr>
-                <td className="px-3 py-2 font-mono text-xs">cache</td>
-                <td className="px-3 py-2 font-mono text-xs">
-                  SimpleStore&lt;string, DidDocument&gt;
-                </td>
-                <td className="px-3 py-2 font-mono text-xs">
-                  SimpleStoreMemory&nbsp;(1hr TTL)
-                </td>
-                <td className="px-3 py-2 text-xs">
-                  Cache keyed by full DID string.
+                  Override the global fetch (tests, custom transports).
                 </td>
               </tr>
             </tbody>
@@ -94,81 +79,74 @@ export default function EdgeKeyResolverPage() {
 
       <section className="mb-10">
         <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
-          Cache behavior
+          Supported key formats
         </AnchorHeading>
-        <ul className="list-disc list-inside text-sm space-y-2 text-text-muted dark:text-text-muted-dark">
+        <p className="mb-3 text-sm">
+          Reads both flavors of public-key material that atproto-flavored DID
+          documents emit:
+        </p>
+        <ul className="list-disc list-inside text-sm space-y-1 text-text-muted dark:text-text-muted-dark">
           <li>
-            Cache key is the bare DID (e.g.{" "}
-            <code className="font-mono">did:plc:abc</code>). Fragment lookups
-            happen in-process from the cached document.
+            <code className="font-mono">publicKeyMultibase</code>: parsed as the
+            multibase portion of a <code className="font-mono">did:key:</code>{" "}
+            string.
           </li>
           <li>
-            <code className="font-mono">did:key:</code> references skip both the
-            fetch and the cache.
-          </li>
-          <li>
-            On a cache miss, the document is fetched and written back to the
-            cache before the resolver returns.
-          </li>
-          <li>
-            DID rotation isn't free here — keys can change. Use a TTL short
-            enough that compromised keys can't keep verifying indefinitely (the
-            in-memory default is 1 hour).
+            <code className="font-mono">publicKeyJwk</code>: OKP keys (Ed25519)
+            and EC keys (P-256, P-384, secp256k1) recognized via{" "}
+            <code className="font-mono">crv</code> /{" "}
+            <code className="font-mono">alg</code>.
           </li>
         </ul>
       </section>
 
       <section className="mb-10">
         <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
-          Edge (Cloudflare Workers)
+          Example
         </AnchorHeading>
-        <p className="mb-3 text-sm">
-          On Cloudflare Workers, pair with{" "}
-          <a
-            href="/docs/edge-resolver-cache"
-            className="text-primary dark:text-primary-dark hover:underline font-mono"
-          >
-            @atiproto/edge-resolver-cache
-          </a>{" "}
-          for an in-memory L1 backed by the Cache API L2:
-        </p>
         <CodeBlock
           code={`import { verify } from "@atiproto/atproto-attestation";
-import { EdgeKeyResolver } from "@atiproto/key-resolver";
-import { createDidCache } from "@atiproto/edge-resolver-cache";
+import { createFetchKeyResolver } from "@atiproto/key-resolver";
 
-const keys = new EdgeKeyResolver({ cache: createDidCache() });
+const keyResolver = createFetchKeyResolver({
+  plcUrl: "https://plc.directory",
+  timeout: 5000,
+});
 
-export default {
-  async fetch(req: Request) {
-    const result = await verify({
-      record,
-      repository,
-      keyResolver: keys.resolve,
-    });
-    return Response.json(result);
-  },
-};`}
+const result = await verify({
+  record,
+  repository: "did:plc:recipient",
+  fields: ["items", "currency", "status"],
+  keyResolver,
+});`}
         />
+        <p className="mt-3 text-sm text-text-muted dark:text-text-muted-dark">
+          For repeated verifications against the same signers, prefer{" "}
+          <a
+            href="/docs/key-resolver/createCachedKeyResolver"
+            className="text-primary dark:text-primary-dark hover:underline font-mono"
+          >
+            createCachedKeyResolver
+          </a>{" "}
+          so each DID document is fetched once per cache TTL rather than once
+          per record.
+        </p>
       </section>
 
       <section className="mb-10">
         <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
-          Node / generic runtimes
+          createDidDocumentFetcher
         </AnchorHeading>
         <p className="mb-3 text-sm">
-          The default in-memory cache works everywhere. For long-running
-          services, supply your own store backed by Redis, Memcached, or
-          similar:
+          Lower-level companion factory exported from the same module. Returns
+          just the DID-document fetch step without the fragment-extraction
+          logic, for callers that want to layer their own caching or extraction
+          on top.
         </p>
         <CodeBlock
-          code={`import { EdgeKeyResolver } from "@atiproto/key-resolver";
-import type { SimpleStore } from "@atproto-labs/simple-store";
-
-const keys = new EdgeKeyResolver({
-  cache: myRedisBackedStore,    // SimpleStore<string, DidDocument>
-  timeout: 5000,
-});`}
+          code={`function createDidDocumentFetcher(
+  options?: FetchKeyResolverOptions,
+): (did: string) => Promise<DidDocument>`}
         />
       </section>
 
@@ -179,18 +157,18 @@ const keys = new EdgeKeyResolver({
         <ul className="space-y-1 text-sm">
           <li>
             <a
-              href="/docs/key-resolver/FetchKeyResolver"
+              href="/docs/key-resolver/createDidKeyResolver"
               className="text-primary dark:text-primary-dark hover:underline font-mono"
             >
-              FetchKeyResolver
+              createDidKeyResolver
             </a>
           </li>
           <li>
             <a
-              href="/docs/edge-resolver-cache"
+              href="/docs/key-resolver/createCachedKeyResolver"
               className="text-primary dark:text-primary-dark hover:underline font-mono"
             >
-              @atiproto/edge-resolver-cache
+              createCachedKeyResolver
             </a>
           </li>
         </ul>

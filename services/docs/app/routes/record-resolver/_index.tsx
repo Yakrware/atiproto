@@ -6,16 +6,20 @@ export default function RecordResolverIndex() {
     <div>
       <h1 className="text-2xl font-bold mb-2">record-resolver</h1>
       <p className="text-text-muted dark:text-text-muted-dark mb-8">
-        Ready-made{" "}
+        Factory functions that return{" "}
         <a
           href="/docs/atproto-attestation/resolvers"
           className="text-primary dark:text-primary-dark hover:underline font-mono text-sm"
         >
           RecordResolver
         </a>{" "}
-        implementations for verifying remote (strongRef) attestations. Pick the
-        variant that matches your runtime: bare relay fetch, agent-backed XRPC,
-        or a cached fetch for the edge.
+        implementations for verifying remote (strongRef) attestations. Each
+        factory returns a function with the canonical RecordResolver signature,
+        ready to drop into{" "}
+        <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
+          verify
+        </code>
+        .
       </p>
 
       <section className="mb-10">
@@ -35,24 +39,24 @@ export default function RecordResolverIndex() {
         <ul className="space-y-3 text-sm">
           <li>
             <a
-              href="/docs/record-resolver/FetchRecordResolver"
+              href="/docs/record-resolver/createFetchRecordResolver"
               className="text-primary dark:text-primary-dark hover:underline font-mono"
             >
-              FetchRecordResolver
-            </a>{" "}
-            — calls{" "}
+              createFetchRecordResolver
+            </a>
+            : calls{" "}
             <code className="font-mono">com.atproto.repo.getRecord</code> on a
             configurable relay using <code className="font-mono">fetch</code>.
-            Works anywhere HTTPS works; no auth needed for public proof records.
+            Works anywhere HTTPS works. No auth needed for public proof records.
           </li>
           <li>
             <a
-              href="/docs/record-resolver/AgentRecordResolver"
+              href="/docs/record-resolver/createAgentRecordResolver"
               className="text-primary dark:text-primary-dark hover:underline font-mono"
             >
-              AgentRecordResolver
-            </a>{" "}
-            — routes the call through any XRPC-shaped client (
+              createAgentRecordResolver
+            </a>
+            : routes the call through any XRPC-shaped client (
             <code className="font-mono">@atiproto/agent</code>,{" "}
             <code className="font-mono">@atproto/api</code>,{" "}
             <code className="font-mono">@atproto/xrpc</code>). Use this when
@@ -60,14 +64,15 @@ export default function RecordResolverIndex() {
           </li>
           <li>
             <a
-              href="/docs/record-resolver/EdgeRecordResolver"
+              href="/docs/record-resolver/createCachedRecordResolver"
               className="text-primary dark:text-primary-dark hover:underline font-mono"
             >
-              EdgeRecordResolver
-            </a>{" "}
-            — same as <code className="font-mono">FetchRecordResolver</code>{" "}
-            with a <code className="font-mono">SimpleStore</code> cache. Proof
-            records are content-addressed, so caching by URI is safe forever.
+              createCachedRecordResolver
+            </a>
+            : same as{" "}
+            <code className="font-mono">createFetchRecordResolver</code> with a{" "}
+            <code className="font-mono">SimpleStore</code> cache. Proof records
+            are content-addressed, so caching by URI is safe forever.
           </li>
         </ul>
       </section>
@@ -78,9 +83,9 @@ export default function RecordResolverIndex() {
         </AnchorHeading>
         <CodeBlock
           code={`import { verify } from "@atiproto/atproto-attestation";
-import { EdgeRecordResolver } from "@atiproto/record-resolver";
+import { createCachedRecordResolver } from "@atiproto/record-resolver";
 
-const records = new EdgeRecordResolver({
+const recordResolver = createCachedRecordResolver({
   relay: "https://bsky.network",
 });
 
@@ -88,7 +93,7 @@ const result = await verify({
   record,
   repository: "did:plc:recipient",
   fields: ["items", "currency", "status"],
-  recordResolver: records.resolve,
+  recordResolver,
 });`}
         />
       </section>
@@ -104,8 +109,8 @@ const result = await verify({
               className="text-primary dark:text-primary-dark hover:underline font-mono"
             >
               KeyResolver &amp; RecordResolver
-            </a>{" "}
-            — the underlying resolver interfaces.
+            </a>
+            : the underlying resolver interfaces.
           </li>
           <li>
             <a
@@ -113,8 +118,8 @@ const result = await verify({
               className="text-primary dark:text-primary-dark hover:underline font-mono"
             >
               key-resolver
-            </a>{" "}
-            — companion package for inline attestations.
+            </a>
+            : companion package for inline attestations.
           </li>
         </ul>
       </section>

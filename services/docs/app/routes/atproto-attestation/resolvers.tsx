@@ -11,31 +11,15 @@ export default function ResolversPage() {
         @atiproto/atproto-attestation
       </p>
       <p className="text-text-muted dark:text-text-muted-dark mb-8">
-        Two pluggable functions consumedconsumed by{" "}
+        Two pluggable functions used by{" "}
         <a
           href="/docs/atproto-attestation/verify"
           className="text-primary dark:text-primary-dark hover:underline font-mono text-sm"
         >
           verify
-        </a>{" "}
-        to fetch verification material that lives outside the record.
-        Ready-made implementations ship in the{" "}
-        <a
-          href="/docs/key-resolver"
-          className="text-primary dark:text-primary-dark hover:underline font-mono text-sm"
-        >
-          @atiproto/key-resolver
-        </a>{" "}
-        and{" "}
-        <a
-          href="/docs/record-resolver"
-          className="text-primary dark:text-primary-dark hover:underline font-mono text-sm"
-        >
-          @atiproto/record-resolver
-        </a>{" "}
-        packages.
-        to fetch verification material that lives outside the record.
-        Ready-made implementations ship in the{" "}
+        </a>
+        . They fetch verification material that lives outside the
+        record. Ready-made implementations ship in the{" "}
         <a
           href="/docs/key-resolver"
           className="text-primary dark:text-primary-dark hover:underline font-mono text-sm"
@@ -69,128 +53,75 @@ interface KeyData {
           string stored at{" "}
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-xs font-mono">
             signature.key
-          </code>{" "}
-          — typically a{" "}
+          </code>
+          , typically a{" "}
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-xs font-mono">
             did:key:…
           </code>{" "}
           but in principle anything your protocol uses (DID + key id,
-
-          JWK URL,  etc).
+          JWK URL, etc).
         </p>
         <p className="mt-3 text-sm text-text-muted dark:text-text-muted-dark">
           The verifier's default resolver only understands bare{" "}
-          <code className="font-mono">did:key:</code> strings. Supply a
-          custom resolver to verify against keys hosted in a DID
-          document (PLC or DID Web) — use one of the prebuilt resolvers
-          in{" "}
+          <code className="font-mono">did:key:</code> strings. Use one
+          of the prebuilt factories in{" "}
           <a
             href="/docs/key-resolver"
             className="text-primary dark:text-primary-dark hover:underline font-mono"
           >
             @atiproto/key-resolver
-          </a>
-          .
-          The verifier's default resolver only understands bare{" "}
-          <code className="font-mono">did:key:</code> strings. Supply a
-          custom resolver to verify against keys hosted in a DID
-          document (PLC or DID Web) — use one of the prebuilt resolvers
-          in{" "}
-          <a
-            href="/docs/key-resolver"
-            className="text-primary dark:text-primary-dark hover:underline font-mono"
-          >
-            @atiproto/key-resolver
-          </a>
-          .
+          </a>{" "}
+          to verify against keys hosted in a DID document.
         </p>
       </section>
 
       <section className="mb-10">
         <AnchorHeading as="h3" className="text-base font-semibold mb-3">
-          PrebuiltPrebuilt KeyResolversKeyResolvers
+          Prebuilt KeyResolvers
         </AnchorHeading>
         <ul className="space-y-2 text-sm">
           <li>
             <a
-              href="/docs/key-resolver/DidKeyResolver"
+              href="/docs/key-resolver/createDidKeyResolver"
               className="text-primary dark:text-primary-dark hover:underline font-mono"
             >
-              DidKeyResolver
-            </a>{" "}
-            — local-only parser for{" "}
+              createDidKeyResolver
+            </a>
+            : local-only parser for{" "}
             <code className="font-mono">did:key:</code> references.
           </li>
           <li>
             <a
-              href="/docs/key-resolver/FetchKeyResolver"
+              href="/docs/key-resolver/createFetchKeyResolver"
               className="text-primary dark:text-primary-dark hover:underline font-mono"
             >
-              FetchKeyResolver
-            </a>{" "}
-            — fetches the DID document from the PLC directory or did:web
+              createFetchKeyResolver
+            </a>
+            : fetches the DID document from the PLC directory or did:web
             host.
           </li>
           <li>
             <a
-              href="/docs/key-resolver/EdgeKeyResolver"
+              href="/docs/key-resolver/createCachedKeyResolver"
               className="text-primary dark:text-primary-dark hover:underline font-mono"
             >
-              EdgeKeyResolver
-            </a>{" "}
-            — caches the fetched DID document, suitable for repeated
-            verification on edge runtimes.
-          </li>
-        </ul>
-        <ul className="space-y-2 text-sm">
-          <li>
-            <a
-              href="/docs/key-resolver/DidKeyResolver"
-              className="text-primary dark:text-primary-dark hover:underline font-mono"
-            >
-              DidKeyResolver
-            </a>{" "}
-            — local-only parser for{" "}
-            <code className="font-mono">did:key:</code> references.
-          </li>
-          <li>
-            <a
-              href="/docs/key-resolver/FetchKeyResolver"
-              className="text-primary dark:text-primary-dark hover:underline font-mono"
-            >
-              FetchKeyResolver
-            </a>{" "}
-            — fetches the DID document from the PLC directory or did:web
-            host.
-          </li>
-          <li>
-            <a
-              href="/docs/key-resolver/EdgeKeyResolver"
-              className="text-primary dark:text-primary-dark hover:underline font-mono"
-            >
-              EdgeKeyResolver
-            </a>{" "}
-            — caches the fetched DID document, suitable for repeated
+              createCachedKeyResolver
+            </a>
+            : caches the fetched DID document, suitable for repeated
             verification on edge runtimes.
           </li>
         </ul>
         <CodeBlock
-          code={`import { verifyverify } from "@atiproto/atproto-attestation";
-import { EdgeKeyResolver } from "@atiproto/key-resolver";
+          code={`import { verify } from "@atiproto/atproto-attestation";
+import { createCachedKeyResolver } from "@atiproto/key-resolver";
 
-const keyskeys = newnew EdgeKeyResolver()EdgeKeyResolver();
+const keyResolver = createCachedKeyResolver();
 
 await verify({
   record,
   repository,
   fields,
-  keyResolver: keys.resolve,
-});`}
-await verify({
-  record,
-  repository,
-  fields,
-  keyResolver: keys.resolve,
+  keyResolver,
 });`}
         />
       </section>
@@ -209,8 +140,8 @@ type RecordMap = { [key: string]: unknown };`}
           <code className="font-mono">signatures[]</code>. Given an{" "}
           <code className="font-mono">at://</code> URI, return the proof
           record stored at that location. The returned record must
-
-          include its <code className="font-mono">$type</code> (typically{" "}
+          include its <code className="font-mono">$type</code>{" "}
+          (typically{" "}
           <code className="font-mono">network.attested.proof</code>) and
           the <code className="font-mono">cid</code> field that the
           verifier compares against the recomputed canonical CID.
@@ -227,139 +158,85 @@ type RecordMap = { [key: string]: unknown };`}
 
       <section className="mb-10">
         <AnchorHeading as="h3" className="text-base font-semibold mb-3">
-          PrebuiltPrebuilt RecordResolversRecordResolvers
+          Prebuilt RecordResolvers
         </AnchorHeading>
         <ul className="space-y-2 text-sm">
           <li>
             <a
-              href="/docs/record-resolver/FetchRecordResolver"
+              href="/docs/record-resolver/createFetchRecordResolver"
               className="text-primary dark:text-primary-dark hover:underline font-mono"
             >
-              FetchRecordResolver
-            </a>{" "}
-            — plain fetch against a configurable relay or PDS.
+              createFetchRecordResolver
+            </a>
+            : plain fetch against a configurable relay or PDS.
           </li>
           <li>
             <a
-              href="/docs/record-resolver/AgentRecordResolver"
+              href="/docs/record-resolver/createAgentRecordResolver"
               className="text-primary dark:text-primary-dark hover:underline font-mono"
             >
-              AgentRecordResolver
-            </a>{" "}
-            — routes <code className="font-mono">getRecord</code> through
-            an existing XRPC-shaped client.
+              createAgentRecordResolver
+            </a>
+            : routes <code className="font-mono">getRecord</code>{" "}
+            through an existing XRPC-shaped client.
           </li>
           <li>
             <a
-              href="/docs/record-resolver/EdgeRecordResolver"
+              href="/docs/record-resolver/createCachedRecordResolver"
               className="text-primary dark:text-primary-dark hover:underline font-mono"
             >
-              EdgeRecordResolver
-            </a>{" "}
-            — cached fetch. Safe because proof records are
-            content-addressed and never mutate in place.
-          </li>
-        </ul>
-        <ul className="space-y-2 text-sm">
-          <li>
-            <a
-              href="/docs/record-resolver/FetchRecordResolver"
-              className="text-primary dark:text-primary-dark hover:underline font-mono"
-            >
-              FetchRecordResolver
-            </a>{" "}
-            — plain fetch against a configurable relay or PDS.
-          </li>
-          <li>
-            <a
-              href="/docs/record-resolver/AgentRecordResolver"
-              className="text-primary dark:text-primary-dark hover:underline font-mono"
-            >
-              AgentRecordResolver
-            </a>{" "}
-            — routes <code className="font-mono">getRecord</code> through
-            an existing XRPC-shaped client.
-          </li>
-          <li>
-            <a
-              href="/docs/record-resolver/EdgeRecordResolver"
-              className="text-primary dark:text-primary-dark hover:underline font-mono"
-            >
-              EdgeRecordResolver
-            </a>{" "}
-            — cached fetch. Safe because proof records are
+              createCachedRecordResolver
+            </a>
+            : cached fetch. Safe because proof records are
             content-addressed and never mutate in place.
           </li>
         </ul>
         <CodeBlock
-          code={`import { verifyverify } from "@atiproto/atproto-attestation";
-import { EdgeRecordResolver } from "@atiproto/record-resolver";
+          code={`import { verify } from "@atiproto/atproto-attestation";
+import { createCachedRecordResolver } from "@atiproto/record-resolver";
 
-const recordsrecords = new EdgeRecordResolver()new EdgeRecordResolver();
+const recordResolver = createCachedRecordResolver();
 
 await verify({
   record,
   repository,
   fields,
-  recordResolver: records.resolve,
-});`}
-await verify({
-  record,
-  repository,
-  fields,
-  recordResolver: records.resolve,
+  recordResolver,
 });`}
         />
       </section>
 
       <section className="mb-10">
-        <AnchorHeading as="h2h2" className="text-xlxl font-semibold mb-44">
-          FullFull exampleexample
+        <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
+          Full example
         </AnchorHeading>
         <CodeBlock
-          code={`import { verifyverify } from "@atiproto/atproto-attestation";
-import { EdgeKeyResolverEdgeKeyResolver } from "@atiprotoatiproto/key-resolver";
-import { EdgeRecordResolver } from "@atiproto/record-resolverkey-resolver";
-import { EdgeRecordResolver } from "@atiproto/record-resolver";
+          code={`import { verify } from "@atiproto/atproto-attestation";
+import { createCachedKeyResolver } from "@atiproto/key-resolver";
+import { createCachedRecordResolver } from "@atiproto/record-resolver";
 
-const keys = new EdgeKeyResolver();
-const records = new EdgeRecordResolver();
-
-const result = await verify({
-  record: cart,
-  repository: "did:plc:recipient",
-  fields: ["items", "currency", "status"],
-  keyResolver: keys.resolve,
-  recordResolver: records.resolve,
-});`}
-const keys = new EdgeKeyResolver();
-const records = new EdgeRecordResolver();
+const keyResolver = createCachedKeyResolver();
+const recordResolver = createCachedRecordResolver();
 
 const result = await verify({
   record: cart,
   repository: "did:plc:recipient",
   fields: ["items", "currency", "status"],
-  keyResolver: keys.resolve,
-  recordResolver: records.resolve,
+  keyResolver,
+  recordResolver,
 });`}
         />
       </section>
 
       <section>
         <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
-          Custom resolversCustom resolvers
+          Custom resolvers
         </AnchorHeading>
         <p className="text-sm">
-          Both types are plain functions. If the prebuilt resolvers
+          Both types are plain functions. If the prebuilt factories
           don't fit (e.g. you need a custom key reference format, or
           your proof records are mirrored to a non-XRPC store), write
-          your own — anything matching the shape above works.
-        </p>
-        <p className="text-sm">
-          Both types are plain functions. If the prebuilt resolvers
-          don't fit (e.g. you need a custom key reference format, or
-          your proof records are mirrored to a non-XRPC store), write
-          your own — anything matching the shape above works.
+          your own. Any function matching the shape above works.
         </p>
       </section>
     </div>

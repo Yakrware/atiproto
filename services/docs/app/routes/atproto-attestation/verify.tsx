@@ -13,8 +13,8 @@ export default function VerifyPage() {
         <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-sm font-mono">
           signatures[]
         </code>{" "}
-        and checks each entry. Returns a structured result rather than throwing
-        — callers decide whether a partial pass is acceptable.
+        and checks each entry. Returns a structured result rather than throwing,
+        so callers decide whether a partial pass is acceptable.
       </p>
 
       <section className="mb-10">
@@ -65,7 +65,7 @@ interface VerifyEntryResult {
             ): the proof record is fetched via{" "}
             <code className="font-mono">recordResolver</code>, the CID is
             recomputed, and <code className="font-mono">proof.cid</code> must
-            equal it. Authority comes from the repo hosting the proof — there
+            equal it. Authority comes from the repo hosting the proof, so there
             are no signature bytes to check.
           </li>
           <li>
@@ -152,7 +152,7 @@ const result = await verify({
         <p className="text-sm">
           The verifier reports per-entry rather than throwing because real
           records carry multiple attestations (PoS, AppView, broker) and partial
-          validity is often what callers want — e.g. accept a cart whose PoS
+          validity is often what callers want, e.g. accept a cart whose PoS
           signature is good, even if a stale AppView signature is left over.
           Callers can collapse the result to a boolean via{" "}
           <code className="px-1.5 py-0.5 bg-surface-alt dark:bg-surface-alt-dark rounded text-xs font-mono">

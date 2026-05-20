@@ -1,33 +1,35 @@
 import { CodeBlock } from "~/components/CodeBlock";
 import { AnchorHeading } from "~/components/AnchorHeading";
 
-export default function EdgeRecordResolverPage() {
+export default function CreateCachedRecordResolverPage() {
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-1">EdgeRecordResolver</h1>
+      <h1 className="text-2xl font-bold mb-1">createCachedRecordResolver</h1>
       <p className="text-text-muted dark:text-text-muted-dark mb-1 text-sm font-mono">
         @atiproto/record-resolver
       </p>
       <p className="text-text-muted dark:text-text-muted-dark mb-8">
-        Wraps{" "}
+        Returns a RecordResolver that wraps{" "}
         <a
-          href="/docs/record-resolver/FetchRecordResolver"
+          href="/docs/record-resolver/createFetchRecordResolver"
           className="text-primary dark:text-primary-dark hover:underline font-mono text-sm"
         >
-          FetchRecordResolver
+          createFetchRecordResolver
         </a>{" "}
         with a <code className="font-mono">SimpleStore</code> cache. Cache key
-        is the full <code className="font-mono">at://</code> URI; safe because
+        is the full <code className="font-mono">at://</code> URI. Safe because
         proof records are content-addressed by their strongRef CID and never
         change in place.
       </p>
 
       <section className="mb-10">
         <AnchorHeading as="h2" className="text-xl font-semibold mb-4">
-          Constructor
+          Signature
         </AnchorHeading>
         <CodeBlock
-          code={`new EdgeRecordResolver(options?: EdgeRecordResolverOptions)`}
+          code={`function createCachedRecordResolver(
+  options?: CachedRecordResolverOptions,
+): RecordResolver`}
         />
 
         <div className="overflow-x-auto mt-4">
@@ -101,8 +103,8 @@ export default function EdgeRecordResolverPage() {
         </AnchorHeading>
         <p className="mb-3 text-sm">
           Pair with a tiered cache (in-memory L1 + Cache API L2) for
-          cross-request persistence within a colo. Build the cache using the
-          same primitives as{" "}
+          cross-request persistence within a colo. Build the cache from the same
+          primitives as{" "}
           <a
             href="/docs/edge-resolver-cache"
             className="text-primary dark:text-primary-dark hover:underline font-mono"
@@ -113,7 +115,7 @@ export default function EdgeRecordResolverPage() {
         </p>
         <CodeBlock
           code={`import { verify } from "@atiproto/atproto-attestation";
-import { EdgeRecordResolver } from "@atiproto/record-resolver";
+import { createCachedRecordResolver } from "@atiproto/record-resolver";
 import { CacheApiStore, TieredStore } from "@atiproto/edge-resolver-cache";
 import { SimpleStoreMemory } from "@atproto-labs/simple-store-memory";
 
@@ -122,14 +124,14 @@ const cache = new TieredStore(
   new CacheApiStore({ prefix: "proof:", ttlSeconds: 7 * 86_400 }),
 );
 
-const records = new EdgeRecordResolver({ cache });
+const recordResolver = createCachedRecordResolver({ cache });
 
 export default {
   async fetch(req: Request) {
     const result = await verify({
       record,
       repository,
-      recordResolver: records.resolve,
+      recordResolver,
     });
     return Response.json(result);
   },
@@ -143,11 +145,10 @@ export default {
         </AnchorHeading>
         <p className="text-sm">
           Each strongRef pins a specific proof record CID. If the proof's
-          contents change, the strongRef stops resolving — there is no
-          mutation-in-place. So a cache keyed by URI is safe for an unlimited
-          duration. The 24-hour TTL on the in-memory default exists only to
-          bound memory; for Workers backed by Cache API, much longer TTLs are
-          reasonable.
+          contents change, the strongRef stops resolving: there is no mutation
+          in place. So a cache keyed by URI is safe for an unlimited duration.
+          The 24-hour TTL on the in-memory default exists only to bound memory;
+          for Workers backed by Cache API, much longer TTLs are reasonable.
         </p>
       </section>
 
@@ -158,10 +159,10 @@ export default {
         <ul className="space-y-1 text-sm">
           <li>
             <a
-              href="/docs/record-resolver/FetchRecordResolver"
+              href="/docs/record-resolver/createFetchRecordResolver"
               className="text-primary dark:text-primary-dark hover:underline font-mono"
             >
-              FetchRecordResolver
+              createFetchRecordResolver
             </a>
           </li>
           <li>
