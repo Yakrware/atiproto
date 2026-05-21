@@ -1,6 +1,6 @@
 {
   "name": "@atiproto/atproto-attestation",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "ATProto record attestation: sign and verify records using did:key signatures over a DAG-CBOR CID",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -26,9 +26,13 @@
     "url": "https://github.com/Yakrware/atiproto.git",
     "directory": "packages/atproto-attestation"
   },
-  "homepage": "https://atiproto.com/docs/lexicon/network.attested.signature",
+  "homepage": "https://atiproto.com/docs/atproto-attestation",
   "bugs": "https://github.com/Yakrware/atiproto/issues",
   "license": "MIT",
+  "publishConfig": {
+    "tag": "beta",
+    "access": "public"
+  },
   "dependencies": {
     "@ipld/dag-cbor": "^9.2.1",
     "@noble/curves": "^1.6.0",

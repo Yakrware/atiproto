@@ -1,6 +1,6 @@
 {
   "name": "@atiproto/agent",
-  "version": "1.4.0",
+  "version": "2.0.0-beta.1",
   "description": "ATProto agent",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -29,9 +29,13 @@
   "homepage": "https://atiproto.com/docs/get-started",
   "bugs": "https://github.com/Yakrware/atiproto/issues",
   "license": "MIT",
+  "publishConfig": {
+    "tag": "beta",
+    "access": "public"
+  },
   "dependencies": {
-    "@atiproto/atproto-attestation": "^0.0.1",
-    "@atiproto/lexicons": "^1.1.0",
+    "@atiproto/atproto-attestation": "^0.1.0",
+    "@atiproto/lexicons": "^2.0.0-beta.1",
     "@atproto/api": "^0.19.6",
     "@atproto/xrpc": "^0.7.7"
   },
