@@ -156,10 +156,10 @@ console.log(data.checkoutUrl);`}
           <li>
             Set up{" "}
             <a
-              href="/docs/stripe-connect"
+              href="/docs/broker-onboarding"
               className="text-primary dark:text-primary-dark hover:underline"
             >
-              Stripe Connect
+              Broker Onboarding
             </a>{" "}
             so users can receive payments
           </li>

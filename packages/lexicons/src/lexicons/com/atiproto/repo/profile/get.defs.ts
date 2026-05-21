@@ -16,6 +16,7 @@ const main = l.query(
   l.jsonPayload({
     did: l.string({ format: 'did' }),
     profile: l.ref<AtiprotoProfile.View>((() => AtiprotoProfile.view) as any),
+    brokers: l.optional(l.array(l.string({ format: 'did' }))),
   }),
 )
 export { main }

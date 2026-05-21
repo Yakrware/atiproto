@@ -1,7 +1,7 @@
 {
   "lexicon": 1,
   "id": "com.atiproto.profile",
-  "description": "A user's payment profile. Records the ordered list of preferred brokers and per-channel accepts flags. The brokers list is account-idempotent: any compliant PoS or broker can resolve who handles payments for a given DID.",
+  "description": "A user's payment profile. Records per-channel accepts flags. The user's preferred broker list lives in the DID document's `service[]` block (as `PaymentBroker` entries), not on this record; any compliant PoS or broker resolves who handles payments by reading the DID document.",
   "defs": {
     "main": {
       "type": "record",
@@ -10,15 +10,6 @@
         "type": "object",
         "required": ["createdAt"],
         "properties": {
-          "brokers": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "did",
-              "description": "did:web of a broker that may settle payments on behalf of this user."
-            },
-            "description": "Ordered list of preferred brokers. First broker that accepts the payment processes it. Defaults to the PoS home authority when omitted."
-          },
           "acceptsItems": {
             "type": "boolean",
             "description": "Whether the user accepts one-time items (default: true)."
@@ -40,19 +31,12 @@
     },
     "view": {
       "type": "object",
-      "description": "Profile view for API responses. `acceptingPayments` is server-derived from the broker list and is not stored on the record.",
+      "description": "Profile view for API responses. `brokers` and `acceptingPayments` are server-derived from the user's DID document; they are not stored on the record.",
       "required": ["uri", "createdAt"],
       "properties": {
         "uri": {
           "type": "string",
           "format": "at-uri"
-        },
-        "brokers": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "format": "did"
-          }
         },
         "acceptsItems": {
           "type": "boolean"
@@ -62,7 +46,7 @@
         },
         "acceptingPayments": {
           "type": "boolean",
-          "description": "True when at least one broker on the profile is configured to accept payments. For v2, the mere presence of a broker on the list is taken as readiness."
+          "description": "True when the user's DID document advertises at least one `PaymentBroker` service entry. For v2, the mere presence of a broker is taken as readiness."
         },
         "createdAt": {
           "type": "string",

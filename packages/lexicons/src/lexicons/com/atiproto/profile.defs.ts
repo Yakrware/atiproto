@@ -12,11 +12,6 @@ type Main = {
   $type: 'com.atiproto.profile'
 
   /**
-   * Ordered list of preferred brokers. First broker that accepts the payment processes it. Defaults to the PoS home authority when omitted.
-   */
-  brokers?: l.DidString[]
-
-  /**
    * Whether the user accepts one-time items (default: true).
    */
   acceptsItems?: boolean
@@ -35,7 +30,6 @@ const main = l.record<'literal:self', Main>(
   'literal:self',
   $nsid,
   l.object({
-    brokers: l.optional(l.array(l.string({ format: 'did' }))),
     acceptsItems: l.optional(l.boolean()),
     acceptsSubscriptions: l.optional(l.boolean()),
     createdAt: l.string({ format: 'datetime' }),
@@ -58,16 +52,15 @@ export const $assert = /*#__PURE__*/ main.assert.bind(main),
   $validate = /*#__PURE__*/ main.validate.bind(main),
   $safeValidate = /*#__PURE__*/ main.safeValidate.bind(main)
 
-/** Profile view for API responses. `acceptingPayments` is server-derived from the broker list and is not stored on the record. */
+/** Profile view for API responses. `brokers` and `acceptingPayments` are server-derived from the user's DID document; they are not stored on the record. */
 type View = {
   $type?: 'com.atiproto.profile#view'
   uri: l.AtUriString
-  brokers?: l.DidString[]
   acceptsItems?: boolean
   acceptsSubscriptions?: boolean
 
   /**
-   * True when at least one broker on the profile is configured to accept payments. For v2, the mere presence of a broker on the list is taken as readiness.
+   * True when the user's DID document advertises at least one `PaymentBroker` service entry. For v2, the mere presence of a broker is taken as readiness.
    */
   acceptingPayments?: boolean
   createdAt: l.DatetimeString
@@ -76,13 +69,12 @@ type View = {
 
 export type { View }
 
-/** Profile view for API responses. `acceptingPayments` is server-derived from the broker list and is not stored on the record. */
+/** Profile view for API responses. `brokers` and `acceptingPayments` are server-derived from the user's DID document; they are not stored on the record. */
 const view = l.typedObject<View>(
   $nsid,
   'view',
   l.object({
     uri: l.string({ format: 'at-uri' }),
-    brokers: l.optional(l.array(l.string({ format: 'did' }))),
     acceptsItems: l.optional(l.boolean()),
     acceptsSubscriptions: l.optional(l.boolean()),
     acceptingPayments: l.optional(l.boolean()),

@@ -9,13 +9,15 @@ const $nsid = 'com.atiproto.recipient.profile.get'
 
 export { $nsid }
 
-/** Get the authenticated user's payment profile. Returns defaults when no profile is configured. `acceptingPayments` on the profile view reflects server-derived readiness from the user's broker list. When called against a broker, the response also includes a `broker` block with the broker DID, this user's account status with that broker, and a fresh onboarding link. */
+/** Get the authenticated user's payment-related state. The PoS variant returns the user's profile and their broker list (the same list `repo.profile.get` would surface). The broker variant returns a `brokerView` describing this user's onboarding state with that broker plus a fresh onboarding link. */
 const main = l.query(
   $nsid,
-  l.params(),
+  l.params({ redirectUrl: l.optional(l.string({ format: 'uri' })) }),
   l.jsonPayload({
-    profile: l.ref<AtiprotoProfile.View>((() => AtiprotoProfile.view) as any),
-    hasProfile: l.boolean(),
+    profile: l.optional(
+      l.ref<AtiprotoProfile.View>((() => AtiprotoProfile.view) as any),
+    ),
+    brokers: l.optional(l.array(l.string({ format: 'did' }))),
     broker: l.optional(l.ref<BrokerView>((() => brokerView) as any)),
   }),
 )
@@ -54,7 +56,7 @@ type BrokerView = {
     | l.UnknownString
 
   /**
-   * Optional. Fresh broker-hosted onboarding link. Clients should redirect the user here to complete (or update) their account.
+   * Optional. Fresh broker-hosted onboarding link. Clients should redirect the user here to complete (or update) their account. When `redirectUrl` was supplied on the request, the broker embeds it so the user lands back at the caller after onboarding.
    */
   onboardingUrl?: l.UriString
 }

@@ -5,8 +5,12 @@ export default [
     index("routes/_index.tsx"),
     route("get-started", "routes/get-started.tsx"),
     route("checkout", "routes/checkout.tsx"),
-    route("stripe-connect", "routes/stripe-connect.tsx"),
+    route("broker-onboarding", "routes/broker-onboarding.tsx"),
     route("edge-oauth", "routes/edge-oauth.tsx"),
+
+    // agent
+    route("agent", "routes/agent/_index.tsx"),
+    route("agent/appendBroker", "routes/agent/appendBroker.tsx"),
 
     // atproto-attestation
     route("atproto-attestation", "routes/atproto-attestation/_index.tsx"),

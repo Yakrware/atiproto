@@ -54,11 +54,18 @@ export function buildNavTree(): NavItem[] {
   const guides: NavItem[] = [
     { label: "Get Started", href: "/docs/get-started" },
     { label: "Checkout Flow", href: "/docs/checkout" },
-    { label: "Stripe Connect", href: "/docs/stripe-connect" },
+    { label: "Broker Onboarding", href: "/docs/broker-onboarding" },
     { label: "Edge OAuth Client", href: "/docs/edge-oauth" },
   ];
 
   const packages: NavItem[] = [
+    {
+      label: "agent",
+      children: [
+        { label: "Get Started", href: "/docs/agent" },
+        { label: "com.appendBroker", href: "/docs/agent/appendBroker" },
+      ],
+    },
     {
       label: "atproto-attestation",
       children: [
