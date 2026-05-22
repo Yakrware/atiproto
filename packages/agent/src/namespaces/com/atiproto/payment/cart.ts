@@ -15,12 +15,12 @@ export class ComAtiprotoPaymentCartNS {
     this._client = client;
   }
 
-  clone(
-    data: com.atiproto.payment.cart.clone.$InputBody,
+  checkout(
+    data: com.atiproto.payment.cart.checkout.$InputBody,
     opts?: CallOptions,
-  ): TypedResponse<com.atiproto.payment.cart.clone.$OutputBody> {
+  ): TypedResponse<com.atiproto.payment.cart.checkout.$OutputBody> {
     return this._client.call(
-      "com.atiproto.payment.cart.clone",
+      "com.atiproto.payment.cart.checkout",
       undefined,
       data,
       opts,

@@ -236,47 +236,17 @@ describe("Agent", () => {
       );
     });
 
-    it("calls com.atiproto.payment.cart.clone with correct NSID", async () => {
+    it("calls com.atiproto.payment.cart.checkout with correct NSID", async () => {
       const data = {
-        uri: "at://did:plc:test/com.atiproto.cart/xyz" as any,
+        cartcart: "at://did:plc:test/com.atiproto.cart/xyz" as any,
       };
 
-      await agent.com.atiproto.payment.cart.clone(data);
+      await agent.com.atiproto.payment.cart.checkout(data);
 
       expect(agent.call).toHaveBeenCalledWith(
-        "com.atiproto.payment.cart.clone",
+        "com.atiproto.payment.cart.checkout",
         undefined,
         data,
-        undefined,
-      );
-    });
-
-    it("calls com.atiproto.recipient.payment.subscription.validate with correct NSID and params", async () => {
-      const params = {
-        sender: "did:plc:sender" as const,
-      };
-
-      await agent.com.atiproto.recipient.payment.subscription.validate(params);
-
-      expect(agent.call).toHaveBeenCalledWith(
-        "com.atiproto.recipient.payment.subscription.validate",
-        params,
-        undefined,
-        undefined,
-      );
-    });
-
-    it("calls com.atiproto.payment.subscription.validate with correct NSID and params", async () => {
-      const params = {
-        subject: "did:plc:subject" as const,
-      };
-
-      await agent.com.atiproto.payment.subscription.validate(params);
-
-      expect(agent.call).toHaveBeenCalledWith(
-        "com.atiproto.payment.subscription.validate",
-        params,
-        undefined,
         undefined,
       );
     });
@@ -327,21 +297,6 @@ describe("Agent", () => {
       );
     });
 
-    it("calls com.atiproto.payment.item.validate with correct NSID and params", async () => {
-      const params = {
-        recordUri: "at://did:plc:creator/app.bsky.feed.post/abc" as any,
-      };
-
-      await agent.com.atiproto.payment.item.validate(params);
-
-      expect(agent.call).toHaveBeenCalledWith(
-        "com.atiproto.payment.item.validate",
-        params,
-        undefined,
-        undefined,
-      );
-    });
-
     it("calls com.atiproto.repo.item.count with correct NSID and params", async () => {
       const params = {
         subject: "did:plc:recipient" as const,
@@ -362,17 +317,6 @@ describe("Agent", () => {
 
       expect(agent.call).toHaveBeenCalledWith(
         "com.atiproto.recipient.profile.get",
-        undefined,
-        undefined,
-        undefined,
-      );
-    });
-
-    it("calls com.atiproto.payment.list with no params", async () => {
-      await agent.com.atiproto.payment.list();
-
-      expect(agent.call).toHaveBeenCalledWith(
-        "com.atiproto.payment.list",
         undefined,
         undefined,
         undefined,
