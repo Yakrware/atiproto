@@ -42,6 +42,9 @@ const main = l.procedure(
       ),
     ),
     item: l.ref<AtiprotoItem.View>((() => AtiprotoItem.view) as any),
+    itemUri: l.optional(l.string({ format: 'at-uri' })),
+    cartUri: l.optional(l.string({ format: 'at-uri' })),
+    checkoutUrl: l.optional(l.string({ format: 'uri' })),
   }),
 )
 export { main }

@@ -73,6 +73,21 @@
               "type": "ref",
               "ref": "com.atiproto.item#view",
               "description": "The signed item view (status: pending)."
+            },
+            "itemUri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "URI of the created item record."
+            },
+            "cartUri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "URI of the created or updated cart record, when the workflow creates one."
+            },
+            "checkoutUrl": {
+              "type": "string",
+              "format": "uri",
+              "description": "Broker checkout URL returned after a successful multi-step tip+cart flow."
             }
           }
         }

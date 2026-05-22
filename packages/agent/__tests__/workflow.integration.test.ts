@@ -84,6 +84,14 @@ describe("workflow interpreter — integration", () => {
                 },
               ],
             },
+            item: {
+              $type: `${ITEM_COLLECTION}#view`,
+              uri: `at://${USER_DID}/${ITEM_COLLECTION}/tipkey1`,
+              amount: 500,
+              currency: "USD",
+              status: "pending",
+              createdAt: "2024-01-01T00:00:00Z",
+            },
           });
         }
         // Callback
@@ -159,6 +167,14 @@ describe("workflow interpreter — integration", () => {
                 },
               ],
             },
+            item: {
+              $type: `${ITEM_COLLECTION}#view`,
+              uri: `at://${USER_DID}/${ITEM_COLLECTION}/tipkey1`,
+              amount: 500,
+              currency: "USD",
+              status: "pending",
+              createdAt: "2024-01-01T00:00:00Z",
+            },
           });
         }
         if (xrpcCalls === 2) {
@@ -177,6 +193,14 @@ describe("workflow interpreter — integration", () => {
                 },
               ],
             },
+            item: {
+              $type: `${ITEM_COLLECTION}#view`,
+              uri: `at://${USER_DID}/${ITEM_COLLECTION}/tipkey1`,
+              amount: 500,
+              currency: "USD",
+              status: "pending",
+              createdAt: "2024-01-01T00:00:00Z",
+            },
           });
         }
         // Final
@@ -185,6 +209,14 @@ describe("workflow interpreter — integration", () => {
           itemUri: `at://${USER_DID}/${ITEM_COLLECTION}/tipkey1`,
           cartUri: `at://${USER_DID}/${CART_COLLECTION}/cartkey1`,
           checkoutUrl: "https://stripe.example/checkout/xyz",
+          item: {
+            $type: `${ITEM_COLLECTION}#view`,
+            uri: `at://${USER_DID}/${ITEM_COLLECTION}/tipkey1`,
+            amount: 500,
+            currency: "USD",
+            status: "pending",
+            createdAt: "2024-01-01T00:00:00Z",
+          },
         });
       },
       "/xrpc/com.atproto.repo.createRecord": async (req) => {
@@ -245,6 +277,14 @@ describe("workflow interpreter — integration", () => {
         jsonRes({
           workflow: { intent: "noop", actions: [] },
           itemUri: `at://${USER_DID}/${ITEM_COLLECTION}/abc`,
+          item: {
+            $type: `${ITEM_COLLECTION}#view`,
+            uri: `at://${USER_DID}/${ITEM_COLLECTION}/abc`,
+            amount: 0,
+            currency: "USD",
+            status: "completed",
+            createdAt: "2024-01-01T00:00:00Z",
+          },
         }),
     });
 
@@ -280,6 +320,14 @@ describe("workflow interpreter — integration", () => {
                 },
               ],
             },
+            item: {
+              $type: `${ITEM_COLLECTION}#view`,
+              uri: `at://${USER_DID}/${ITEM_COLLECTION}/tipkey1`,
+              amount: 500,
+              currency: "USD",
+              status: "pending",
+              createdAt: "2024-01-01T00:00:00Z",
+            },
           });
         }
         // Callback with error
@@ -296,6 +344,14 @@ describe("workflow interpreter — integration", () => {
                 code: "TipCreateFailed",
               },
             ],
+          },
+          item: {
+            $type: `${ITEM_COLLECTION}#view`,
+            uri: `at://${USER_DID}/${ITEM_COLLECTION}/tipkey1`,
+            amount: 500,
+            currency: "USD",
+            status: "pending",
+            createdAt: "2024-01-01T00:00:00Z",
           },
         });
       },
@@ -347,6 +403,14 @@ describe("workflow interpreter — integration", () => {
                 },
               ],
             },
+            item: {
+              $type: `${ITEM_COLLECTION}#view`,
+              uri: `at://${USER_DID}/${ITEM_COLLECTION}/first-rkey`,
+              amount: 500,
+              currency: "USD",
+              status: "pending",
+              createdAt: "2024-01-01T00:00:00Z",
+            },
           });
         }
         // Error callback — agent has partial responses [first]
@@ -370,6 +434,14 @@ describe("workflow interpreter — integration", () => {
                 code: "RolledBack",
               },
             ],
+          },
+          item: {
+            $type: `${ITEM_COLLECTION}#view`,
+            uri: `at://${USER_DID}/${ITEM_COLLECTION}/first-rkey`,
+            amount: 500,
+            currency: "USD",
+            status: "pending",
+            createdAt: "2024-01-01T00:00:00Z",
           },
         });
       },
@@ -423,6 +495,14 @@ describe("workflow interpreter — integration", () => {
                 record: { $type: ITEM_COLLECTION },
               },
             ],
+          },
+          item: {
+            $type: `${ITEM_COLLECTION}#view`,
+            uri: `at://${USER_DID}/${ITEM_COLLECTION}/key`,
+            amount: 500,
+            currency: "USD",
+            status: "pending",
+            createdAt: "2024-01-01T00:00:00Z",
           },
         }),
       "/xrpc/com.atproto.repo.createRecord": async (req) => {
@@ -541,7 +621,7 @@ describe("workflow interpreter — integration", () => {
     const agent = buildAgent(fetchHandler);
     const res = await agent.com.atiproto.payment.cart.get({ uri: cartUri });
 
-    expect(res.data.uri).toBe(cartUri);
+    expect(res.data.cart.uri).toBe(cartUri);
     expect((res.data as any).workflow).toBeUndefined();
     expect(pdsUpdates).toBe(1);
     // One initial query call + one PDS write — no callback.
@@ -616,9 +696,27 @@ describe("workflow interpreter — integration", () => {
                 },
               ],
             },
+            item: {
+              $type: `${ITEM_COLLECTION}#view`,
+              uri: `at://${USER_DID}/${ITEM_COLLECTION}/k`,
+              amount: 500,
+              currency: "USD",
+              status: "pending",
+              createdAt: "2024-01-01T00:00:00Z",
+            },
           });
         }
-        return jsonRes({ itemUri: `at://${USER_DID}/${ITEM_COLLECTION}/k` });
+        return jsonRes({
+          itemUri: `at://${USER_DID}/${ITEM_COLLECTION}/k`,
+          item: {
+            $type: `${ITEM_COLLECTION}#view`,
+            uri: `at://${USER_DID}/${ITEM_COLLECTION}/k`,
+            amount: 500,
+            currency: "USD",
+            status: "pending",
+            createdAt: "2024-01-01T00:00:00Z",
+          },
+        });
       },
       "/xrpc/com.atproto.repo.createRecord": async (req) => {
         const body = await req.json();

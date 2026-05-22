@@ -11,11 +11,28 @@ function hasComNS(client: XrpcClient): client is XrpcClient & { com: object } {
 
 export class ComNS {
   atiproto: ComAtiprotoNS;
-  private readonly _client: XrpcClient;
+
+  /**
+   * Append (or promote) a `PaymentBroker` service entry on the
+   * authenticated user's DID document. See `appendBroker` in
+   * `./com/appendBroker.ts` for the full behavior.
+   *
+   * Bound as an instance property (rather than a class method) so that
+   * `ComNS` carries no private fields. The agent's `com` is a structural
+   * intersection of this class with the underlying client's `com`
+   * namespace; a private `_client` here would collide with the public
+   * `_client` on `@atproto/api`'s ComNS and collapse the intersection
+   * to `never`.
+   */
+  appendBroker: (
+    broker: string,
+    options?: AppendBrokerOptions,
+  ) => Promise<void>;
 
   constructor(client: XrpcClient, underlying?: XrpcClient) {
-    this._client = client;
     this.atiproto = new ComAtiprotoNS(client);
+    this.appendBroker = (broker, options) =>
+      runAppendBroker(client, broker, options);
 
     if (underlying && hasComNS(underlying)) {
       return new Proxy(this, {
@@ -25,45 +42,6 @@ export class ComNS {
         },
       });
     }
-  }
-
-  /**
-   * Append (or promote) a `PaymentBroker` service entry on the
-   * authenticated user's DID document.
-   *
-   * The broker entry uses the W3C service shape:
-   *
-   *   { id: `${broker}#payment-broker`,
-   *     type: "PaymentBroker",
-   *     serviceEndpoint: "https://<host>" }
-   *
-   * `serviceEndpoint` is derived from the broker's did:web host (or
-   * supplied via `options.serviceEndpoint`).
-   *
-   * Sort rules:
-   * - If `broker` is new and no PaymentBroker entries exist yet, the
-   *   new entry is appended to the end of the service array
-   *   (regardless of `default`).
-   * - If `broker` is new and `default` is true, the new entry is
-   *   inserted just before the previous first PaymentBroker (other
-   *   service entries that precede the broker block stay put).
-   * - If `broker` is new and `default` is false, the new entry is
-   *   appended just after the last PaymentBroker (keeping the broker
-   *   block contiguous).
-   * - If `broker` is already present and `default` is true, the entry
-   *   is moved to the front of the broker block (no-op when it's
-   *   already first).
-   * - If `broker` is already present and `default` is false, no-op.
-   *
-   * Other services on the DID document are preserved untouched.
-   *
-   * Uses the standard atproto PLC flow: `resolveIdentity` ->
-   * `signPlcOperation` -> `submitPlcOperation`. When the PDS requires
-   * email confirmation, pass `options.token` from
-   * `com.atproto.identity.requestPlcOperationSignature`.
-   */
-  appendBroker(broker: string, options?: AppendBrokerOptions): Promise<void> {
-    return runAppendBroker(this._client, broker, options);
   }
 }
 

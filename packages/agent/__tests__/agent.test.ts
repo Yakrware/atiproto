@@ -206,7 +206,10 @@ describe("Agent", () => {
 
     it("calls com.atiproto.payment.item.create with correct NSID and data", async () => {
       const data = {
-        subject: "did:plc:test" as const,
+        subject: {
+          $type: "com.atiproto.item#userRef" as const,
+          did: "did:plc:test" as const,
+        },
         amount: 500,
         currency: "USD",
       };
@@ -223,7 +226,7 @@ describe("Agent", () => {
 
     it("calls com.atiproto.payment.item.get with correct NSID and params", async () => {
       const params = {
-        uri: "at://did:plc:test/com.atiproto.item/abc" as any,
+        uri: "at://did:plc:test/com.atiproto.item/abc" as const,
       };
 
       await agent.com.atiproto.payment.item.get(params);
@@ -238,7 +241,7 @@ describe("Agent", () => {
 
     it("calls com.atiproto.payment.cart.checkout with correct NSID", async () => {
       const data = {
-        cartcart: "at://did:plc:test/com.atiproto.cart/xyz" as any,
+        cart: "at://did:plc:test/com.atiproto.cart/xyz" as const,
       };
 
       await agent.com.atiproto.payment.cart.checkout(data);
@@ -253,7 +256,7 @@ describe("Agent", () => {
 
     it("calls com.atiproto.repo.subscription.count with correct NSID and params", async () => {
       const params = {
-        subject: "did:plc:subject" as const,
+        record: "at://did:plc:subject" as const,
       };
 
       await agent.com.atiproto.repo.subscription.count(params);
@@ -269,7 +272,7 @@ describe("Agent", () => {
     it("calls com.atiproto.payment.subscription.cancel with correct NSID", async () => {
       const data = {
         subscriptionUri:
-          "at://did:plc:test/com.atiproto.subscription/abc" as any,
+          "at://did:plc:test/com.atiproto.subscription/abc" as const,
       };
 
       await agent.com.atiproto.payment.subscription.cancel(data);
@@ -299,7 +302,7 @@ describe("Agent", () => {
 
     it("calls com.atiproto.repo.item.count with correct NSID and params", async () => {
       const params = {
-        subject: "did:plc:recipient" as const,
+        record: "at://did:plc:recipient" as const,
       };
 
       await agent.com.atiproto.repo.item.count(params);
