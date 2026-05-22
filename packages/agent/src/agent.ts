@@ -39,8 +39,8 @@ const DEFAULT_MAX_WORKFLOW_STEPS = 10;
  * Agent we use its `withProxy` clone (so labelers + auth headers compose
  * correctly); otherwise we inject the header by hand.
  *
- * Exported so other packages — and `prepChatForReceipts` — can build
- * audience-pinned handlers from any `XrpcClient`.
+ * Exported so other packages can build audience-pinned handlers from any
+ * `XrpcClient`.
  */
 export function createFetchHandler(
   client: XrpcClient,
@@ -251,8 +251,7 @@ class AgentImpl<TClient extends XrpcClient = ApiAgent> extends XrpcClient {
  * to the underlying `TClient`, so structurally an `Agent<TClient>` *is* a
  * `TClient` too — `agent.withProxy(...)`, `agent.chat.bsky.*`, etc. all
  * work at runtime. The intersection here lets TypeScript accept an
- * `Agent<ApiAgent>` wherever an `ApiAgent` is required (e.g. when calling
- * `prepChatForReceipts`).
+ * `Agent<ApiAgent>` wherever an `ApiAgent` is required.
  */
 export type Agent<TClient extends XrpcClient = ApiAgent> = AgentImpl<TClient> &
   TClient;
