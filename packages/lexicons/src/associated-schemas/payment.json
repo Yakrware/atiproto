@@ -1,0 +1,58 @@
+{
+  "lexicon": 1,
+  "id": "network.attested.payment",
+  "description": "A minimal record attesting that a payment was performed, signed by the broker. Carries only status, broker identity, timestamps, and signatures by default; the recipient `subject` is optional and absent unless the issuer opts in to publishing it. Line item details live in the `network.attested.payment.initiate` input, not on the record itself; carts and entitlements reference this record by uri.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": ["status", "broker", "createdAt", "signatures"],
+        "properties": {
+          "subject": {
+            "type": "string",
+            "format": "did",
+            "description": "Optional DID of the payment recipient. Absent by default; Broker expected to retain the recipient information internally. Setting this on the record makes the recipient publicly visible."
+          },
+          "status": {
+            "type": "string",
+            "maxLength": 64,
+            "knownValues": [
+              "pending",
+              "completed",
+              "failed",
+              "refunded",
+              "cancelled"
+            ]
+          },
+          "broker": {
+            "type": "string",
+            "format": "did",
+            "description": "DID of the broker that issued and is settling this payment."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Set when `status === completed`."
+          },
+          "signatures": {
+            "type": "array",
+            "items": {
+              "type": "union",
+              "refs": [
+                "network.attested.signature",
+                "com.atproto.repo.strongRef"
+              ]
+            },
+            "description": "Broker attestation(s). Each entry is either an inline `network.attested.signature` or a `com.atproto.repo.strongRef` pointing at a remote `network.attested.proof` record. The canonical signing payload covers `status`, `broker`, `createdAt`, plus `subject` and `completedAt` when present. Mutating any of those fields invalidates every signature in this array."
+          }
+        }
+      }
+    }
+  }
+}

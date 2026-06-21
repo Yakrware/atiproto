@@ -74,16 +74,4 @@ export class ComAtiprotoPaymentSubscriptionNS {
       opts,
     ) as any;
   }
-
-  validate(
-    params?: com.atiproto.payment.subscription.validate.$Params,
-    opts?: CallOptions,
-  ): TypedResponse<com.atiproto.payment.subscription.validate.$OutputBody> {
-    return this._client.call(
-      "com.atiproto.payment.subscription.validate",
-      params as QueryParams,
-      undefined,
-      opts,
-    ) as any;
-  }
 }

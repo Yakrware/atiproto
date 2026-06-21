@@ -4,7 +4,7 @@
   "defs": {
     "main": {
       "type": "procedure",
-      "description": "Update a pending subscription. Only pending subscriptions can be updated.",
+      "description": "Update a subscription.",
       "input": {
         "encoding": "application/json",
         "schema": {

@@ -3,8 +3,14 @@
  */
 
 export * as actions from './atiproto/actions.js'
-export * as authEnhanced from './atiproto/authEnhanced.js'
-export * as authGeneral from './atiproto/authGeneral.js'
+export * as authCreateCart from './atiproto/authCreateCart.js'
+export * as authCreatePayment from './atiproto/authCreatePayment.js'
+export * as authReadCart from './atiproto/authReadCart.js'
+export * as authReadEntitlements from './atiproto/authReadEntitlements.js'
+export * as authReadPayments from './atiproto/authReadPayments.js'
+export * as authReadPublic from './atiproto/authReadPublic.js'
+export * as authReadRecipient from './atiproto/authReadRecipient.js'
+export * as authWriteProfile from './atiproto/authWriteProfile.js'
 export * as cart from './atiproto/cart.js'
 export * as item from './atiproto/item.js'
 export * as payment from './atiproto/payment.js'

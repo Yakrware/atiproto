@@ -1,113 +1,125 @@
 {
+  "lexicon": 1,
+  "id": "com.atiproto.item",
+  "description": "A one-time payment line item from a sender to a recipient or to a specific record (e.g. a post). Created as part of a `com.atiproto.cart`; the cart owns `currency`. Co-signed by the PoS and the recipient AppView. When marked as private, `subject` is absent from the stored record so a public reader cannot tell who or what was paid for; the issuing PoS retains the hydrated record.",
   "defs": {
     "main": {
-      "description": "A record representing a item given by one user to another",
+      "type": "record",
       "key": "any",
       "record": {
+        "type": "object",
+        "required": ["amount", "quantity", "status", "createdAt", "signatures"],
         "properties": {
           "subject": {
-            "description": "DID of the user receiving the item",
-            "format": "did",
-            "type": "string"
-          },
-          "recordUri": {
-            "description": "AT-URI of specific record being tipped",
-            "format": "at-uri",
-            "type": "string"
+            "type": "union",
+            "refs": ["com.atproto.repo.strongRef", "#userRef"],
+            "description": "Reference to the entity being paid for. Either a `com.atproto.repo.strongRef` (a specific record, e.g. a post) or a `#userRef` (a thin wrapper carrying a did string for the user being paid). Absent when marked as private."
           },
           "amount": {
-            "description": "Tip amount in cents (0 when recipient allows zero items)",
+            "type": "integer",
             "minimum": 0,
-            "type": "integer"
+            "description": "Per-unit amount in the smallest unit of the cart's `currency` (0 when the recipient permits zero-value items). Multiply by `quantity` for the line total."
           },
-          "currency": {
-            "description": "ISO 4217 currency code",
-            "maxLength": 3,
-            "type": "string"
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 1,
+            "description": "Number of units of this item. Defaults to 1."
           },
           "status": {
-            "description": "Tip status",
-            "maxLength": 64,
             "type": "string",
-            "enum": ["pending", "authorized", "completed", "failed", "refunded"]
+            "maxLength": 64,
+            "description": "Implementation-defined status string. PoS does not enforce or interpret this value; payment / cart state lives on the cart's `status` field."
           },
           "message": {
-            "description": "Optional message (max 500 chars)",
+            "type": "string",
             "maxGraphemes": 500,
             "maxLength": 5000,
-            "type": "string"
+            "description": "Optional message attached to the item."
           },
           "createdAt": {
-            "description": "Creation timestamp",
-            "format": "datetime",
-            "type": "string"
+            "type": "string",
+            "format": "datetime"
           },
           "completedAt": {
-            "description": "Completion timestamp",
-            "format": "datetime",
-            "type": "string"
+            "type": "string",
+            "format": "datetime"
+          },
+          "signatures": {
+            "type": "array",
+            "items": {
+              "type": "union",
+              "refs": [
+                "network.attested.signature",
+                "com.atproto.repo.strongRef"
+              ]
+            },
+            "description": "PoS + recipient AppView attestations. Each entry is either an inline `network.attested.signature` or a `com.atproto.repo.strongRef` pointing at a remote `network.attested.proof` record. The canonical signing payload covers `amount`, `quantity`, `status`, `createdAt`, plus `subject`, `message`, and `completedAt` when present. Mutating any of those fields invalidates every signature in this array."
           }
-        },
-        "required": ["amount", "currency", "status", "createdAt"],
-        "type": "object"
-      },
-      "type": "record"
+        }
+      }
     },
     "view": {
       "type": "object",
-      "description": "View of a item record for use in API responses",
-      "required": ["uri", "amount", "currency", "status", "createdAt"],
+      "required": ["uri", "amount", "quantity", "status", "createdAt"],
       "properties": {
         "uri": {
-          "description": "AT-URI of the item record",
-          "format": "at-uri",
-          "type": "string"
+          "type": "string",
+          "format": "at-uri"
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid"
         },
         "subject": {
-          "description": "DID of the user receiving the item",
-          "format": "did",
-          "type": "string"
-        },
-        "recordUri": {
-          "description": "AT-URI of specific record being tipped",
-          "format": "at-uri",
-          "type": "string"
+          "type": "union",
+          "refs": ["com.atproto.repo.strongRef", "#userRef"]
         },
         "amount": {
-          "description": "Tip amount in cents (0 when recipient allows zero items)",
-          "minimum": 0,
-          "type": "integer"
+          "type": "integer",
+          "minimum": 0
         },
-        "currency": {
-          "description": "ISO 4217 currency code",
-          "maxLength": 3,
-          "type": "string"
+        "quantity": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1
         },
         "status": {
-          "description": "Tip status",
-          "maxLength": 64,
           "type": "string",
-          "enum": ["pending", "authorized", "completed", "failed", "refunded"]
+          "maxLength": 64
         },
         "message": {
-          "description": "Optional message (max 500 chars)",
+          "type": "string",
           "maxGraphemes": 500,
-          "maxLength": 5000,
-          "type": "string"
+          "maxLength": 5000
         },
         "createdAt": {
-          "description": "Creation timestamp",
-          "format": "datetime",
-          "type": "string"
+          "type": "string",
+          "format": "datetime"
         },
         "completedAt": {
-          "description": "Completion timestamp",
-          "format": "datetime",
-          "type": "string"
+          "type": "string",
+          "format": "datetime"
+        },
+        "signatures": {
+          "type": "array",
+          "items": {
+            "type": "union",
+            "refs": ["network.attested.signature", "com.atproto.repo.strongRef"]
+          }
+        }
+      }
+    },
+    "userRef": {
+      "type": "object",
+      "description": "Thin wrapper that carries a bare did string for the user being paid. The wire shape is `{ \"$type\": \"com.atiproto.item#userRef\", \"did\": \"did:plc:...\" }`; pair with `com.atproto.repo.strongRef` in a `subject` union to express either-or.",
+      "required": ["did"],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did"
         }
       }
     }
-  },
-  "id": "com.atiproto.item",
-  "lexicon": 1
+  }
 }

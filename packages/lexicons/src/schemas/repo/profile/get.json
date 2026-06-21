@@ -31,6 +31,14 @@
               "type": "ref",
               "ref": "com.atiproto.profile#view",
               "description": "Public profile data"
+            },
+            "brokers": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "did"
+              },
+              "description": "Ordered list of the user's preferred broker DIDs. Server-derived: the PoS reads the user's DID document, filters `service[]` entries with `type: \"PaymentBroker\"`, and returns each entry's DID (the portion of `id` before `#payment-broker`). First broker that accepts the payment processes it."
             }
           }
         }

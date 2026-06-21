@@ -62,16 +62,4 @@ export class ComAtiprotoPaymentItemNS {
       opts,
     ) as any;
   }
-
-  validate(
-    params?: com.atiproto.payment.item.validate.$Params,
-    opts?: CallOptions,
-  ): TypedResponse<com.atiproto.payment.item.validate.$OutputBody> {
-    return this._client.call(
-      "com.atiproto.payment.item.validate",
-      params as QueryParams,
-      undefined,
-      opts,
-    ) as any;
-  }
 }

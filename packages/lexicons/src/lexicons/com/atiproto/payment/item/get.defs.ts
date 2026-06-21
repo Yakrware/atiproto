@@ -9,14 +9,10 @@ const $nsid = 'com.atiproto.payment.item.get'
 
 export { $nsid }
 
-/** Get a specific item sent by the authenticated user. Looks up by item record uri, subject (recipient) DID, or record uri. These are mutually exclusive and resolved in that order. */
+/** Hydrate an item record by uri. The authenticated user must be the sender. Search filters that were previously on this endpoint live on `payment.item.list`. */
 const main = l.query(
   $nsid,
-  l.params({
-    uri: l.optional(l.string({ format: 'at-uri' })),
-    subject: l.optional(l.string({ format: 'did' })),
-    recordUri: l.optional(l.string({ format: 'at-uri' })),
-  }),
+  l.params({ uri: l.string({ format: 'at-uri' }) }),
   l.jsonPayload({
     item: l.ref<AtiprotoItem.View>((() => AtiprotoItem.view) as any),
   }),

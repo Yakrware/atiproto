@@ -10,7 +10,7 @@ const $nsid = 'com.atiproto.payment.item.put'
 
 export { $nsid }
 
-/** Update a pending item. Only pending items can be updated. */
+/** Update an item. */
 const main = l.procedure(
   $nsid,
   l.params(),

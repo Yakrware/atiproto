@@ -4,24 +4,15 @@
   "defs": {
     "main": {
       "type": "query",
-      "description": "Get a specific item received by the authenticated user (as the recipient/subject). Looks up by item record uri, sender DID, or record uri. These are mutually exclusive and resolved in that order.",
+      "description": "Hydrate an incoming item record by uri (the authenticated user must be the recipient/subject). Search filters that were previously on this endpoint live on `recipient.payment.item.list`.",
       "parameters": {
         "type": "params",
+        "required": ["uri"],
         "properties": {
           "uri": {
             "type": "string",
             "format": "at-uri",
-            "description": "AT-URI of the item record. Takes precedence over sender and recordUri."
-          },
-          "sender": {
-            "type": "string",
-            "format": "did",
-            "description": "DID of the item sender. Takes precedence over recordUri."
-          },
-          "recordUri": {
-            "type": "string",
-            "format": "at-uri",
-            "description": "AT-URI of the record being tipped. Ignored if uri or sender is provided."
+            "description": "URI of the item record."
           }
         }
       },
@@ -33,8 +24,7 @@
           "properties": {
             "item": {
               "type": "ref",
-              "ref": "com.atiproto.item#view",
-              "description": "The item record data"
+              "ref": "com.atiproto.item#view"
             }
           }
         }

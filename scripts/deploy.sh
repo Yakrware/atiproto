@@ -15,11 +15,37 @@ done
 PACKAGES=(
   "packages/lexicons"
   "packages/agent"
+  "packages/atproto-attestation"
+  "packages/key-resolver"
+  "packages/record-resolver"
   "packages/edge-resolvers"
   "packages/kv-oauth-state-store"
   "packages/edge-oauth-client"
   "packages/edge-resolver-cache"
 )
+
+# True iff $1 is already in the list of published versions for $2.
+# Uses `npm view <name> versions` so beta / pre-release versions count,
+# not just whatever is tagged `latest`. Returns "false" for packages
+# that have never been published.
+is_published() {
+  local version="$1"
+  local name="$2"
+  local json
+  json=$(npm view "$name" versions --json 2>/dev/null || echo "")
+  [ -z "$json" ] && { echo false; return; }
+  node -e "
+    const arg = process.argv[1];
+    let versions;
+    try {
+      const v = JSON.parse(arg);
+      versions = Array.isArray(v) ? v : [v];
+    } catch {
+      versions = [];
+    }
+    console.log(versions.includes(process.argv[2]));
+  " "$json" "$version"
+}
 
 PUBLISHED=0
 
@@ -31,15 +57,12 @@ for pkg_dir in "${PACKAGES[@]}"; do
   name=$(node -p "require('./$pkg_dir/package.json').name")
   local_version=$(node -p "require('./$pkg_dir/package.json').version")
 
-  # Get the published version from npm (empty string if not published yet)
-  remote_version=$(npm view "$name" version 2>/dev/null || echo "")
-
-  if [ "$local_version" = "$remote_version" ]; then
+  if [ "$(is_published "$local_version" "$name")" = "true" ]; then
     echo "Skipping $name@$local_version (already published)"
     continue
   fi
 
-  echo "Publishing $name@$local_version (registry has ${remote_version:-nothing})..."
+  echo "Publishing $name@$local_version..."
 
   npm run build -w "$pkg_dir"
 

@@ -9,12 +9,12 @@ const $nsid = 'com.atiproto.recipient.payment.item.list'
 
 export { $nsid }
 
-/** List items received by the authenticated user (items where the authed user is the recipient/subject). Includes items marked private, which are only stored in atiproto's database. */
+/** List items received by the authenticated user (items whose `subject` is the authed user, or whose `record` points at a record the authed user owns). Includes items marked private, which are retained server-side. */
 const main = l.query(
   $nsid,
   l.params({
     sender: l.optional(l.string({ format: 'did' })),
-    recordUri: l.optional(l.string({ format: 'at-uri' })),
+    record: l.optional(l.string({ format: 'at-uri' })),
     cursor: l.optional(l.string({ maxLength: 512 })),
     limit: l.optional(
       l.withDefault(l.integer({ minimum: 1, maximum: 100 }), 50),

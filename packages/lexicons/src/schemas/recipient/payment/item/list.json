@@ -4,19 +4,19 @@
   "defs": {
     "main": {
       "type": "query",
-      "description": "List items received by the authenticated user (items where the authed user is the recipient/subject). Includes items marked private, which are only stored in atiproto's database.",
+      "description": "List items received by the authenticated user (items whose `subject` is the authed user, or whose `record` points at a record the authed user owns). Includes items marked private, which are retained server-side.",
       "parameters": {
         "type": "params",
         "properties": {
           "sender": {
             "type": "string",
             "format": "did",
-            "description": "Optional: only return items sent by this DID"
+            "description": "Optional: only return items sent by this DID."
           },
-          "recordUri": {
+          "record": {
             "type": "string",
             "format": "at-uri",
-            "description": "Optional: only return items received for this specific record"
+            "description": "Optional. Pass an at-uri to a specific record (the item's `subject` strongRef), or `at://did:plc:...` (a repo-level at-uri) to match items whose `subject` is a `#userRef` carrying that DID."
           },
           "cursor": {
             "type": "string",

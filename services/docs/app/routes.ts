@@ -5,9 +5,58 @@ export default [
     index("routes/_index.tsx"),
     route("get-started", "routes/get-started.tsx"),
     route("checkout", "routes/checkout.tsx"),
-    route("stripe-connect", "routes/stripe-connect.tsx"),
+    route("broker-onboarding", "routes/broker-onboarding.tsx"),
     route("edge-oauth", "routes/edge-oauth.tsx"),
-    route("permission-sets", "routes/permission-sets.tsx"),
+
+    // agent
+    route("agent", "routes/agent/_index.tsx"),
+    route("agent/appendBroker", "routes/agent/appendBroker.tsx"),
+
+    // atproto-attestation
+    route("atproto-attestation", "routes/atproto-attestation/_index.tsx"),
+    route(
+      "atproto-attestation/Attestation",
+      "routes/atproto-attestation/Attestation.tsx",
+    ),
+    route(
+      "atproto-attestation/verify",
+      "routes/atproto-attestation/verify.tsx",
+    ),
+    route(
+      "atproto-attestation/resolvers",
+      "routes/atproto-attestation/resolvers.tsx",
+    ),
+    route("atproto-attestation/keys", "routes/atproto-attestation/keys.tsx"),
+
+    // key-resolver
+    route("key-resolver", "routes/key-resolver/_index.tsx"),
+    route(
+      "key-resolver/createDidKeyResolver",
+      "routes/key-resolver/createDidKeyResolver.tsx",
+    ),
+    route(
+      "key-resolver/createFetchKeyResolver",
+      "routes/key-resolver/createFetchKeyResolver.tsx",
+    ),
+    route(
+      "key-resolver/createCachedKeyResolver",
+      "routes/key-resolver/createCachedKeyResolver.tsx",
+    ),
+
+    // record-resolver
+    route("record-resolver", "routes/record-resolver/_index.tsx"),
+    route(
+      "record-resolver/createFetchRecordResolver",
+      "routes/record-resolver/createFetchRecordResolver.tsx",
+    ),
+    route(
+      "record-resolver/createAgentRecordResolver",
+      "routes/record-resolver/createAgentRecordResolver.tsx",
+    ),
+    route(
+      "record-resolver/createCachedRecordResolver",
+      "routes/record-resolver/createCachedRecordResolver.tsx",
+    ),
 
     // edge-oauth-client
     route("edge-oauth-client", "routes/edge-oauth-client/_index.tsx"),

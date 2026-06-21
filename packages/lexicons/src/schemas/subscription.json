@@ -1,78 +1,89 @@
 {
+  "lexicon": 1,
+  "id": "com.atiproto.subscription",
+  "description": "A recurring payment line item from a sender to a recipient or to a specific record (e.g. a paid feed or post stream). Created as part of a `com.atiproto.cart`; the cart owns `currency`. Co-signed by the PoS and the recipient AppView. When marked as private, `subject` is absent from the stored record so a public reader cannot tell who or what is being subscribed to; the issuing PoS retains the hydrated record.",
   "defs": {
     "main": {
-      "description": "A record representing a subscription from one user to another",
+      "type": "record",
       "key": "any",
       "record": {
-        "properties": {
-          "subject": {
-            "description": "DID of the user being subscribed to",
-            "format": "did",
-            "type": "string"
-          },
-          "amount": {
-            "description": "Subscription amount in cents (0 for free subscriptions)",
-            "minimum": 0,
-            "type": "integer"
-          },
-          "currency": {
-            "description": "ISO 4217 currency code",
-            "maxLength": 3,
-            "type": "string"
-          },
-          "interval": {
-            "description": "Billing interval",
-            "maxLength": 64,
-            "enum": ["monthly", "yearly"],
-            "type": "string"
-          },
-          "status": {
-            "description": "Subscription status",
-            "maxLength": 64,
-            "enum": ["pending", "active", "past_due", "cancelled", "expired"],
-            "type": "string"
-          },
-          "billingStartDate": {
-            "description": "First billing period, can be used to determine recurrence",
-            "format": "datetime",
-            "type": "string"
-          },
-          "cancelledAt": {
-            "description": "Cancellation timestamp",
-            "format": "datetime",
-            "type": "string"
-          },
-          "accessUntil": {
-            "description": "Date until which the subscriber retains access after cancellation",
-            "format": "datetime",
-            "type": "string"
-          },
-          "createdAt": {
-            "description": "Creation timestamp",
-            "format": "datetime",
-            "type": "string"
-          }
-        },
+        "type": "object",
         "required": [
-          "subject",
           "amount",
-          "currency",
           "interval",
           "status",
           "billingStartDate",
-          "createdAt"
+          "createdAt",
+          "signatures"
         ],
-        "type": "object"
-      },
-      "type": "record"
+        "properties": {
+          "subject": {
+            "type": "union",
+            "refs": ["com.atproto.repo.strongRef", "#userRef"],
+            "description": "Reference to the entity being subscribed to. Either a `com.atproto.repo.strongRef` (a specific record, e.g. a paid feed) or a `#userRef` (a thin wrapper carrying a did string for the user being subscribed to). Absent when marked as private."
+          },
+          "amount": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Per-period subscription amount in the smallest unit of the cart's `currency` (0 for free)."
+          },
+          "interval": {
+            "type": "union",
+            "refs": [
+              "network.attested.payment.initiate#namedInterval",
+              "network.attested.payment.initiate#customInterval"
+            ],
+            "description": "Billing cadence. Mirrors `network.attested.payment.initiate#interval`: either `network.attested.payment.initiate#namedInterval` (weekly / monthly / yearly) or `network.attested.payment.initiate#customInterval` (`{ days: integer >= 1 }`)."
+          },
+          "status": {
+            "type": "string",
+            "maxLength": 64,
+            "knownValues": [
+              "pending",
+              "active",
+              "past_due",
+              "cancelled",
+              "expired"
+            ],
+            "description": "Subscription lifecycle state. Open to extension via `knownValues`; PoS continues to interpret these values for subscription-specific flows (renewal, dunning, etc.)."
+          },
+          "billingStartDate": {
+            "type": "string",
+            "format": "datetime",
+            "description": "First billing period; can be used to derive recurrence."
+          },
+          "cancelledAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "accessUntil": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Date until which the subscriber retains access after cancellation."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "signatures": {
+            "type": "array",
+            "items": {
+              "type": "union",
+              "refs": [
+                "network.attested.signature",
+                "com.atproto.repo.strongRef"
+              ]
+            },
+            "description": "PoS + recipient AppView attestations. Each entry is either an inline `network.attested.signature` or a `com.atproto.repo.strongRef` pointing at a remote `network.attested.proof` record. The canonical signing payload covers `amount`, `interval`, `status`, `billingStartDate`, `createdAt`, plus `subject`, `cancelledAt`, and `accessUntil` when present. Mutating any of those fields invalidates every signature in this array."
+          }
+        }
+      }
     },
     "view": {
       "type": "object",
-      "description": "View of a subscription record for use in API responses",
       "required": [
         "uri",
         "amount",
-        "currency",
         "interval",
         "status",
         "billingStartDate",
@@ -80,65 +91,79 @@
       ],
       "properties": {
         "uri": {
-          "description": "AT-URI of the subscription record",
-          "format": "at-uri",
-          "type": "string"
+          "type": "string",
+          "format": "at-uri"
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid"
         },
         "subject": {
-          "description": "DID of the user being subscribed to",
-          "format": "did",
-          "type": "string"
+          "type": "union",
+          "refs": ["com.atproto.repo.strongRef", "#userRef"]
         },
         "amount": {
-          "description": "Subscription amount in cents (0 for free subscriptions)",
-          "minimum": 0,
-          "type": "integer"
-        },
-        "currency": {
-          "description": "ISO 4217 currency code",
-          "maxLength": 3,
-          "type": "string"
+          "type": "integer",
+          "minimum": 0
         },
         "interval": {
-          "description": "Billing interval",
-          "maxLength": 64,
-          "enum": ["monthly", "yearly"],
-          "type": "string"
+          "type": "union",
+          "refs": [
+            "network.attested.payment.initiate#namedInterval",
+            "network.attested.payment.initiate#customInterval"
+          ]
         },
         "status": {
-          "description": "Subscription status",
+          "type": "string",
           "maxLength": 64,
-          "enum": ["pending", "active", "past_due", "cancelled", "expired"],
-          "type": "string"
+          "knownValues": [
+            "pending",
+            "active",
+            "past_due",
+            "cancelled",
+            "expired"
+          ]
         },
         "billingStartDate": {
-          "description": "First billing period, can be used to determine recurrence",
-          "format": "datetime",
-          "type": "string"
+          "type": "string",
+          "format": "datetime"
         },
         "renewalDate": {
-          "description": "Next scheduled renewal/billing date. Server-derived from the billing schedule; not stored in PDS. Omitted when not applicable (e.g. cancelled or unauthenticated views).",
+          "type": "string",
           "format": "datetime",
-          "type": "string"
+          "description": "Next scheduled renewal/billing date. Server-derived from the billing schedule; not stored on the record."
         },
         "cancelledAt": {
-          "description": "Cancellation timestamp",
-          "format": "datetime",
-          "type": "string"
+          "type": "string",
+          "format": "datetime"
         },
         "accessUntil": {
-          "description": "Date until which the subscriber retains access after cancellation",
-          "format": "datetime",
-          "type": "string"
+          "type": "string",
+          "format": "datetime"
         },
         "createdAt": {
-          "description": "Creation timestamp",
-          "format": "datetime",
-          "type": "string"
+          "type": "string",
+          "format": "datetime"
+        },
+        "signatures": {
+          "type": "array",
+          "items": {
+            "type": "union",
+            "refs": ["network.attested.signature", "com.atproto.repo.strongRef"]
+          }
+        }
+      }
+    },
+    "userRef": {
+      "type": "object",
+      "description": "Thin wrapper that carries a bare did string for the user being subscribed to. The wire shape is `{ \"$type\": \"com.atiproto.subscription#userRef\", \"did\": \"did:plc:...\" }`; pair with `com.atproto.repo.strongRef` in a `subject` union to express either-or.",
+      "required": ["did"],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did"
         }
       }
     }
-  },
-  "id": "com.atiproto.subscription",
-  "lexicon": 1
+  }
 }

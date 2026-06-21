@@ -1,0 +1,23 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.authReadPublic",
+  "defs": {
+    "main": {
+      "type": "permission-set",
+      "title": "Read Public",
+      "detail": "Public, unauthenticated-equivalent lookups: any user's profile, plus completed-item and active-subscription counters. Read-only; no repo writes.",
+      "permissions": [
+        {
+          "type": "permission",
+          "resource": "rpc",
+          "aud": "*",
+          "lxm": [
+            "com.atiproto.repo.profile.get",
+            "com.atiproto.repo.item.count",
+            "com.atiproto.repo.subscription.count"
+          ]
+        }
+      ]
+    }
+  }
+}

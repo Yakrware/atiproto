@@ -4,19 +4,14 @@
   "defs": {
     "main": {
       "type": "query",
-      "description": "List items sent by the authenticated user",
+      "description": "List items sent by the authenticated user.",
       "parameters": {
         "type": "params",
         "properties": {
           "subject": {
             "type": "string",
-            "format": "did",
-            "description": "Optional: only return items sent to this recipient DID"
-          },
-          "recordUri": {
-            "type": "string",
             "format": "at-uri",
-            "description": "Optional: only return items for this specific record"
+            "description": "Optional. Mirror of the item's `subject` union: pass an at-uri to a specific record (matches items whose `subject` is that record), or pass `at://did:plc:...` (a repo-level at-uri) to match items whose `subject` is a `#userRef` carrying that DID."
           },
           "cursor": {
             "type": "string",

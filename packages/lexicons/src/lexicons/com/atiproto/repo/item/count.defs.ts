@@ -8,12 +8,11 @@ const $nsid = 'com.atiproto.repo.item.count'
 
 export { $nsid }
 
-/** Count active (completed) items. If recordUri is provided, counts items for that record. If subject is provided, counts items received by that DID. If neither is provided, counts items sent by the authenticated user. Optionally filtered by a start/end datetime window. When the authenticated user is the subject/owner of the target, the response also includes the sum of amounts. */
+/** Count active (completed) items. When `record` is provided, counts items targeting that at-uri (either a specific record or, when the at-uri is repo-level like `at://did:plc:...`, all items received by that user). When omitted, counts items sent by the authenticated user. Optionally filtered by a start/end datetime window. When the authenticated caller is the subject/owner of the target (or counting their own sent items), the response also includes the sum of amounts. */
 const main = l.query(
   $nsid,
   l.params({
-    recordUri: l.optional(l.string({ format: 'at-uri' })),
-    subject: l.optional(l.string({ format: 'did' })),
+    record: l.optional(l.string({ format: 'at-uri' })),
     startDate: l.optional(l.string({ format: 'datetime' })),
     endDate: l.optional(l.string({ format: 'datetime' })),
   }),

@@ -4,7 +4,7 @@
   "defs": {
     "main": {
       "type": "procedure",
-      "description": "Update a pending item. Only pending items can be updated.",
+      "description": "Update an item.",
       "input": {
         "encoding": "application/json",
         "schema": {

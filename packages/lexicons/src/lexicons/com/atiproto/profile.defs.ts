@@ -8,46 +8,30 @@ const $nsid = 'com.atiproto.profile'
 
 export { $nsid }
 
-/** A record representing a user's tipping/subscription settings */
 type Main = {
   $type: 'com.atiproto.profile'
 
   /**
-   * Whether user accepts items (default: true)
+   * Whether the user accepts one-time items (default: true).
    */
   acceptsItems?: boolean
 
   /**
-   * Whether user accepts subscriptions (default: true)
+   * Whether the user accepts subscriptions (default: true).
    */
   acceptsSubscriptions?: boolean
-
-  /**
-   * Opt out of payment receipt DMs (default: false)
-   */
-  disableReceiptNotifications?: boolean
-
-  /**
-   * Creation timestamp
-   */
   createdAt: l.DatetimeString
-
-  /**
-   * Last update timestamp
-   */
   updatedAt?: l.DatetimeString
 }
 
 export type { Main }
 
-/** A record representing a user's tipping/subscription settings */
 const main = l.record<'literal:self', Main>(
   'literal:self',
   $nsid,
   l.object({
     acceptsItems: l.optional(l.boolean()),
     acceptsSubscriptions: l.optional(l.boolean()),
-    disableReceiptNotifications: l.optional(l.boolean()),
     createdAt: l.string({ format: 'datetime' }),
     updatedAt: l.optional(l.string({ format: 'datetime' })),
   }),
@@ -68,44 +52,24 @@ export const $assert = /*#__PURE__*/ main.assert.bind(main),
   $validate = /*#__PURE__*/ main.validate.bind(main),
   $safeValidate = /*#__PURE__*/ main.safeValidate.bind(main)
 
-/** View of a user's profile settings for use in API responses */
+/** Profile view for API responses. `brokers` and `acceptingPayments` are server-derived from the user's DID document; they are not stored on the record. */
 type View = {
   $type?: 'com.atiproto.profile#view'
-
-  /**
-   * AT-URI of the profile record
-   */
   uri: l.AtUriString
-
-  /**
-   * Whether user accepts items (default: true)
-   */
   acceptsItems?: boolean
-
-  /**
-   * Whether user accepts subscriptions (default: true)
-   */
   acceptsSubscriptions?: boolean
 
   /**
-   * Opt out of payment receipt DMs (default: false)
+   * True when the user's DID document advertises at least one `PaymentBroker` service entry. For v2, the mere presence of a broker is taken as readiness.
    */
-  disableReceiptNotifications?: boolean
-
-  /**
-   * Creation timestamp
-   */
+  acceptingPayments?: boolean
   createdAt: l.DatetimeString
-
-  /**
-   * Last update timestamp
-   */
   updatedAt?: l.DatetimeString
 }
 
 export type { View }
 
-/** View of a user's profile settings for use in API responses */
+/** Profile view for API responses. `brokers` and `acceptingPayments` are server-derived from the user's DID document; they are not stored on the record. */
 const view = l.typedObject<View>(
   $nsid,
   'view',
@@ -113,7 +77,7 @@ const view = l.typedObject<View>(
     uri: l.string({ format: 'at-uri' }),
     acceptsItems: l.optional(l.boolean()),
     acceptsSubscriptions: l.optional(l.boolean()),
-    disableReceiptNotifications: l.optional(l.boolean()),
+    acceptingPayments: l.optional(l.boolean()),
     createdAt: l.string({ format: 'datetime' }),
     updatedAt: l.optional(l.string({ format: 'datetime' })),
   }),

@@ -4,7 +4,7 @@
   "defs": {
     "main": {
       "type": "procedure",
-      "description": "Cancel an active subscription",
+      "description": "Cancel an active subscription. Should be implemented by broker. May be implemented by PoS to orchestrate with broker.",
       "input": {
         "encoding": "application/json",
         "schema": {
@@ -14,7 +14,7 @@
             "subscriptionUri": {
               "type": "string",
               "format": "at-uri",
-              "description": "AT-URI of the subscription to cancel"
+              "description": "URI of the subscription to cancel."
             },
             "workflow": {
               "type": "ref",
@@ -34,20 +34,14 @@
               "ref": "com.atiproto.actions#outboundWorkflow",
               "description": "Workflow envelope. When present, the agent runs the actions and calls back. When absent, this is the final native result."
             },
-            "subscriptionUri": {
-              "type": "string",
-              "format": "at-uri",
-              "description": "URI of the updated subscription record"
-            },
             "subscription": {
               "type": "ref",
-              "ref": "com.atiproto.subscription#view",
-              "description": "Updated subscription record"
+              "ref": "com.atiproto.subscription#view"
             },
             "accessUntil": {
               "type": "string",
               "format": "datetime",
-              "description": "Timestamp when access expires"
+              "description": "Timestamp when access expires."
             }
           }
         }

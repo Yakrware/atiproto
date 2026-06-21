@@ -11,22 +11,21 @@ const $nsid = 'com.atiproto.recipient.payment.cart.get'
 
 export { $nsid }
 
-/** Get a cart that pays the authenticated user — a cart whose items target this user. Look up by cart URI, by a contained item record URI, or by a contained subscription record URI. One of `uri`, `itemUri`, or `subscriptionUri` is required. */
+/** Hydrate an incoming cart by uri (a cart whose items target the authenticated user). Includes the resolved item and subscription records that target this user. */
 const main = l.query(
   $nsid,
-  l.params({
-    uri: l.optional(l.string({ format: 'at-uri' })),
-    itemUri: l.optional(l.string({ format: 'at-uri' })),
-    subscriptionUri: l.optional(l.string({ format: 'at-uri' })),
-  }),
+  l.params({ uri: l.string({ format: 'at-uri' }) }),
   l.jsonPayload({
-    uri: l.string({ format: 'at-uri' }),
-    cid: l.optional(l.string({ format: 'cid' })),
     cart: l.ref<AtiprotoCart.View>((() => AtiprotoCart.view) as any),
-    items: l.array(l.ref<AtiprotoItem.View>((() => AtiprotoItem.view) as any)),
-    subscriptions: l.array(
-      l.ref<AtiprotoSubscription.View>(
-        (() => AtiprotoSubscription.view) as any,
+    items: l.array(
+      l.typedUnion(
+        [
+          l.typedRef<AtiprotoItem.View>((() => AtiprotoItem.view) as any),
+          l.typedRef<AtiprotoSubscription.View>(
+            (() => AtiprotoSubscription.view) as any,
+          ),
+        ],
+        false,
       ),
     ),
   }),

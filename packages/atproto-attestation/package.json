@@ -1,0 +1,48 @@
+{
+  "name": "@atiproto/atproto-attestation",
+  "version": "0.1.0",
+  "description": "ATProto record attestation: sign and verify records using did:key signatures over a DAG-CBOR CID",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup && tsc --emitDeclarationOnly --declaration",
+    "prepack": "npm run build",
+    "test": "vitest run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Yakrware/atiproto.git",
+    "directory": "packages/atproto-attestation"
+  },
+  "homepage": "https://atiproto.com/docs/atproto-attestation",
+  "bugs": "https://github.com/Yakrware/atiproto/issues",
+  "license": "MIT",
+  "publishConfig": {
+    "tag": "beta",
+    "access": "public"
+  },
+  "dependencies": {
+    "@ipld/dag-cbor": "^9.2.1",
+    "@noble/curves": "^1.6.0",
+    "@noble/hashes": "^1.5.0",
+    "multiformats": "^13.3.1"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^4.1.4",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.2",
+    "vitest": "^4.1.2"
+  }
+}

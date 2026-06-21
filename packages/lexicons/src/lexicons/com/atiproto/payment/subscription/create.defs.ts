@@ -3,26 +3,45 @@
  */
 
 import { l } from '@atproto/lex'
-import * as AtiprotoActions from '../../actions.defs.js'
+import * as RepoStrongRef from '../../../atproto/repo/strongRef.defs.js'
 import * as AtiprotoSubscription from '../../subscription.defs.js'
-import * as AtiprotoCart from '../../cart.defs.js'
+import * as PaymentInitiate from '../../../../network/attested/payment/initiate.defs.js'
+import * as AtiprotoActions from '../../actions.defs.js'
 
 const $nsid = 'com.atiproto.payment.subscription.create'
 
 export { $nsid }
 
-/** Create a subscription to a user. Returns a one-off cart with checkout URL. */
+/** Create a subscription. */
 const main = l.procedure(
   $nsid,
   l.params(),
   l.jsonPayload({
-    subject: l.string({ format: 'did' }),
-    amount: l.optional(l.integer()),
-    currency: l.string({ maxLength: 3 }),
-    interval: l.enum(['monthly', 'yearly']),
+    subject: l.typedUnion(
+      [
+        l.typedRef<RepoStrongRef.Main>((() => RepoStrongRef.main) as any),
+        l.typedRef<AtiprotoSubscription.UserRef>(
+          (() => AtiprotoSubscription.userRef) as any,
+        ),
+      ],
+      false,
+    ),
+    amount: l.optional(l.integer({ minimum: 0 })),
+    currency: l.optional(l.string({ maxLength: 3 })),
+    interval: l.typedUnion(
+      [
+        l.typedRef<PaymentInitiate.NamedInterval>(
+          (() => PaymentInitiate.namedInterval) as any,
+        ),
+        l.typedRef<PaymentInitiate.CustomInterval>(
+          (() => PaymentInitiate.customInterval) as any,
+        ),
+      ],
+      false,
+    ),
+    billingStartDate: l.optional(l.string({ format: 'datetime' })),
+    private: l.optional(l.boolean()),
     cartUri: l.optional(l.string({ format: 'at-uri' })),
-    redirectUrl: l.optional(l.string({ format: 'uri' })),
-    isPrivate: l.optional(l.boolean()),
     workflow: l.optional(
       l.ref<AtiprotoActions.InboundWorkflow>(
         (() => AtiprotoActions.inboundWorkflow) as any,
@@ -35,17 +54,9 @@ const main = l.procedure(
         (() => AtiprotoActions.outboundWorkflow) as any,
       ),
     ),
-    subscriptionUri: l.optional(l.string({ format: 'at-uri' })),
-    subscription: l.optional(
-      l.ref<AtiprotoSubscription.View>(
-        (() => AtiprotoSubscription.view) as any,
-      ),
+    subscription: l.ref<AtiprotoSubscription.View>(
+      (() => AtiprotoSubscription.view) as any,
     ),
-    cartUri: l.optional(l.string({ format: 'at-uri' })),
-    cart: l.optional(
-      l.ref<AtiprotoCart.View>((() => AtiprotoCart.view) as any),
-    ),
-    checkoutUrl: l.optional(l.string({ format: 'uri' })),
   }),
 )
 export { main }

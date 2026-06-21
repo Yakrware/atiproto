@@ -20,13 +20,13 @@ test.describe("Navigation", () => {
     await expect(page.locator("h1")).toContainText("Checkout Flow");
   });
 
-  test("navigates to Stripe Connect via sidebar", async ({ page }) => {
+  test("navigates to Broker Onboarding via sidebar", async ({ page }) => {
     await page.goto("/docs/get-started");
     await page.setViewportSize({ width: 1280, height: 720 });
     const sidebar = page.getByTestId("sidebar-nav");
-    await sidebar.getByRole("link", { name: "Stripe Connect" }).click();
-    await expect(page).toHaveURL(/\/docs\/stripe-connect/);
-    await expect(page.locator("h1")).toContainText("Stripe Connect");
+    await sidebar.getByRole("link", { name: "Broker Onboarding" }).click();
+    await expect(page).toHaveURL(/\/docs\/broker-onboarding/);
+    await expect(page.locator("h1")).toContainText("Broker Onboarding");
   });
 
   test("home link points to /", async ({ page }) => {
@@ -41,7 +41,7 @@ test.describe("Navigation", () => {
     const sidebar = page.getByTestId("sidebar-nav");
     await expect(sidebar.getByText("Get Started")).toBeVisible();
     await expect(sidebar.getByText("Checkout Flow")).toBeVisible();
-    await expect(sidebar.getByText("Stripe Connect")).toBeVisible();
+    await expect(sidebar.getByText("Broker Onboarding")).toBeVisible();
   });
 
   test("returns 404 for unknown routes", async ({ page }) => {

@@ -1,9 +1,9 @@
-import { schemas } from "@atiproto/lexicons";
+import { allSchemas, schemas } from "@atiproto/lexicons";
 
 export interface NavItem {
   label: string;
   href?: string;
-  type?: "query" | "procedure" | "record" | "permission-set";
+  type?: "query" | "procedure" | "record" | "permission-set" | "object";
   children?: NavItem[];
 }
 
@@ -11,11 +11,34 @@ export interface SearchEntry {
   nsid: string;
   description: string;
   type: string;
+  authority: "com.atiproto" | "network.attested";
 }
 
-const PREFIX = "com.atiproto.";
+const PREFIXES = ["com.atiproto.", "network.attested."] as const;
 
-function getMainDef(schema: (typeof schemas)[number]) {
+// Schemas pulled from upstream authorities purely as build-time refs
+// (e.g. `com.atproto.repo.strongRef` via `goat lex pull`). Not part of our
+// documented surface; the docs hide them.
+function isVendoredDependency(nsid: string): boolean {
+  return (
+    !nsid.startsWith("com.atiproto.") && !nsid.startsWith("network.attested.")
+  );
+}
+
+function stripPrefix(nsid: string): string {
+  for (const p of PREFIXES) {
+    if (nsid.startsWith(p)) return nsid.slice(p.length);
+  }
+  return nsid;
+}
+
+function getAuthority(nsid: string): "com.atiproto" | "network.attested" {
+  return nsid.startsWith("network.attested.")
+    ? "network.attested"
+    : "com.atiproto";
+}
+
+function getMainDef(schema: (typeof allSchemas)[number]) {
   return schema.defs?.main as Record<string, unknown> | undefined;
 }
 
@@ -31,12 +54,73 @@ export function buildNavTree(): NavItem[] {
   const guides: NavItem[] = [
     { label: "Get Started", href: "/docs/get-started" },
     { label: "Checkout Flow", href: "/docs/checkout" },
-    { label: "Stripe Connect", href: "/docs/stripe-connect" },
+    { label: "Broker Onboarding", href: "/docs/broker-onboarding" },
     { label: "Edge OAuth Client", href: "/docs/edge-oauth" },
-    { label: "Permission Sets", href: "/docs/permission-sets" },
   ];
 
-  const edgePackages: NavItem[] = [
+  const packages: NavItem[] = [
+    {
+      label: "agent",
+      children: [
+        { label: "Get Started", href: "/docs/agent" },
+        { label: "com.appendBroker", href: "/docs/agent/appendBroker" },
+      ],
+    },
+    {
+      label: "atproto-attestation",
+      children: [
+        { label: "Get Started", href: "/docs/atproto-attestation" },
+        {
+          label: "Attestation",
+          href: "/docs/atproto-attestation/Attestation",
+        },
+        { label: "verify", href: "/docs/atproto-attestation/verify" },
+        {
+          label: "KeyResolver & RecordResolver",
+          href: "/docs/atproto-attestation/resolvers",
+        },
+        {
+          label: "did:key utilities",
+          href: "/docs/atproto-attestation/keys",
+        },
+      ],
+    },
+    {
+      label: "key-resolver",
+      children: [
+        { label: "Get Started", href: "/docs/key-resolver" },
+        {
+          label: "createDidKeyResolver",
+          href: "/docs/key-resolver/createDidKeyResolver",
+        },
+        {
+          label: "createFetchKeyResolver",
+          href: "/docs/key-resolver/createFetchKeyResolver",
+        },
+        {
+          label: "createCachedKeyResolver",
+          href: "/docs/key-resolver/createCachedKeyResolver",
+        },
+      ],
+    },
+    {
+      label: "record-resolver",
+      children: [
+        { label: "Get Started", href: "/docs/record-resolver" },
+        {
+          label: "createFetchRecordResolver",
+          href: "/docs/record-resolver/createFetchRecordResolver",
+        },
+        {
+          label: "createAgentRecordResolver",
+          href: "/docs/record-resolver/createAgentRecordResolver",
+        },
+        {
+          label: "createCachedRecordResolver",
+          href: "/docs/record-resolver/createCachedRecordResolver",
+        },
+      ],
+    },
     {
       label: "edge-oauth-client",
       children: [
@@ -126,23 +210,49 @@ export function buildNavTree(): NavItem[] {
 
   const records: NavItem[] = [];
   const permissionSets: NavItem[] = [];
-  const namespaceMap = new Map<string, NavItem[]>();
+  // Group methods by namespace, but keep the two authorities separate so the
+  // nav reflects that `network.attested.*` is an upstream protocol vocabulary,
+  // not part of our PoS surface.
+  const apiNamespaceMap = new Map<string, NavItem[]>();
+  const attestedNamespaceMap = new Map<string, NavItem[]>();
+  const attestedRecords: NavItem[] = [];
+  const objectDefs: NavItem[] = [];
+  const attestedObjectDefs: NavItem[] = [];
 
-  for (const schema of schemas) {
+  for (const schema of allSchemas) {
+    if (isVendoredDependency(schema.id)) continue;
     const def = getMainDef(schema);
     if (!def) continue;
 
     const type = getType(def);
-    const shortId = schema.id.startsWith(PREFIX)
-      ? schema.id.slice(PREFIX.length)
-      : schema.id;
+    const shortId = stripPrefix(schema.id);
+    const authority = getAuthority(schema.id);
 
     if (type === "record") {
-      records.push({
+      const entry: NavItem = {
         label: shortId,
         href: `/docs/lexicon/${schema.id}`,
         type: "record",
-      });
+      };
+      if (authority === "network.attested") {
+        attestedRecords.push(entry);
+      } else {
+        records.push(entry);
+      }
+      continue;
+    }
+
+    if (type === "object") {
+      const entry: NavItem = {
+        label: shortId,
+        href: `/docs/lexicon/${schema.id}`,
+        type: "object",
+      };
+      if (authority === "network.attested") {
+        attestedObjectDefs.push(entry);
+      } else {
+        objectDefs.push(entry);
+      }
       continue;
     }
 
@@ -156,55 +266,106 @@ export function buildNavTree(): NavItem[] {
       continue;
     }
 
+    if (type !== "query" && type !== "procedure") continue;
+
     const parts = shortId.split(".");
     const method = parts.pop()!;
-    const ns = parts.join(".");
+    const ns = parts.join(".") || "(root)";
+    const map =
+      authority === "network.attested" ? attestedNamespaceMap : apiNamespaceMap;
 
-    if (!namespaceMap.has(ns)) {
-      namespaceMap.set(ns, []);
-    }
-    namespaceMap.get(ns)!.push({
+    if (!map.has(ns)) map.set(ns, []);
+    map.get(ns)!.push({
       label: method,
       href: `/docs/lexicon/${schema.id}`,
       type: type as "query" | "procedure",
     });
   }
 
-  const apiGroups: NavItem[] = Array.from(namespaceMap.entries())
+  const apiGroups: NavItem[] = Array.from(apiNamespaceMap.entries())
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([ns, children]) => ({
       label: ns,
       children: children.sort((a, b) => a.label.localeCompare(b.label)),
     }));
 
-  return [
+  const attestedApiGroups: NavItem[] = Array.from(
+    attestedNamespaceMap.entries(),
+  )
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([ns, children]) => ({
+      label: ns,
+      children: children.sort((a, b) => a.label.localeCompare(b.label)),
+    }));
+
+  const attestedChildren: NavItem[] = [];
+  if (attestedRecords.length > 0) {
+    attestedChildren.push({
+      label: "Records",
+      children: attestedRecords.sort((a, b) => a.label.localeCompare(b.label)),
+    });
+  }
+  if (attestedObjectDefs.length > 0) {
+    attestedChildren.push({
+      label: "Types",
+      children: attestedObjectDefs.sort((a, b) =>
+        a.label.localeCompare(b.label),
+      ),
+    });
+  }
+  attestedChildren.push(...attestedApiGroups);
+
+  const tree: NavItem[] = [
     { label: "Guides", children: guides },
-    { label: "Edge OAuth Packages", children: edgePackages },
+    { label: "Packages", children: packages },
     {
       label: "Record Types",
       children: records.sort((a, b) => a.label.localeCompare(b.label)),
     },
+  ];
+
+  if (objectDefs.length > 0) {
+    tree.push({
+      label: "Types",
+      children: objectDefs.sort((a, b) => a.label.localeCompare(b.label)),
+    });
+  }
+
+  tree.push(
     {
       label: "Permission Sets",
       children: permissionSets.sort((a, b) => a.label.localeCompare(b.label)),
     },
     { label: "API Reference", children: apiGroups },
-  ];
+  );
+
+  if (attestedChildren.length > 0) {
+    tree.push({
+      label: "network.attested",
+      children: attestedChildren,
+    });
+  }
+
+  return tree;
 }
 
 export function buildSearchIndex(): SearchEntry[] {
-  return schemas.map((schema) => {
-    const def = getMainDef(schema);
-    return {
-      nsid: schema.id,
-      description: def ? getDescription(def) : "",
-      type: def ? getType(def) : "unknown",
-    };
-  });
+  return allSchemas
+    .filter((schema) => !isVendoredDependency(schema.id))
+    .map((schema) => {
+      const def = getMainDef(schema);
+      return {
+        nsid: schema.id,
+        description: def ? getDescription(def) : "",
+        type: def ? getType(def) : "unknown",
+        authority: getAuthority(schema.id),
+      };
+    });
 }
 
 export function computeVersion(): string {
-  const ids = schemas
+  const ids = allSchemas
+    .filter((s) => !isVendoredDependency(s.id))
     .map((s) => s.id)
     .sort()
     .join(",");
@@ -216,7 +377,7 @@ export function computeVersion(): string {
 }
 
 export function findSchema(nsid: string) {
-  return schemas.find((s) => s.id === nsid) ?? null;
+  return allSchemas.find((s) => s.id === nsid) ?? null;
 }
 
-export { schemas };
+export { allSchemas, schemas };

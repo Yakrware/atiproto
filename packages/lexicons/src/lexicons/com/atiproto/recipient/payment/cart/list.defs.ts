@@ -9,19 +9,36 @@ const $nsid = 'com.atiproto.recipient.payment.cart.list'
 
 export { $nsid }
 
-/** List carts whose items pay the authenticated user — i.e. carts targeting this user as a payment recipient. Read-only, no PDS writes. */
+/** List carts whose items pay the authenticated user (carts targeting this user as a payment recipient). Read-only, no PDS writes. */
 const main = l.query(
   $nsid,
   l.params({
     sender: l.optional(l.string({ format: 'did' })),
-    status: l.optional(l.enum(['open', 'completed', 'expired', 'abandoned'])),
+    status: l.optional(
+      l.string<{
+        maxLength: 64
+        knownValues: [
+          'open',
+          'expired',
+          'abandoned',
+          'pending',
+          'completed',
+          'failed',
+          'refunded',
+          'cancelled',
+          'fulfilled',
+        ]
+      }>({ maxLength: 64 }),
+    ),
+    startDate: l.optional(l.string({ format: 'datetime' })),
+    endDate: l.optional(l.string({ format: 'datetime' })),
     cursor: l.optional(l.string({ maxLength: 512 })),
     limit: l.optional(
       l.withDefault(l.integer({ minimum: 1, maximum: 100 }), 20),
     ),
   }),
   l.jsonPayload({
-    carts: l.array(l.ref<CartResponse>((() => cartResponse) as any)),
+    carts: l.array(l.ref<AtiprotoCart.View>((() => AtiprotoCart.view) as any)),
     cursor: l.optional(l.string({ maxLength: 512 })),
   }),
 )
@@ -37,32 +54,3 @@ export type $OutputBody<B = l.BinaryData> = l.InferMethodOutputBody<
 export const $lxm = main.nsid,
   $params = main.parameters,
   $output = main.output
-
-type CartResponse = {
-  $type?: 'com.atiproto.recipient.payment.cart.list#cartResponse'
-
-  /**
-   * AT-URI of the cart record
-   */
-  uri: l.AtUriString
-
-  /**
-   * CID of the cart record
-   */
-  cid: l.CidString
-  record: AtiprotoCart.View
-}
-
-export type { CartResponse }
-
-const cartResponse = l.typedObject<CartResponse>(
-  $nsid,
-  'cartResponse',
-  l.object({
-    uri: l.string({ format: 'at-uri' }),
-    cid: l.string({ format: 'cid' }),
-    record: l.ref<AtiprotoCart.View>((() => AtiprotoCart.view) as any),
-  }),
-)
-
-export { cartResponse }

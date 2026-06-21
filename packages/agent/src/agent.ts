@@ -9,6 +9,10 @@ import {
   type XRPCResponse,
 } from "@atproto/xrpc";
 import { schemas } from "@atiproto/lexicons";
+import {
+  Attestation,
+  type AttestationOptions,
+} from "@atiproto/atproto-attestation";
 import { ComNS } from "./namespaces/com.js";
 import {
   WORKFLOW_FIELD,
@@ -35,8 +39,8 @@ const DEFAULT_MAX_WORKFLOW_STEPS = 10;
  * Agent we use its `withProxy` clone (so labelers + auth headers compose
  * correctly); otherwise we inject the header by hand.
  *
- * Exported so other packages — and `prepChatForReceipts` — can build
- * audience-pinned handlers from any `XrpcClient`.
+ * Exported so other packages can build audience-pinned handlers from any
+ * `XrpcClient`.
  */
 export function createFetchHandler(
   client: XrpcClient,
@@ -74,6 +78,15 @@ export interface AgentOptions {
    * steps (N) for <nsid>")`.
    */
   maxWorkflowSteps?: number;
+
+  /**
+   * Optional attestation used to sign records the agent writes on the
+   * user's behalf. Accept either a pre-built `Attestation` or the options
+   * to construct one. When set, create / update workflow actions targeting
+   * collections in `SIGNED_RECORD_COLLECTIONS` get an inline signature
+   * appended to `signatures[]` before being sent to the PDS.
+   */
+  attestation?: Attestation | AttestationOptions;
 }
 
 /**
@@ -103,6 +116,7 @@ export interface AgentOptions {
  */
 class AgentImpl<TClient extends XrpcClient = ApiAgent> extends XrpcClient {
   com: ComNS & ComOf<TClient>;
+  readonly attestation?: Attestation;
   private readonly _maxWorkflowSteps: number;
 
   // The override is assigned in the constructor (bound version of _call);
@@ -116,7 +130,10 @@ class AgentImpl<TClient extends XrpcClient = ApiAgent> extends XrpcClient {
   );
   constructor(
     options: SessionManager | XrpcClient | FetchHandler | FetchHandlerOptions,
-    { maxWorkflowSteps = DEFAULT_MAX_WORKFLOW_STEPS }: AgentOptions = {},
+    {
+      maxWorkflowSteps = DEFAULT_MAX_WORKFLOW_STEPS,
+      attestation,
+    }: AgentOptions = {},
   ) {
     const client =
       options instanceof XrpcClient ? options : new ApiAgent(options);
@@ -124,6 +141,10 @@ class AgentImpl<TClient extends XrpcClient = ApiAgent> extends XrpcClient {
     super(createFetchHandler(client, SERVICE_TYPE, SERVICE_DID), schemas);
 
     this._maxWorkflowSteps = maxWorkflowSteps;
+    this.attestation =
+      attestation instanceof Attestation
+        ? attestation
+        : attestation && new Attestation(attestation);
     this.com = new ComNS(this, client) as ComNS & ComOf<TClient>;
 
     // Same closure-capture pattern as the Proxy below — keep `client` and
@@ -169,7 +190,11 @@ class AgentImpl<TClient extends XrpcClient = ApiAgent> extends XrpcClient {
       }
 
       try {
-        const responses = await runActions(client, workflow.actions);
+        const responses = await runActions(
+          client,
+          workflow.actions,
+          this.attestation,
+        );
         if (isQuery) {
           workflow = undefined;
           break;
@@ -226,8 +251,7 @@ class AgentImpl<TClient extends XrpcClient = ApiAgent> extends XrpcClient {
  * to the underlying `TClient`, so structurally an `Agent<TClient>` *is* a
  * `TClient` too — `agent.withProxy(...)`, `agent.chat.bsky.*`, etc. all
  * work at runtime. The intersection here lets TypeScript accept an
- * `Agent<ApiAgent>` wherever an `ApiAgent` is required (e.g. when calling
- * `prepChatForReceipts`).
+ * `Agent<ApiAgent>` wherever an `ApiAgent` is required.
  */
 export type Agent<TClient extends XrpcClient = ApiAgent> = AgentImpl<TClient> &
   TClient;

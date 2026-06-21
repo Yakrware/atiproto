@@ -1,0 +1,59 @@
+{
+  "lexicon": 1,
+  "id": "network.attested.verify",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Verify signatures on a signed record (`network.attested.payment`, `network.attested.entitlement`, or any `com.atiproto.*` record using the same scheme). Open to any caller. Implemented by both brokers (over their `network.attested.payment` records) and the PoS (over its own records). To retrieve hydrated payment details, call `network.attested.payment.status`, which auto-fills private fields when the caller is a signing party.",
+      "parameters": {
+        "type": "params",
+        "required": ["uri"],
+        "properties": {
+          "uri": {
+            "type": "string",
+            "format": "at-uri",
+            "description": "URI of the record to verify."
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["uri", "valid", "signatures"],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "format": "at-uri"
+            },
+            "cid": {
+              "type": "string",
+              "format": "cid",
+              "description": "CID of the record at verification time."
+            },
+            "valid": {
+              "type": "boolean",
+              "description": "True when every signature in `signatures` validates against the canonical signing payload."
+            },
+            "signatures": {
+              "type": "array",
+              "items": {
+                "type": "union",
+                "refs": [
+                  "network.attested.signature",
+                  "com.atproto.repo.strongRef"
+                ]
+              },
+              "description": "Verified signatures from the record. Each entry is either an inline `network.attested.signature` or a `com.atproto.repo.strongRef` to a remote `network.attested.proof` record."
+            },
+            "workflow": {
+              "type": "ref",
+              "ref": "com.atiproto.actions#outboundWorkflow",
+              "description": "Optional. Present when cross-layer verification requires the agent to call the other party (e.g. PoS verifying a cart wants the broker's payment status)."
+            }
+          }
+        }
+      }
+    }
+  }
+}

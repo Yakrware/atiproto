@@ -91,6 +91,24 @@ export function CodeExample({
   outputSchema,
   recordSchema,
 }: CodeExampleProps) {
+  // `network.attested.*` is a shared protocol vocabulary; @atiproto/agent
+  // does not currently expose those endpoints as namespaced methods. Skip
+  // the auto-generated usage example in that case (the surface is documented
+  // in plain prose in the lexicon detail above).
+  if (nsid.startsWith("network.attested.")) {
+    return (
+      <section className="mt-6">
+        <h3 className="text-lg font-semibold mb-3">Usage</h3>
+        <p className="text-sm text-text-muted dark:text-text-muted-dark">
+          This endpoint is part of the shared <code>network.attested</code>{" "}
+          protocol vocabulary. Call it via a standard <code>XrpcClient</code>{" "}
+          until <code>@atiproto/agent</code> exposes a dedicated namespace for
+          it.
+        </p>
+      </section>
+    );
+  }
+
   const agentPath = nsid
     .replace(/^com\./, "")
     .split(".")

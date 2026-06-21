@@ -1,0 +1,27 @@
+{
+  "lexicon": 1,
+  "id": "com.atiproto.authReadRecipient",
+  "defs": {
+    "main": {
+      "type": "permission-set",
+      "title": "Read Recipient",
+      "detail": "Read access to the authenticated user's incoming carts, items, and subscriptions, plus their own profile. Read-only; no repo writes. Public profile lookup and item / subscription counts live in `com.atiproto.authReadPublic`.",
+      "permissions": [
+        {
+          "type": "permission",
+          "resource": "rpc",
+          "aud": "*",
+          "lxm": [
+            "com.atiproto.recipient.payment.cart.get",
+            "com.atiproto.recipient.payment.cart.list",
+            "com.atiproto.recipient.payment.item.get",
+            "com.atiproto.recipient.payment.item.list",
+            "com.atiproto.recipient.payment.subscription.get",
+            "com.atiproto.recipient.payment.subscription.list",
+            "com.atiproto.recipient.profile.get"
+          ]
+        }
+      ]
+    }
+  }
+}

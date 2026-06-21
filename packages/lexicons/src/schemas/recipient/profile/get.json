@@ -4,37 +4,71 @@
   "defs": {
     "main": {
       "type": "query",
-      "description": "Get the authenticated user's profile settings. Returns defaults if no profile exists.",
+      "description": "Get the authenticated user's payment-related state. The PoS variant returns the user's profile and their broker list (the same list `repo.profile.get` would surface). The broker variant returns a `brokerView` describing this user's onboarding state with that broker plus a fresh onboarding link.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "redirectUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Optional. URL the broker embeds in the returned `onboardingUrl` so the user is sent back here after completing (or cancelling) onboarding. Brokers should honor this when their hosted flow supports a return URL; ignored by the PoS variant."
+          }
+        }
+      },
       "output": {
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": ["profile", "hasProfile", "readyForPayment"],
           "properties": {
-            "uri": {
-              "type": "string",
-              "format": "at-uri",
-              "description": "Profile record URI (absent if no profile configured)"
-            },
-            "cid": {
-              "type": "string",
-              "format": "cid",
-              "description": "Profile record CID (absent if no profile configured)"
-            },
             "profile": {
               "type": "ref",
               "ref": "com.atiproto.profile#view",
-              "description": "The profile record data (defaults if not configured)"
+              "description": "The user's profile view. Present only when the responder is a PoS (not a broker)."
             },
-            "hasProfile": {
-              "type": "boolean",
-              "description": "Whether the user has saved a profile record"
+            "brokers": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "did"
+              },
+              "description": "Ordered list of broker DIDs from the user's DID document, identical to the array returned by `repo.profile.get`. Present only when the responder is a PoS."
             },
-            "readyForPayment": {
-              "type": "boolean",
-              "description": "Whether the user's payment account is set up and enabled"
+            "broker": {
+              "type": "ref",
+              "ref": "#brokerView",
+              "description": "Broker-side view: the broker DID, this user's account status with that broker, and a fresh onboarding link. Present only when the responder is a broker."
             }
           }
+        }
+      }
+    },
+    "brokerView": {
+      "type": "object",
+      "description": "Broker-side view of the authed user's account. Returned only when `recipient.profile.get` is called on a broker (rather than a PoS).",
+      "required": ["did", "status"],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did",
+          "description": "DID of the broker answering the request."
+        },
+        "status": {
+          "type": "string",
+          "maxLength": 64,
+          "knownValues": [
+            "none",
+            "pending",
+            "needs_info",
+            "ready",
+            "restricted",
+            "disabled"
+          ],
+          "description": "Broker-defined onboarding state for the authed user. `ready` means the user can receive payouts; the other values indicate where onboarding is and whether action is needed."
+        },
+        "onboardingUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "Optional. Fresh broker-hosted onboarding link. Clients should redirect the user here to complete (or update) their account. When `redirectUrl` was supplied on the request, the broker embeds it so the user lands back at the caller after onboarding."
         }
       }
     }

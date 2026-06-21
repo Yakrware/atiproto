@@ -1,6 +1,6 @@
 {
   "name": "@atiproto/lexicons",
-  "version": "1.1.0",
+  "version": "2.0.0-beta.1",
   "description": "ATProto lexicon types and utilities",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -17,7 +17,7 @@
     "dist"
   ],
   "scripts": {
-    "build:lexicons": "lex build --lexicons ./src/schemas --out ./src/lexicons --clear --indexFile",
+    "build:lexicons": "node ./scripts/build-lexicons.mjs",
     "build": "npm run build:lexicons && tsup && tsc --emitDeclarationOnly --declaration --composite false --incremental false",
     "prepack": "npm run build",
     "test": "echo \"No tests yet\" && exit 0"
@@ -30,6 +30,10 @@
   "homepage": "https://atiproto.com/docs/lexicon",
   "bugs": "https://github.com/Yakrware/atiproto/issues",
   "license": "MIT",
+  "publishConfig": {
+    "tag": "beta",
+    "access": "public"
+  },
   "dependencies": {
     "@atproto/lex": "^0.0.23"
   },
